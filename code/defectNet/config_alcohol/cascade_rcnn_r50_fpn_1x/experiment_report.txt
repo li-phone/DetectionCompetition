@@ -1,0 +1,47 @@
+
+
+-------------------------- Experiment Report ----------------------
+trick_name                  score       on
+baseline                    xx.xx       V
+iou_cluster                 xx.xx       V
+iou_decrease                xx.xx       V
+iou_increase                xx.xx       V
+anchor_cluster              xx.xx       V
+focal_loss                  xx.xx       V
+4_stage                     xx.xx       V
+label_weight                xx.xx       V
+box_weight                  xx.xx       V
+dig_augment_n1(flip)        0.64226       V
+dig_augment_n1_no_overlap   xx.xx       V
+score:                      -----       X
+
+
+-------------------------- dig_augment(n=1)(flip) ----------------------
+C:\Users\LiFeng\Anaconda3\envs\uselessNet\python.exe C:/Users/LiFeng/undone-work/uselessNet/code/mmdetection/tools/coco_eval.py
+loading annotations into memory...
+Done (t=0.17s)
+creating index...
+index created!
+Loading and preparing results...
+DONE (t=0.44s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *bbox*
+DONE (t=10.87s).
+Accumulating evaluation results...
+DONE (t=2.14s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.667
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.836
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.726
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.691
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.542
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.607
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.366
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.709
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.712
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.729
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.621
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.650
+
+Process finished with exit code 0
