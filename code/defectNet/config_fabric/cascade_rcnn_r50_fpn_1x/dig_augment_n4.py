@@ -102,9 +102,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.2138794,
-                neg_iou_thr=0.2138794,
-                min_pos_iou=0.2138794,
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -117,9 +117,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.54407745,
-                neg_iou_thr=0.54407745,
-                min_pos_iou=0.54407745,
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -132,9 +132,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.78370548,
-                neg_iou_thr=0.78370548,
-                min_pos_iou=0.78370548,
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -191,18 +191,18 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
-        img_prefix=data_root + '/train/',
+        ann_file=data_root + '/annotations/instances_20191223_dig_augment_n4.json',
+        img_prefix=data_root + '/dig_augment_n4/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
-        img_prefix=data_root + '/train/',
+        ann_file=data_root + '/annotations/instances_20191223_dig_augment_n4.json',
+        img_prefix=data_root + '/dig_augment_n4/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
-        img_prefix=data_root + '/train/',
+        ann_file=data_root + '/annotations/instances_20191223_dig_augment_n4.json',
+        img_prefix=data_root + '/dig_augment_n4/',
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -224,11 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/iou_cluster'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/dig_augment_n4'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

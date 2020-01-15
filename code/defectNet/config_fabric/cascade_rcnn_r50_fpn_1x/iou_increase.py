@@ -102,9 +102,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.5,
-                neg_iou_thr=0.5,
-                min_pos_iou=0.5,
+                pos_iou_thr=0.55,
+                neg_iou_thr=0.55,
+                min_pos_iou=0.55,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -117,9 +117,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.6,
-                neg_iou_thr=0.6,
-                min_pos_iou=0.6,
+                pos_iou_thr=0.65,
+                neg_iou_thr=0.65,
+                min_pos_iou=0.65,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -132,9 +132,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.7,
-                neg_iou_thr=0.7,
-                min_pos_iou=0.7,
+                pos_iou_thr=0.75,
+                neg_iou_thr=0.75,
+                min_pos_iou=0.75,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -158,7 +158,7 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = r'E:\liphone\data\images\detections\alcohol'
+data_root = '/home/liphone/undone-work/data/detection/alcohol'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -191,18 +191,18 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -224,11 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/dig_augment_n1'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/iou_increase'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

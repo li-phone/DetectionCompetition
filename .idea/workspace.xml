@@ -2,8 +2,51 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="362f427e-636b-4f88-861a-9f7dd2e0ff39" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/code/auto_login.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/geckodriver.log" beforeDir="false" afterPath="$PROJECT_DIR$/.ignores" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/annjson2coco.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/boxes_features_analysis.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/check_coco.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/coco2yolo.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/download_dataset.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/draw_util.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/list2coco.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/rename.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/coco_utils/split_coco.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/4_stage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/anchor_cluster.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/baseline.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/box_weight.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/dig_augment_n1.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/experiment_report.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/focal_loss.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/iou_cluster.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/iou_decrease.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/iou_increase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code/defectNet/config_fabric/cascade_rcnn_r50_fpn_1x/label_weight.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/4_stage.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/anchor_cluster.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/baseline.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/box_weight.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1_no_overlap.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/experiment_report.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/focal_loss.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/iou_cluster.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/iou_decrease.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/iou_increase.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/label_weight.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/cascade_rcnn_r50_fpn_1x_alcohol.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/cascade_rcnn_r50_fpn_1x_alcohol2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/cascade_rcnn_r50_fpn_1x_alcohol_unfreeze.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/cascade_rcnn_r50_fpn_1x_alcohol_v3.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/cascade_rcnn_r50_fpn_1x_cervical.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/faster_rcnn_r50_fpn_1x_cervical.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/old/retinanet_r101_fpn_1x_alcohol.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/core/bbox/bbox_target.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/mmdet/core/bbox/bbox_target.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/preprocess/data_cluster.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/preprocess/data_cluster.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/batch_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/utilities/batch_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/infer.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/utilities/infer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/utilities/train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,11 +56,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.ignores">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/code/coco_utils/annjson2coco.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="1" selection-start-line="1" selection-end-line="1" />
+            <state relative-caret-position="133">
+              <caret line="31" column="20" lean-forward="true" selection-start-line="31" selection-start-column="20" selection-end-line="31" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/code/coco_utils/split_coco.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-19">
+              <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -48,14 +106,17 @@
         <option value="$PROJECT_DIR$/code/a.py" />
         <option value="$PROJECT_DIR$/g.sh" />
         <option value="$PROJECT_DIR$/.ignores" />
+        <option value="$PROJECT_DIR$/code/toolboxs/fabric2coco.py" />
+        <option value="$PROJECT_DIR$/code/coco_utils/annjson2coco.py" />
+        <option value="$PROJECT_DIR$/code/coco_utils/split_coco.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-450" />
-    <option name="y" value="155" />
-    <option name="width" value="2425" />
-    <option name="height" value="1375" />
+    <option name="x" value="-10" />
+    <option name="y" value="-10" />
+    <option name="width" value="1940" />
+    <option name="height" value="1100" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -76,6 +137,12 @@
               <item name="defectNet" type="462c0819:PsiDirectoryNode" />
               <item name="code" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="DefectNet" type="b2602c69:ProjectViewProjectNode" />
+              <item name="defectNet" type="462c0819:PsiDirectoryNode" />
+              <item name="code" type="462c0819:PsiDirectoryNode" />
+              <item name="coco_utils" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -85,9 +152,17 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/code/DefectNet/dataset" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\home\undone-work\master-graduate\参考文献\ReadingNote\文档\目标检测小论文\defectNet\code" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\home\undone-work\master-graduate\参考文献\ReadingNote\文档\目标检测小论文\defectNet\code\DefectNet\dataset" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -101,7 +176,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.a">
+  <component name="RunManager" selected="Python.split_coco">
     <configuration name="a" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="DefectNet" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -116,6 +191,50 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="D:\home\undone-work\master-graduate\参考文献\ReadingNote\文档\目标检测小论文\defectNet\code\auto_login.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="annjson2coco" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="DefectNet" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/code/coco_utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/coco_utils/annjson2coco.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="fabric2coco" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="DefectNet" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/code/toolboxs" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/toolboxs/fabric2coco.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -146,8 +265,33 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="split_coco" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="DefectNet" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/code/coco_utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/code/coco_utils/split_coco.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.split_coco" />
+        <item itemvalue="Python.annjson2coco" />
+        <item itemvalue="Python.fabric2coco" />
         <item itemvalue="Python.a" />
         <item itemvalue="Python.resnet" />
       </list>
@@ -169,24 +313,25 @@
       <workItem from="1578899336046" duration="6470000" />
       <workItem from="1578923022479" duration="1184000" />
       <workItem from="1578924229756" duration="4056000" />
-      <workItem from="1579007637278" duration="1581000" />
+      <workItem from="1579007637278" duration="2222000" />
+      <workItem from="1579109285282" duration="6557000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19711000" />
+    <option name="totallyTimeSpent" value="26909000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19168901" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17895442" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.36997318" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.33378017" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -194,7 +339,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.541555" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.38739946" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.4155496" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -206,9 +351,23 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/code/coco_utils/split_coco.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/DefectNet$annjson2coco.coverage" NAME="annjson2coco Coverage Results" MODIFIED="1579114089817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/coco_utils" />
+    <SUITE FILE_PATH="coverage/DefectNet$split_coco.coverage" NAME="split_coco Coverage Results" MODIFIED="1579115931032" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/coco_utils" />
     <SUITE FILE_PATH="coverage/DefectNet$a.coverage" NAME="a Coverage Results" MODIFIED="1578927904983" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code" />
     <SUITE FILE_PATH="coverage/DefectNet$resnet.coverage" NAME="resnet Coverage Results" MODIFIED="1578900176577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="D:/Install/Anaconda3/Lib/site-packages/torchvision/models" />
+    <SUITE FILE_PATH="coverage/DefectNet$fabric2coco.coverage" NAME="fabric2coco Coverage Results" MODIFIED="1579113576026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/code/toolboxs" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/code/DefectNet/.ignores" />
@@ -219,25 +378,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/eval_report.txt" />
-    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/experiment_report.txt">
+    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_fabric/cascade_rcnn_r50_fpn_1x/eval_report.txt" />
+    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_fabric/cascade_rcnn_r50_fpn_1x/experiment_report.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
           <caret line="17" selection-start-line="17" selection-end-line="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/anchor_cluster.py">
+    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_fabric/cascade_rcnn_r50_fpn_1x/anchor_cluster.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/4_stage.py">
+    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_fabric/cascade_rcnn_r50_fpn_1x/4_stage.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
           <caret line="11" column="23" lean-forward="true" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/baseline.py">
+    <entry file="file://$PROJECT_DIR$/code/DefectNet/config_fabric/cascade_rcnn_r50_fpn_1x/baseline.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-3658">
           <caret line="11" column="23" lean-forward="true" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
@@ -452,20 +611,86 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code/auto_login.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="32" column="19" lean-forward="true" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/code/auto_login.py" />
     <entry file="file://$PROJECT_DIR$/.ignores">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
           <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/check_coco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2195">
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/boxes_features_analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/draw_util.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/rename.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="41" selection-start-line="12" selection-start-column="41" selection-end-line="12" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/list2coco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2214">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/Install/Anaconda3/Lib/site-packages/pycocotools/coco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="179" column="8" selection-start-line="179" selection-start-column="8" selection-end-line="179" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/coco2yolo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="33" column="34" lean-forward="true" selection-start-line="33" selection-start-column="34" selection-end-line="34" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/annjson2coco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="31" column="20" lean-forward="true" selection-start-line="31" selection-start-column="20" selection-end-line="31" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/code/coco_utils/split_coco.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-19">
+          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

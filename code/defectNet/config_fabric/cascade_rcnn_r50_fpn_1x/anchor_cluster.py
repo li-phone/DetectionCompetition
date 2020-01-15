@@ -20,7 +20,7 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        anchor_ratios=[0.5, 1.0, 2.0],
+        anchor_ratios=[0.5, 1.0, 2.0, 5.39433482, 3.92304408, 10.44139619],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -224,11 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/baseline'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/anchor_cluster'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

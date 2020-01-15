@@ -248,11 +248,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/focal_loss'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/focal_loss'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

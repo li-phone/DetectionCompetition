@@ -33,8 +33,8 @@ def infer(model, image_paths):
         for idx, pred in enumerate(result):
             # category_id = label2name[idx+1]
             category_id = idx
-            # if 0 == category_id:
-            #     continue
+            if 0 == category_id:
+                continue
             for x in pred:
                 bbox_pred = {
                     "image_id": img_id,
@@ -51,18 +51,18 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3.py',
         help='train config file path')
     parser.add_argument(
         '--resume_from',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1/epoch_12.pth',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3/epoch_12.pth',
         help='train config file path')
     parser.add_argument(
         '--img_dir',
-        default=r'E:\liphone\data\images\detections\alcohol\test')
+        default='/home/liphone/undone-work/data/detection/alcohol/test')
     parser.add_argument(
         '--work_dir',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1/',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3/',
         help='train config file path')
     args = parser.parse_args()
 

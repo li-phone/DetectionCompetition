@@ -49,7 +49,7 @@ def get_cluster(x, save_name, n=3):
 
 
 # name2label = {1: 1, 9: 2, 5: 3, 3: 4, 4: 5, 0: 6, 2: 7, 8: 8, 6: 9, 10: 10, 7: 11}
-label_weight = {0: 0, 1: 0.15, 2: 0.09, 3: 0.09, 4: 0.05, 5: 0.13, 6: 0.05, 7: 0.12, 8: 0.13, 9: 0.07, 10: 0.12}
+# label_weight = {0: 0, 1: 0.15, 2: 0.09, 3: 0.09, 4: 0.05, 5: 0.13, 6: 0.05, 7: 0.12, 8: 0.13, 9: 0.07, 10: 0.12}
 # label2name = {v: k for k, v in name2label.items()}
 # label_weight = {label2name[k]:v for k,v in name_weight.items()}
 

@@ -1,0 +1,23 @@
+
+
+-------------------------- Experiment Report ----------------------
+trick_name                  score       gain        on
+baseline                    0.75721     +0          V
+baseline_r101               xx.xx       +           V
+baseline_caffe_c4_1x        xx.xx       +           V
+baseline_x101_32x4d_fpn_1x  xx.xx       +           V
+baseline_x101_64x4d_fpn_1x  xx.xx       +           V
+iou_cluster                 xx.xx       +           V
+iou_decrease                xx.xx       +           V
+iou_increase                xx.xx       +           V
+anchor_cluster              0.75673     -0.00048    V
+4_stage                     0.72062     -0.03659    V
+label_weight                0.73687     -0.02034    V
+box_weight                  xx.xx       +           V
+dig_augment_n1(flip)        0.64226     -0.11495    V
+dig_augment_n4(4img)        0.19849     -0.55872    V
+dig_augment_n4_id3          0.75148     -0.00573    V
+dig_augment_n4_id3_nms.3    0.75124     -0.00597    V
+focal_loss                  xx.xx       +           V
+score:                      -----       ----        X
+

@@ -9,11 +9,7 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        style='pytorch',
-        dcn=dict(  # ??????????μ??????ξ?? ?????1
-            modulated=False, deformable_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, False, False, True)
-    ),
+        style='pytorch'),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -25,9 +21,6 @@ model = dict(
         feat_channels=256,
         anchor_scales=[8],
         anchor_ratios=[0.5, 1.0, 2.0],
-        # anchor_ratios=[0.02, 0.05, 0.1, 0.5, 1.0, 2.0, 10.0, 20.0, 50.0], #?????????ó????
-        # anchor_ratios=[0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0, 2, 4, 6, 8, 10, 12, 15, 18, 30],
-        # anchor_ratios=[0.02, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 8.0, 20.0], #?????????ó????
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -109,6 +102,21 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
+                pos_iou_thr=0.4,
+                neg_iou_thr=0.4,
+                min_pos_iou=0.4,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
                 pos_iou_thr=0.5,
                 neg_iou_thr=0.5,
                 min_pos_iou=0.5,
@@ -135,21 +143,6 @@ train_cfg = dict(
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
             pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.7,
-                neg_iou_thr=0.7,
-                min_pos_iou=0.7,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='RandomSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
             debug=False)
     ],
     stage_loss_weights=[1, 0.5, 0.25])
@@ -162,11 +155,10 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100),
-    keep_all_stages=False)
+        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = r'E:\liphone\data\images\detections\alcohol'
+data_root = '/home/liphone/undone-work/data/detection/alcohol'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -195,7 +187,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=2,
+    imgs_per_gpu=4,  # ===================#
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
@@ -213,8 +205,7 @@ data = dict(
         img_prefix=data_root + '/train/',
         pipeline=test_pipeline))
 # optimizer
-# optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -233,11 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x_freeze'
-resume_from = './work_dirs/cascade_rcnn_r50_fpn_1x_freeze/epoch_12.pth'
-load_from = None  # 'checkpoints/cascade_rcnn_r50_coco_pretrained_weights_classes_21.pth' #????coco???????
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/iou_decrease'
+resume_from = None
+load_from = None
 workflow = [('train', 1)]

@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='CascadeRCNN',
-    num_stages=3,
+    num_stages=4,
     pretrained='torchvision://resnet50',
     backbone=dict(
         type='ResNet',
@@ -33,6 +33,19 @@ model = dict(
         out_channels=256,
         featmap_strides=[4, 8, 16, 32]),
     bbox_head=[
+        dict(
+            type='SharedFCBBoxHead',
+            num_fcs=2,
+            in_channels=256,
+            fc_out_channels=1024,
+            roi_feat_size=7,
+            num_classes=12,
+            target_means=[0., 0., 0., 0.],
+            target_stds=[0.2, 0.2, 0.4, 0.4],
+            reg_class_agnostic=True,
+            loss_cls=dict(
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+            loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
         dict(
             type='SharedFCBBoxHead',
             num_fcs=2,
@@ -102,6 +115,21 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
+                pos_iou_thr=0.4,
+                neg_iou_thr=0.4,
+                min_pos_iou=0.4,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
                 pos_iou_thr=0.5,
                 neg_iou_thr=0.5,
                 min_pos_iou=0.5,
@@ -145,7 +173,7 @@ train_cfg = dict(
             pos_weight=-1,
             debug=False)
     ],
-    stage_loss_weights=[1, 0.5, 0.25])
+    stage_loss_weights=[2, 1, 0.5, 0.25])
 test_cfg = dict(
     rpn=dict(
         nms_across_levels=False,
@@ -224,11 +252,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/box_weight'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/4_stage'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

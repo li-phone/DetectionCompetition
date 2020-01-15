@@ -19,7 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/baseline.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3.py',
         help='train config file path',
     )
     parser.add_argument('--work_dir', help='the dir to save logs and models')

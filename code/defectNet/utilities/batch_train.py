@@ -23,10 +23,18 @@ def main():
         # 'focal_loss',
         # 'anchor_cluster',
         # '4_stage',
-        'iou_decrease',
-        'iou_increase',
-        'iou_cluster',
-        'baseline',
+        # 'iou_decrease',
+        # 'iou_increase',
+        # 'iou_cluster',
+        # 'baseline',
+        # 'label_weight',
+        # 'box_weight',
+        # 'dig_augment_n4',
+        # 'dig_augment_n4_id3',
+        # 'baseline_r101',
+        'baseline_x101_32x4d_fpn_1x',
+        'baseline_x101_64x4d_fpn_1x',
+        'baseline_caffe_c4_1x',
     ]
     for p in tqdm(train_params):
         print('p={}'.format(p))

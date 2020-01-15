@@ -1,5 +1,3 @@
-# fp16 settings
-fp16 = dict(loss_scale=512.)
 # model settings
 model = dict(
     type='CascadeRCNN',
@@ -11,11 +9,7 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        style='pytorch',
-        # dcn=dict( #在最后三个block加入可变形卷积
-        #   modulated=False, deformable_groups=1, fallback_on_stride=False),
-        #  stage_with_dcn=(False, True, True, True)
-    ),
+        style='pytorch'),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -26,12 +20,12 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        anchor_ratios=[0.2, 0.5, 1.0, 2.0, 5.0],  # 添加了0.2，5，过两天发图
+        anchor_ratios=[0.5, 1.0, 2.0],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
         loss_cls=dict(
-            type='FocalLoss', use_sigmoid=True, loss_weight=1.0),  # 修改了loss，为了调控难易样本与正负样本比例
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
     bbox_roi_extractor=dict(
         type='SingleRoIExtractor',
@@ -58,7 +52,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=11,
+            num_classes=12,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
@@ -71,7 +65,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=11,
+            num_classes=12,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
@@ -108,27 +102,12 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.4,  # 更换
-                neg_iou_thr=0.4,
-                min_pos_iou=0.4,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='OHEMSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
                 pos_iou_thr=0.5,
                 neg_iou_thr=0.5,
                 min_pos_iou=0.5,
                 ignore_iof_thr=-1),
             sampler=dict(
-                type='OHEMSampler',  # 解决难易样本，也解决了正负样本比例问题。
+                type='RandomSampler',
                 num=512,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
@@ -143,7 +122,22 @@ train_cfg = dict(
                 min_pos_iou=0.6,
                 ignore_iof_thr=-1),
             sampler=dict(
-                type='OHEMSampler',
+                type='RandomSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
                 num=512,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
@@ -161,16 +155,16 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=20))  # 这里可以换为sof_tnms
+        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = r'E:\liphone\data\images\detections\alcohol'
+data_root = '/home/liphone/undone-work/data/detection/alcohol'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(492, 658), keep_ratio=True),  # 这里可以更换多尺度[(),()]
+    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
@@ -181,7 +175,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(492, 658),
+        img_scale=(1333, 800),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -193,12 +187,12 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=8,  # 有的同学不知道batchsize在哪修改，其实就是修改这里，每个gpu同时处理的images数目。
+    imgs_per_gpu=4,  # ===================#
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',  # 更换自己的json文件
-        img_prefix=data_root + '/train/',  # images目录
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
@@ -211,7 +205,7 @@ data = dict(
         img_prefix=data_root + '/train/',
         pipeline=test_pipeline))
 # optimizer
-optimizer = dict(type='SGD', lr=0.001, momentum=0.9, weight_decay=0.0001)  # lr = 0.00125*batch_size，不能过大，否则梯度爆炸。
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -219,24 +213,22 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=1.0 / 3,
-    step=[6, 12, 19])
+    step=[8, 11])
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=64,
+    interval=50,
     hooks=[
-        dict(type='TextLoggerHook'),  # 控制台输出信息的风格
-        # dict(type='TensorboardLoggerHook') # 需要安装tensorflow and tensorboard才可以使用
+        dict(type='TextLoggerHook'),
+        # dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
-total_epochs = 20
+dataset_name = 'alcohol'
+total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x_freeze'
-# load_from = work_dir + '/latest.pth'  # 模型加载目录文件
-load_from = None
-# load_from = '../work_dirs/cascade_rcnn_r50_fpn_1x_freeze/cascade_rcnn_r50_coco_pretrained_weights_classes_11.pth'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/box_weight'
 resume_from = None
+load_from = None
 workflow = [('train', 1)]

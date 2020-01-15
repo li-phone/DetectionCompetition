@@ -1,7 +1,7 @@
 # model settings
 model = dict(
     type='CascadeRCNN',
-    num_stages=4,
+    num_stages=3,
     pretrained='torchvision://resnet50',
     backbone=dict(
         type='ResNet',
@@ -20,7 +20,7 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        anchor_ratios=[0.5, 1, 2, 3.9175005, 5.36551419, 10.44139619],
+        anchor_ratios=[0.5, 1.0, 2.0],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -44,9 +44,7 @@ model = dict(
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0,
-                # type='FocalLoss',use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0,
-            ),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
         dict(
             type='SharedFCBBoxHead',
@@ -59,9 +57,7 @@ model = dict(
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0,
-                # type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0,
-            ),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
         dict(
             type='SharedFCBBoxHead',
@@ -74,24 +70,7 @@ model = dict(
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0,
-                # type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0,
-            ),
-            loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
-        dict(
-            type='SharedFCBBoxHead',
-            num_fcs=2,
-            in_channels=256,
-            fc_out_channels=1024,
-            roi_feat_size=7,
-            num_classes=12,
-            target_means=[0., 0., 0., 0.],
-            target_stds=[0.016, 0.016, 0.033, 0.033],
-            reg_class_agnostic=True,
-            loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0,
-                # type='FocalLoss', use_sigmoid=True, gamma=2.0, alpha=0.25, loss_weight=1.0,
-            ),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
     ])
 # model training and testing settings
@@ -123,9 +102,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.45,
-                neg_iou_thr=0.45,
-                min_pos_iou=0.45,
+                pos_iou_thr=0.2138794,
+                neg_iou_thr=0.2138794,
+                min_pos_iou=0.2138794,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -138,9 +117,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.55,
-                neg_iou_thr=0.55,
-                min_pos_iou=0.55,
+                pos_iou_thr=0.54407745,
+                neg_iou_thr=0.54407745,
+                min_pos_iou=0.54407745,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -153,24 +132,9 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.65,
-                neg_iou_thr=0.65,
-                min_pos_iou=0.65,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='RandomSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.75,
-                neg_iou_thr=0.75,
-                min_pos_iou=0.75,
+                pos_iou_thr=0.78370548,
+                neg_iou_thr=0.78370548,
+                min_pos_iou=0.78370548,
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
@@ -181,7 +145,7 @@ train_cfg = dict(
             pos_weight=-1,
             debug=False)
     ],
-    stage_loss_weights=[1, 0.5, 0.25, 0.125])
+    stage_loss_weights=[1, 0.5, 0.25])
 test_cfg = dict(
     rpn=dict(
         nms_across_levels=False,
@@ -194,7 +158,7 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = r'E:\liphone\data\images\detections\alcohol'
+data_root = '/home/liphone/undone-work/data/detection/alcohol'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -223,25 +187,25 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=4,
+    imgs_per_gpu=4,  # ===================#
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instances_20191223_annotations_dig_augment_n1.json',
-        img_prefix=data_root + '/dig_augment_n1/',
+        ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
+        img_prefix=data_root + '/train/',
         pipeline=test_pipeline))
 # optimizer
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -260,12 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x_dig_augment_n1'
-# resume_from = work_dir + '/latest.pth'  # 模型加载目录文件
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/iou_cluster'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]

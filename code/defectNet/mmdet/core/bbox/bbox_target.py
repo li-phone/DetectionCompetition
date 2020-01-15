@@ -74,7 +74,7 @@ def bbox_target_single(pos_bboxes,
         # # ---------------------------- new added ----------------------------
         # for i in range(num_pos):
         #     w = label_weight_map[int(labels[i])] / min_wt
-        #     bbox_weights[i] = torch.Tensor([w]).type(torch.float32).cuda()
+        #     bbox_weights[i, :] = torch.Tensor([w]).type(torch.float32).cuda()
         # # ---------------------------- new added end ------------------------
 
     if num_neg > 0:

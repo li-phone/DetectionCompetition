@@ -2,10 +2,12 @@
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    pretrained='torchvision://resnet50',
+    pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
-        type='ResNet',
-        depth=50,
+        type='ResNeXt',
+        depth=101,
+        groups=64,
+        base_width=4,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -187,7 +189,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=4,  # ===================#
+    imgs_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
@@ -197,12 +199,12 @@ data = dict(
     val=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
-        img_prefix=data_root + '/train/',
+        img_prefix=data_root + 'train/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/instances_train_20191223_annotations.json',
-        img_prefix=data_root + '/train/',
+        img_prefix=data_root + 'train/',
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -224,11 +226,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_type = 'alcohol'
+dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_type + '/cascade_rcnn_r50_fpn_1x' + '/label_weight'
-resume_from = None
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/baseline_x101_64x4d_fpn_1x'
 load_from = None
+resume_from = None
 workflow = [('train', 1)]
