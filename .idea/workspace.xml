@@ -2,28 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="362f427e-636b-4f88-861a-9f7dd2e0ff39" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/README.en.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/experiment_report.txt" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/experiment_report.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/configs/cascade_rcnn_r50_caffe_c4_1x.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/configs/cityscapes/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/configs/gcnet/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/configs/gn+ws/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/configs/reppoints/reppoints.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/anchor_heads/fcos_head.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/anchor_heads/rpn_head.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/detectors/retinanet.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/detectors/test_mixins.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/plugins/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/models/shared_heads/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/mmdet/ops/nms/src/soft_nms_cpu.pyx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/batch_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/utilities/batch_train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/coco_eval.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/infer.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/defectNet/utilities/infer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/utilities/simsun.ttc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/code/defectNet/utilities/utilities/utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/doc/defectNet, Towards Efficient Defects Detection.docx" beforeDir="false" afterPath="$PROJECT_DIR$/doc/defectNet, Towards Efficient Defects Detection.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/doc/研究生为什么要有科学素养-终稿.doc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/g.sh" beforeDir="false" afterPath="$PROJECT_DIR$/g.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/auto_login.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/geckodriver.log" beforeDir="false" afterPath="$PROJECT_DIR$/.ignores" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,23 +13,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/code/auto_login.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="32" column="19" lean-forward="true" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/g.sh">
+        <entry file="file://$PROJECT_DIR$/.ignores">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="152">
-              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+            <state relative-caret-position="19">
+              <caret line="1" selection-start-line="1" selection-end-line="1" />
             </state>
           </provider>
         </entry>
@@ -79,15 +47,7 @@
         <option value="$PROJECT_DIR$/code/DefectNet/config_alcohol/cascade_rcnn_r50_fpn_1x/experiment_report.txt" />
         <option value="$PROJECT_DIR$/code/a.py" />
         <option value="$PROJECT_DIR$/g.sh" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectConfigurationFiles">
-    <option name="files">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/misc.xml" />
-        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
-        <option value="$PROJECT_DIR$/.idea/modules.xml" />
+        <option value="$PROJECT_DIR$/.ignores" />
       </list>
     </option>
   </component>
@@ -116,11 +76,6 @@
               <item name="defectNet" type="462c0819:PsiDirectoryNode" />
               <item name="code" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="DefectNet" type="b2602c69:ProjectViewProjectNode" />
-              <item name="defectNet" type="462c0819:PsiDirectoryNode" />
-              <item name="doc" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -128,6 +83,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -213,18 +169,18 @@
       <workItem from="1578899336046" duration="6470000" />
       <workItem from="1578923022479" duration="1184000" />
       <workItem from="1578924229756" duration="4056000" />
-      <workItem from="1579007637278" duration="1328000" />
+      <workItem from="1579007637278" duration="1581000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19458000" />
+    <option name="totallyTimeSpent" value="19711000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19168901" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19168901" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -238,7 +194,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3297587" />
+      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.541555" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.4155496" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -489,9 +445,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/g.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/code/auto_login.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
+        <state relative-caret-position="23">
           <caret line="32" column="19" lean-forward="true" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
@@ -499,10 +462,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/g.sh">
+    <entry file="file://$PROJECT_DIR$/.ignores">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+        <state relative-caret-position="19">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
         </state>
       </provider>
     </entry>
