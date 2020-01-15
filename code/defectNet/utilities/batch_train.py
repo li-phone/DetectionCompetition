@@ -20,12 +20,12 @@ def hint(wav_file='./wav/qq.wav', n=3):
 
 def main():
     train_params = [
-        # '4_stage',
         # 'focal_loss',
-        'anchor_cluster',
-        'iou_cluster',
+        # 'anchor_cluster',
+        # '4_stage',
         'iou_decrease',
         'iou_increase',
+        'iou_cluster',
         'baseline',
     ]
     for p in tqdm(train_params):
@@ -38,7 +38,8 @@ def main():
         hint()
 
         # test
-        line = 'python test.py --config ../config_alcohol/cascade_rcnn_r50_fpn_1x/{}.py' \
+        line = 'python test.py --eval bbox ' \
+               + ' --config             ../config_alcohol/cascade_rcnn_r50_fpn_1x/{}.py' \
                + ' --checkpoint         ../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/{}/latest.pth' \
                + ' --out                ../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/{}/latest_epoch_12_out.pkl' \
                + ' --json_out           ../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/{}/latest_epoch_12_json_out.json'
@@ -56,7 +57,8 @@ def main():
             '../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/{}/latest_epoch_12_out.pkl.bbox.json'.format(p)
         )
         with open('../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_report.txt', 'a+') as fp:
-            fp.write(report)
+            line = '\n\n' + '=' * 36 + p + '=' * 36
+            fp.write(line + report)
         hint()
 
         # infer

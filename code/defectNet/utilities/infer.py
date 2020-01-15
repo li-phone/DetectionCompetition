@@ -31,7 +31,10 @@ def infer(model, image_paths):
         results['images'].append(dict(file_name=os.path.basename(path), id=img_id))
         result = inference_detector(model, path)
         for idx, pred in enumerate(result):
+            # category_id = label2name[idx+1]
             category_id = idx
+            # if 0 == category_id:
+            #     continue
             for x in pred:
                 bbox_pred = {
                     "image_id": img_id,
