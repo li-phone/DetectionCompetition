@@ -1,0 +1,20 @@
+
+
+========================== 34 type defects Experiment Report ======================
+trick_name          acc     mAP     fps     fps_defect       fps_no_defect
+baseline_34_no_bg   xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+baseline_34_bg      xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+two_stage_34        xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+DefectNet_34        xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+score:              -------------------------------------------------
+
+
+
+========================== 20 type defects Experiment Report ======================
+trick_name          acc     mAP     fps     fps_defect       fps_no_defect
+baseline_20_no_bg   xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+baseline_20_bg      xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+two_stage_20        xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+DefectNet_20        xx.xx   xx.xx   xx.xx   xx.xx            xx.xx
+score:              -------------------------------------------------
+

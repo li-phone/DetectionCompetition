@@ -1,0 +1,6 @@
+*.pth
+
+
+ignores/
+work_dirs/
+

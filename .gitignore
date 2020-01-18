@@ -1,0 +1,29 @@
+# code dir
+code/ignores
+code/*/.*
+code/*/build
+code/*/work_dirs
+code/*/__pycache__
+code/*/ignores
+code/*/ignore
+
+# data dir
+data/classification/*/data
+data/detection/*/coco_*
+
+# Pytorch
+*.h5
+*.pth
+*.pkl
+*.pkl.json
+*.log.json
+*.csv
+*.pyc
+*.log
+*.obj
+*.pt
+
+# custom
+*.dll
+.idea/
+
