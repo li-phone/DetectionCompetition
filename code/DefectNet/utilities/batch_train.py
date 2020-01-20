@@ -18,14 +18,22 @@ def hint(wav_file='./wav/qq.wav', n=3):
 
 
 def main():
-    data_name = 'alcohol'
+    data_name = 'fabric'
     train_modes = [
-        'baseline_have_bg',
-        'baseline_no_bg',
+        # 'baseline_have_bg',
+        # 'baseline_no_bg',
+        'baseline_20_have_bg',
+        'baseline_20_no_bg',
+        'baseline_34_have_bg',
+        'baseline_34_no_bg',
     ]
     train_params = [
-        'instance_train_alcohol.json',
-        'instance_train_alcohol_nobg.json',
+        # 'instance_train_alcohol.json',
+        # 'instance_train_alcohol_nobg.json',
+        'instance_train_fabric_20.json',
+        'instance_train_fabric_20_nobg.json',
+        'instance_train_fabric_34.json',
+        'instance_train_fabric_34_nobg.json',
     ]
     for p, ann in tqdm(zip(train_modes, train_params)):
         print('p={}'.format(p))
@@ -62,22 +70,22 @@ def main():
                 fp.write(rpt[0] + '\n' + rpt[1] + '\n')
         hint()
 
-        # infer for test set
-        from infer import infer_main
-        kargs = dict(
-            config='../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/{}.py'.format(p),
-            resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/epoch_12.pth'.format(p),
-            ann_file='/home/liphone/undone-work/data/detection/' + data_name + '/annotations/instance_test_alcohol.json',
-            img_dir='/home/liphone/undone-work/data/detection/' + data_name + '/trainval'.format(p),
-            work_dir='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}'.format(p),
-        )
-        rpts = infer_main(**kargs)
-        with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_test_report.txt', 'a+') as fp:
-            line = '\n\n' + '=' * 36 + p + '=' * 36 + '\n'
-            fp.write(line)
-            for k, v in rpts.items():
-                fp.write(str(k) + ':\n' + str(v) + '\n')
-        hint()
+        # # infer for test set
+        # from infer import infer_main
+        # kargs = dict(
+        #     config='../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/{}.py'.format(p),
+        #     resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/epoch_12.pth'.format(p),
+        #     ann_file='/home/liphone/undone-work/data/detection/' + data_name + '/annotations/instance_test_alcohol.json',
+        #     img_dir='/home/liphone/undone-work/data/detection/' + data_name + '/trainval'.format(p),
+        #     work_dir='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}'.format(p),
+        # )
+        # rpts = infer_main(**kargs)
+        # with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_test_report.txt', 'a+') as fp:
+        #     line = '\n\n' + '=' * 36 + p + '=' * 36 + '\n'
+        #     fp.write(line)
+        #     for k, v in rpts.items():
+        #         fp.write(str(k) + ':\n' + str(v) + '\n')
+        # hint()
 
         time.sleep(1800)
 

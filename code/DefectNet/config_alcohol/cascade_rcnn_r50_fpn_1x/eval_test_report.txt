@@ -1,0 +1,87 @@
+
+
+====================================baseline_have_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.98      0.64      0.78       225
+           1       0.89      1.00      0.94       679
+
+    accuracy                           0.91       904
+   macro avg       0.94      0.82      0.86       904
+weighted avg       0.92      0.91      0.90       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.402
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.662
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.415
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.207
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.316
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.392
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.425
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.487
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.488
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.294
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.385
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.447
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.533  | 瓶盖破损 | 25.877 | 瓶盖变形 | 34.076 |
+| 瓶盖坏边 | 17.841 | 瓶盖打旋 | 78.946 | 瓶盖断点 | 26.155 |
+| 标贴歪斜 | 82.505 | 标贴起皱 | 10.908 | 标贴气泡 | 13.446 |
+| 喷码正常 | 71.397 | 喷码异常 | 80.237 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+AP = [25.877, 34.076, 17.841, 78.946, 26.155, 82.505, 10.908, 13.446, 71.397, 80.237]
+fps:
+0.12808881739599515
+fps_defect:
+0.13008881528177388
+fps_no_defect:
+0.12205326822068956
+
+
+
+====================================baseline_no_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.98      0.53      0.69       225
+           1       0.86      1.00      0.93       679
+
+    accuracy                           0.88       904
+   macro avg       0.92      0.76      0.81       904
+weighted avg       0.89      0.88      0.87       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.407
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.659
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.408
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.224
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.326
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.401
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.430
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.488
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.491
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.296
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.407
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.460
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 26.225 | 瓶盖变形 | 35.388 |
+| 瓶盖坏边 | 19.114 | 瓶盖打旋 | 78.978 | 瓶盖断点 | 25.662 |
+| 标贴歪斜 | 83.825 | 标贴起皱 | 9.868  | 标贴气泡 | 13.965 |
+| 喷码正常 | 72.951 | 喷码异常 | 82.230 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+AP = [26.225, 35.388, 19.114, 78.978, 25.662, 83.825, 9.868, 13.965, 72.951, 82.230]
+fps:
+0.12753184126541678
+fps_defect:
+0.12989061746049524
+fps_no_defect:
+0.12041357888115777

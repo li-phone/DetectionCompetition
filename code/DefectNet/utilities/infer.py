@@ -99,21 +99,21 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_fabric/cascade_rcnn_r50_fpn_1x/baseline_34_no_bg.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg.py',
         help='train config file path')
     parser.add_argument(
         '--resume_from',
-        default='../work_dirs/fabric/cascade_rcnn_r50_fpn_1x/baseline_34_no_bg/epoch_12.pth',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg/epoch_12.pth',
         help='train config file path')
     parser.add_argument(
         '--ann_file',
-        default='/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_fabric_34.json')
+        default='/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json')
     parser.add_argument(
         '--img_dir',
-        default='/home/liphone/undone-work/data/detection/fabric/trainval')
+        default='/home/liphone/undone-work/data/detection/alcohol/trainval')
     parser.add_argument(
         '--work_dir',
-        default='../work_dirs/fabric/cascade_rcnn_r50_fpn_1x/baseline_34_no_bg/',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg/',
         help='train config file path')
     args = parser.parse_args()
 

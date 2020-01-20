@@ -39,7 +39,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=36,
+            num_classes=22,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
@@ -52,7 +52,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=36,
+            num_classes=22,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
@@ -65,7 +65,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=36,
+            num_classes=22,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
@@ -187,21 +187,21 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=4,  # ===================#
+    imgs_per_gpu=6,  # ===================#
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_train_34.json',
+        ann_file=data_root + '/annotations/instance_train_fabric_20.json',
         img_prefix=data_root + '/trainval/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_test_34.json',
+        ann_file=data_root + '/annotations/instance_train_fabric_20.json',
         img_prefix=data_root + '/trainval/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_test_34.json',
+        ann_file=data_root + '/annotations/instance_train_fabric_20.json',
         img_prefix=data_root + '/trainval/',
         pipeline=test_pipeline))
 # optimizer
@@ -228,7 +228,7 @@ dataset_name = 'fabric'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/baseline'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/baseline_20_have_bg'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]
