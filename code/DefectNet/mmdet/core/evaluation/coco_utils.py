@@ -51,6 +51,7 @@ def coco_eval(result_files,
         cocoEval.accumulate()
         coco_rpt = cocoEval.summarize()
 
+        cls_rpt = ''
         if classwise:
             # Compute per-category AP
             # from https://github.com/facebookresearch/detectron2/blob/03064eb5bafe4a3e5750cc7a16672daf5afe8435/detectron2/evaluation/coco_evaluation.py#L259-L283 # noqa

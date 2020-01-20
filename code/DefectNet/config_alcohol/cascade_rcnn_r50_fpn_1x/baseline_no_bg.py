@@ -9,11 +9,7 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        style='pytorch',
-        dcn=dict(  # 在最后一个阶段加入可变形卷积 改进点1
-            modulated=False, deformable_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, False, False, True)
-    ),
+        style='pytorch'),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -24,10 +20,8 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        # anchor_ratios=[0.5, 1.0, 2.0],
-        anchor_ratios=(0.49, 0.77, 1.05, 1.19, 1.47, 2.03, 2.45),
+        anchor_ratios=[0.5, 1.0, 2.0],
         anchor_strides=[4, 8, 16, 32, 64],
-
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
         loss_cls=dict(
@@ -45,7 +39,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=2,
+            num_classes=11,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
@@ -58,7 +52,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=2,
+            num_classes=11,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
@@ -71,7 +65,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=2,
+            num_classes=11,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
@@ -161,11 +155,10 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100),
-    keep_all_stages=False)
+        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'C:/Users/zl/liphone/home/fabric_detection/cervical/coco_cervical/'
+data_root = '/home/liphone/undone-work/data/detection/alcohol'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -194,26 +187,25 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=2,
+    imgs_per_gpu=4,  # ===================#
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train_det.json',
-        img_prefix=data_root + 'pos_crop/',
+        ann_file=data_root + '/annotations/instance_train_alcohol_nobg.json',
+        img_prefix=data_root + '/trainval/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train_det.json',
-        img_prefix=data_root + 'pos_crop/',
+        ann_file=data_root + '/annotations/instance_train_alcohol_nobg.json',
+        img_prefix=data_root + '/trainval/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train_det.json',
-        img_prefix=data_root + 'pos_crop/',
+        ann_file=data_root + '/annotations/instance_train_alcohol_nobg.json',
+        img_prefix=data_root + '/trainval/',
         pipeline=test_pipeline))
 # optimizer
-# optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02/8, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -232,10 +224,11 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 20
+dataset_name = 'alcohol'
+total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/cascade_rcnn_r50_fpn_1x_cervical'
-load_from = None # 'checkpoints/cascade_rcnn_r50_coco_pretrained_weights_classes_21.pth' #采用coco预训练模型
-resume_from = './work_dirs/cascade_rcnn_r50_fpn_1x_cervical/latest.pth'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/baseline_no_bg'
+resume_from = None
+load_from = None
 workflow = [('train', 1)]

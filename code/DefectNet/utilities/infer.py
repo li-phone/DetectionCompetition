@@ -13,6 +13,7 @@ import pandas as pd
 from mmdet.core import coco_eval
 from pycocotools.coco import COCO
 import numpy as np
+from sklearn.metrics import classification_report
 from utilities.draw_util import draw_coco
 
 
@@ -71,23 +72,27 @@ def infer_by_ann(model, img_dir, anns):
     return results, fps_times
 
 
-def cal_acc(anns, threshold=0.05):
+def have_defect(anns, threshold=0.05):
     annotations = json_normalize(anns['annotations'])
-    normal_img_num, defect_img_num = 0, 0
+    det_results = []
     for image in anns['images']:
         defect_num = 0
         if annotations.shape[0] > 0:
             ann = annotations[annotations['image_id'] == image['id']]
             for j in range(ann.shape[0]):
                 a = ann.iloc[j]
-                if a['score'] > threshold:
-                    defect_num += 1
+                if 'score' in a:
+                    if a['score'] > threshold and a['category_id'] > 0:
+                        defect_num += 1
+                else:
+                    if a['category_id'] > 0:
+                        defect_num += 1
         if 0 == defect_num:
-            normal_img_num += 1
+            det_results.append(0)
         else:
-            defect_img_num += 1
-    assert normal_img_num + defect_img_num == len(anns['images'])
-    return normal_img_num, defect_img_num
+            det_results.append(1)
+    assert len(det_results) == len(anns['images'])
+    return det_results
 
 
 def parse_args():
@@ -102,7 +107,7 @@ def parse_args():
         help='train config file path')
     parser.add_argument(
         '--ann_file',
-        default='/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_34.json')
+        default='/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_fabric_34.json')
     parser.add_argument(
         '--img_dir',
         default='/home/liphone/undone-work/data/detection/fabric/trainval')
@@ -144,15 +149,10 @@ def infer_main(config, resume_from, ann_file, img_dir, work_dir):
 
     model = init_detector(config, resume_from, device='cuda:0')
 
-    # infer for normal images
-    normal_img_paths = glob.glob(os.path.join(img_dir, 'normal_Images_*.jpg'))
-    normal_img_results, normal_fps = infer_by_path(model, normal_img_paths)
-    normal_num1, defect_num1 = cal_acc(normal_img_results)
-
-    # infer for defect images
+    # get test ann file
     anns = COCO(ann_file)
-    results, defect_fps = infer_by_ann(model, img_dir, anns)
-    normal_num2, defect_num2 = cal_acc(results)
+    anns.dataset['images'] = anns.dataset['images']
+    results, fps = infer_by_ann(model, img_dir, anns)
 
     # save the defect images results
     filename = '{}_{}_defect_image_cascade_rcnn_r50_fpn_1x_.json'.format(model_name, last_epoch)
@@ -163,10 +163,13 @@ def infer_main(config, resume_from, ann_file, img_dir, work_dir):
     # coco eval for defect images
     defect_rpt = coco_eval(submit_filename, ['bbox'], ann_file, classwise=True)
     mAP = defect_rpt[0][0] + '\n' + defect_rpt[0][1]
-    fps = normal_fps + defect_fps
-    tp = normal_num1 + defect_num2
-    fp = defect_num1 + normal_num2
-    acc = tp / (tp + fp)
+
+    y_pred = have_defect(results)
+    y_true = have_defect(anns.dataset)
+    acc = classification_report(y_true, y_pred, output_dict=False)
+    defect_fps = [fps[i] for i, x in enumerate(y_true) if x != 0]
+    normal_fps = [fps[i] for i, x in enumerate(y_true) if x == 0]
+    assert len(defect_fps) + len(normal_fps) == len(fps)
     return dict(acc=acc, mAP=mAP, fps=np.mean(fps), fps_defect=np.mean(defect_fps), fps_no_defect=np.mean(normal_fps))
 
 

@@ -1,0 +1,61 @@
+
+
+====================================baseline_34_no_bg====================================
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.115
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.240
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.090
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.094
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.124
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.077
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.132
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.189
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.191
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.164
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.208
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.134
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 破洞     | 47.153 | 水渍     | 0.000  | 油渍     | 22.303 |
+| 污渍     | 17.239 | 三丝     | 40.322 | 结头     | 26.785 |
+| 花板跳   | 10.262 | 百脚     | 0.247  | 毛粒     | 18.083 |
+| 粗经     | 0.206  | 松经     | 3.342  | 断经     | 4.077  |
+| 吊经     | 0.698  | 粗维     | 20.953 | 纬缩     | 5.281  |
+| 浆斑     | 20.965 | 整经结   | 24.470 | 星跳     | 3.371  |
+| 跳花     | 5.347  | 断氨纶   | 24.111 | 稀密档   | 0.198  |
+| 浪纹档   | 0.000  | 色差档   | 0.000  | 磨痕     | 0.000  |
+| 轧痕     | 10.401 | 修痕     | 0.000  | 烧毛痕   | 55.488 |
+| 死皱     | 0.243  | 云织     | 0.000  | 双纬     | 0.000  |
+| 双经     | 0.000  | 跳纱     | 0.000  | 筘路     | 0.000  |
+| 纬纱不良 | 28.504 | None     | None   | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+
+====================================baseline_20_no_bg====================================
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.139
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.312
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.097
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.110
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.145
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.086
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.165
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.250
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.254
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.191
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.243
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.170
+
++-----------------------+--------+----------------------------------------+--------+----------------------+--------+
+| category              | AP     | category                               | AP     | category             | AP     |
++-----------------------+--------+----------------------------------------+--------+----------------------+--------+
+| 破洞                  | 44.685 | 水渍_油渍_污渍                         | 17.715 | 三丝                 | 39.019 |
+| 结头                  | 25.410 | 花板跳                                 | 4.273  | 百脚                 | 0.570  |
+| 毛粒                  | 16.906 | 粗经                                   | 0.003  | 松经                 | 4.099  |
+| 断经                  | 6.898  | 吊经                                   | 0.337  | 粗维                 | 19.567 |
+| 纬缩                  | 4.661  | 浆斑                                   | 23.606 | 整经结               | 23.954 |
+| 星跳_跳花             | 5.039  | 断氨纶                                 | 22.450 | 稀密档_浪纹档_色差档 | 0.379  |
+| 磨痕_轧痕_修痕_烧毛痕 | 14.876 | 死皱_云织_双纬_双经_跳纱_筘路_纬纱不良 | 4.498  | None                 | None   |
++-----------------------+--------+----------------------------------------+--------+----------------------+--------+

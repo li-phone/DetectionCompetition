@@ -19,7 +19,7 @@ def _get_box(points):
 def gen_coco(ann_json, save_ann_name, img_dir, name2category):
     categories = []
     name2label_20 = {
-        '破洞': 1, '水渍_油渍_污渍': 2, '三丝': 3, '结头': 4, '花板跳': 5, '百脚': 6, '毛粒': 7,
+        '背景': 0, '破洞': 1, '水渍_油渍_污渍': 2, '三丝': 3, '结头': 4, '花板跳': 5, '百脚': 6, '毛粒': 7,
         '粗经': 8, '松经': 9, '断经': 10, '吊经': 11, '粗维': 12, '纬缩': 13, '浆斑': 14, '整经结': 15, '星跳_跳花': 16,
         '断氨纶': 17, '稀密档_浪纹档_色差档': 18, '磨痕_轧痕_修痕_烧毛痕': 19,
         '死皱_云织_双纬_双经_跳纱_筘路_纬纱不良': 20,
@@ -58,14 +58,14 @@ def gen_coco(ann_json, save_ann_name, img_dir, name2category):
 
 def main():
     ann_file = '/home/liphone/undone-work/data/detection/fabric/annotations/anno_train_20190818-20190928.json'
-    save_ann_name = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_20_all_no_bg.json'
+    save_ann_name = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_20_all_have_bg.json'
     img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
     with open(ann_file) as fp:
         ann_json = json.load(fp)
-    # normal_images = glob.glob(os.path.join(img_dir, 'normal_Images_*.jpg'))
-    # bbox = [0, 0, 5, 5]
-    # for p in normal_images:
-    #     ann_json.append(dict(name=os.path.basename(p), defect_name='背景', bbox=bbox))
+    normal_images = glob.glob(os.path.join(img_dir, 'normal_Images_*.jpg'))
+    bbox = [0, 0, 32, 32]
+    for p in normal_images:
+        ann_json.append(dict(name=os.path.basename(p), defect_name='背景', bbox=bbox))
     # defect_name2label = {
     #     '背景': 0, '破洞': 1, '水渍': 2, '油渍': 3, '污渍': 4, '三丝': 5, '结头': 6, '花板跳': 7, '百脚': 8, '毛粒': 9,
     #     '粗经': 10, '松经': 11, '断经': 12, '吊经': 13, '粗维': 14, '纬缩': 15, '浆斑': 16, '整经结': 17, '星跳': 18, '跳花': 19,
@@ -88,7 +88,8 @@ def main():
     }
     label_list = [k for k, v in name2label_20.items()]
     draw_coco(
-        save_ann_name, img_dir, '/home/liphone/undone-work/data/detection/fabric/.draw_coco_20_no_bg', label_list
+        save_ann_name, img_dir, '/home/liphone/undone-work/data/detection/fabric/.draw_coco_instance_20_all_have_bg',
+        label_list
     )
 
 
