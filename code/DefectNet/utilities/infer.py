@@ -60,7 +60,7 @@ def infer_by_ann(model, img_dir, anns):
         fps_times.append(time.time() - start_t)
         for idx, pred in enumerate(result):
             # category_id = label2name[idx+1]
-            category_id = idx + 1
+            category_id = idx
             for x in pred:
                 bbox_pred = {
                     "image_id": img_id,

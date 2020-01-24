@@ -9,6 +9,8 @@ from mmdet.ops import ContextBlock, DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_conv_layer, build_norm_layer
 
+import torch
+
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -377,6 +379,8 @@ class ResNet(nn.Module):
 
     def __init__(self,
                  depth,
+                 # new added by liphone
+                 num_classes=100,
                  in_channels=3,
                  num_stages=4,
                  strides=(1, 2, 2, 2),
@@ -394,11 +398,16 @@ class ResNet(nn.Module):
                  gen_attention=None,
                  stage_with_gen_attention=((), (), (), ()),
                  with_cp=False,
-                 zero_init_residual=True):
+                 zero_init_residual=True,
+                 ):
         super(ResNet, self).__init__()
         if depth not in self.arch_settings:
             raise KeyError('invalid depth {} for resnet'.format(depth))
         self.depth = depth
+
+        # new added by liphone
+        self.num_classes = num_classes
+
         self.num_stages = num_stages
         assert num_stages >= 1 and num_stages <= 4
         self.strides = strides
@@ -434,7 +443,7 @@ class ResNet(nn.Module):
             dilation = dilations[i]
             dcn = self.dcn if self.stage_with_dcn[i] else None
             gcb = self.gcb if self.stage_with_gcb[i] else None
-            planes = 64 * 2**i
+            planes = 64 * 2 ** i
             res_layer = make_res_layer(
                 self.block,
                 self.inplanes,
@@ -457,8 +466,12 @@ class ResNet(nn.Module):
 
         self._freeze_stages()
 
-        self.feat_dim = self.block.expansion * 64 * 2**(
-            len(self.stage_blocks) - 1)
+        self.feat_dim = self.block.expansion * 64 * 2 ** (
+                len(self.stage_blocks) - 1)
+
+        # new added by liphone
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.fc = nn.Linear(512 * 4, self.num_classes)
 
     @property
     def norm1(self):
@@ -529,7 +542,13 @@ class ResNet(nn.Module):
             x = res_layer(x)
             if i in self.out_indices:
                 outs.append(x)
-        return tuple(outs)
+
+        # new added by liphone
+        x2 = self.avgpool(outs[len(outs) - 1])
+        x2 = torch.flatten(x2, 1)
+        x2 = self.fc(x2)
+
+        return tuple([outs, x2])
 
     def train(self, mode=True):
         super(ResNet, self).train(mode)

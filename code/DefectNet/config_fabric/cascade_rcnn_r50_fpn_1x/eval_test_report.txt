@@ -1,0 +1,190 @@
+
+
+====================================baseline_20_have_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.87      0.81      0.84       761
+           1       0.88      0.92      0.90      1155
+
+    accuracy                           0.88      1916
+   macro avg       0.87      0.87      0.87      1916
+weighted avg       0.88      0.88      0.88      1916
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.134
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.288
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.093
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.153
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.140
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.100
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.171
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.256
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.260
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.277
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.210
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.179
+
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+| category             | AP     | category              | AP     | category                               | AP     |
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+| 背景                 | 51.661 | 破洞                  | 37.505 | 水渍_油渍_污渍                         | 13.121 |
+| 三丝                 | 32.227 | 结头                  | 19.642 | 花板跳                                 | 10.672 |
+| 百脚                 | 4.703  | 毛粒                  | 7.203  | 粗经                                   | 0.050  |
+| 松经                 | 6.190  | 断经                  | 4.970  | 吊经                                   | 2.105  |
+| 粗维                 | 17.208 | 纬缩                  | 2.353  | 浆斑                                   | 22.143 |
+| 整经结               | 17.618 | 星跳_跳花             | 2.653  | 断氨纶                                 | 12.928 |
+| 稀密档_浪纹档_色差档 | 2.113  | 磨痕_轧痕_修痕_烧毛痕 | 13.091 | 死皱_云织_双纬_双经_跳纱_筘路_纬纱不良 | 0.357  |
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+fps:
+0.13782494824714103
+fps_defect:
+0.13863962367499547
+fps_no_defect:
+0.13658848291314385
+
+
+====================================baseline_20_no_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.86      0.73      0.79       761
+           1       0.84      0.92      0.88      1155
+
+    accuracy                           0.85      1916
+   macro avg       0.85      0.83      0.83      1916
+weighted avg       0.85      0.85      0.84      1916
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.099
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.241
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.058
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.115
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.092
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.072
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.122
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.204
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.208
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.213
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.163
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.158
+
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+| category             | AP     | category              | AP     | category                               | AP     |
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+| 背景                 | 0.000  | 破洞                  | 38.179 | 水渍_油渍_污渍                         | 10.862 |
+| 三丝                 | 31.803 | 结头                  | 20.316 | 花板跳                                 | 6.968  |
+| 百脚                 | 0.000  | 毛粒                  | 8.347  | 粗经                                   | 0.059  |
+| 松经                 | 7.381  | 断经                  | 3.689  | 吊经                                   | 1.782  |
+| 粗维                 | 16.976 | 纬缩                  | 1.748  | 浆斑                                   | 17.420 |
+| 整经结               | 16.643 | 星跳_跳花             | 2.391  | 断氨纶                                 | 9.782  |
+| 稀密档_浪纹档_色差档 | 0.000  | 磨痕_轧痕_修痕_烧毛痕 | 13.108 | 死皱_云织_双纬_双经_跳纱_筘路_纬纱不良 | 0.329  |
++----------------------+--------+-----------------------+--------+----------------------------------------+--------+
+fps:
+0.1396149452892375
+fps_defect:
+0.14024758875628054
+fps_no_defect:
+0.13865475710995406
+
+
+====================================baseline_34_no_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.84      0.74      0.79       761
+           1       0.84      0.91      0.87      1155
+
+    accuracy                           0.84      1916
+   macro avg       0.84      0.83      0.83      1916
+weighted avg       0.84      0.84      0.84      1916
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.086
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.204
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.059
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.111
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.085
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.079
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.099
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.151
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.155
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.218
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.151
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.122
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 破洞     | 37.604 | 水渍     | 0.000  |
+| 油渍     | 23.769 | 污渍     | 12.460 | 三丝     | 32.040 |
+| 结头     | 19.873 | 花板跳   | 5.455  | 百脚     | 0.000  |
+| 毛粒     | 4.915  | 粗经     | 0.431  | 松经     | 4.636  |
+| 断经     | 5.289  | 吊经     | 2.727  | 粗维     | 16.688 |
+| 纬缩     | 3.695  | 浆斑     | 17.535 | 整经结   | 18.967 |
+| 星跳     | 1.562  | 跳花     | 2.970  | 断氨纶   | 11.202 |
+| 稀密档   | 2.673  | 浪纹档   | 0.000  | 色差档   | 0.000  |
+| 磨痕     | 0.000  | 轧痕     | 10.849 | 修痕     | 0.000  |
+| 烧毛痕   | 42.921 | 死皱     | 0.000  | 云织     | 0.000  |
+| 双纬     | 0.000  | 双经     | 0.000  | 跳纱     | 0.000  |
+| 筘路     | 0.000  | 纬纱不良 | 21.592 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.14049006416802615
+fps_defect:
+0.14132776590652796
+fps_no_defect:
+0.1392186508855431
+
+
+====================================baseline_34_have_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.84      0.81      0.83       761
+           1       0.88      0.90      0.89      1155
+
+    accuracy                           0.87      1916
+   macro avg       0.86      0.86      0.86      1916
+weighted avg       0.86      0.87      0.86      1916
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.100
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.212
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.070
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.153
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.121
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.075
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.127
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.182
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.186
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.285
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.182
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.136
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 49.810 | 破洞     | 36.736 | 水渍     | 0.000  |
+| 油渍     | 21.109 | 污渍     | 10.365 | 三丝     | 30.553 |
+| 结头     | 19.624 | 花板跳   | 13.983 | 百脚     | 7.922  |
+| 毛粒     | 6.252  | 粗经     | 0.000  | 松经     | 4.616  |
+| 断经     | 4.747  | 吊经     | 0.340  | 粗维     | 15.677 |
+| 纬缩     | 1.901  | 浆斑     | 22.875 | 整经结   | 17.482 |
+| 星跳     | 1.114  | 跳花     | 0.000  | 断氨纶   | 11.580 |
+| 稀密档   | 0.692  | 浪纹档   | 0.000  | 色差档   | 0.000  |
+| 磨痕     | 0.000  | 轧痕     | 8.726  | 修痕     | 0.000  |
+| 烧毛痕   | 45.698 | 死皱     | 0.020  | 云织     | 0.000  |
+| 双纬     | 0.000  | 双经     | 0.000  | 跳纱     | 0.000  |
+| 筘路     | 0.000  | 纬纱不良 | 16.837 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.14047554216205702
+fps_defect:
+0.14122728785395106
+fps_no_defect:
+0.13933458779393923

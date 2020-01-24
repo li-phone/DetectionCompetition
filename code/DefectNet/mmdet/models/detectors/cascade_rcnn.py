@@ -86,6 +86,8 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
 
         self.init_weights(pretrained=pretrained)
 
+        self.criterion = nn.CrossEntropyLoss()
+
     @property
     def with_rpn(self):
         return hasattr(self, 'rpn_head') and self.rpn_head is not None
@@ -113,19 +115,19 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                 self.mask_head[i].init_weights()
 
     def extract_feat(self, img):
-        x = self.backbone(img)
+        x, x2 = self.backbone(img)
         if self.with_neck:
             x = self.neck(x)
-        return x
+        return x, x2
 
     def forward_dummy(self, img):
         outs = ()
         # backbone
-        x = self.extract_feat(img)
+        x, x2 = self.extract_feat(img)
         # rpn
         if self.with_rpn:
             rpn_outs = self.rpn_head(x)
-            outs = outs + (rpn_outs, )
+            outs = outs + (rpn_outs,)
         proposals = torch.randn(1000, 4).cuda()
         # bbox heads
         rois = bbox2roi([proposals])
@@ -146,7 +148,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                 if self.with_shared_head:
                     mask_feats = self.shared_head(mask_feats)
                 mask_pred = self.mask_head[i](mask_feats)
-                outs = outs + (mask_pred, )
+                outs = outs + (mask_pred,)
         return outs
 
     def forward_train(self,
@@ -185,9 +187,26 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        x = self.extract_feat(img)
+        x, x2 = self.extract_feat(img)
+
+        gt_defects = []
+        for gt_label in gt_labels:
+            bg_cnt = 0
+            for l in gt_label:
+                if 1 == int(l):
+                    bg_cnt += 1
+            if bg_cnt != 0 and bg_cnt == len(gt_label):
+                gt_defects.append(0)
+            else:
+                gt_defects.append(1)
 
         losses = dict()
+
+        gt_defects = [torch.Tensor([x]).long().cuda() for x in gt_defects]
+        gt_defects = torch.stack(gt_defects)
+        gt_defects = gt_defects.squeeze()
+        defect_loss = self.criterion(x2, gt_defects)
+        losses.update(defect_loss=defect_loss)
 
         if self.with_rpn:
             rpn_outs = self.rpn_head(x)
