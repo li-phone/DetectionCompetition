@@ -26,7 +26,8 @@ def main():
         # 'baseline_20_no_bg',
         # 'baseline_34_have_bg',
         # 'baseline_34_no_bg',
-        'DefectNet_have_bg',
+        # 'DefectNet_have_bg',
+        'DefectNet_no_bg',
     ]
     train_params = [
         # 'instance_train_alcohol.json',
@@ -59,35 +60,35 @@ def main():
         # except:
         #     print('{} test successfully!'.format(p))
         # hint()
-        #
-        # # # coco eval for train set
-        # # ann_file = '/home/liphone/undone-work/data/detection/' + data_name + '/annotations/{}'.format(ann)
-        # # result_file = '../work_dirs/' + data_name \
-        # #               + '/cascade_rcnn_r50_fpn_1x/{}/latest_epoch_12_out.pkl.bbox.json'.format(p)
-        # # reports = coco_eval(result_file, ['bbox'], ann_file, classwise=True)
-        # # with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_train_report.txt', 'a+') as fp:
-        # #     line = '\n\n' + '=' * 36 + p + '=' * 36 + '\n'
-        # #     fp.write(line)
-        # #     for rpt in reports:
-        # #         fp.write(rpt[0] + '\n' + rpt[1] + '\n')
-        # # hint()
-        #
-        # # infer for test set
-        # from infer import infer_main
-        # kargs = dict(
-        #     config='../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/{}.py'.format(p),
-        #     resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/epoch_12.pth'.format(p),
-        #     ann_file='/home/liphone/undone-work/data/detection/' + data_name + '/annotations/instance_test_fabric_34.json',
-        #     img_dir='/home/liphone/undone-work/data/detection/' + data_name + '/trainval'.format(p),
-        #     work_dir='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}'.format(p),
-        # )
-        # rpts = infer_main(**kargs)
-        # with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_test_report.txt', 'a+') as fp:
+
+        # # coco eval for train set
+        # ann_file = '/home/liphone/undone-work/data/detection/' + data_name + '/annotations/{}'.format(ann)
+        # result_file = '../work_dirs/' + data_name \
+        #               + '/cascade_rcnn_r50_fpn_1x/{}/latest_epoch_12_out.pkl.bbox.json'.format(p)
+        # reports = coco_eval(result_file, ['bbox'], ann_file, classwise=True)
+        # with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_train_report.txt', 'a+') as fp:
         #     line = '\n\n' + '=' * 36 + p + '=' * 36 + '\n'
         #     fp.write(line)
-        #     for k, v in rpts.items():
-        #         fp.write(str(k) + ':\n' + str(v) + '\n')
+        #     for rpt in reports:
+        #         fp.write(rpt[0] + '\n' + rpt[1] + '\n')
         # hint()
+
+        # infer for test set
+        from infer import infer_main
+        kargs = dict(
+            config='../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/{}.py'.format(p),
+            resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/epoch_12.pth'.format(p),
+            ann_file='/home/liphone/undone-work/data/detection/' + data_name + '/annotations/instance_test_alcohol.json',
+            img_dir='/home/liphone/undone-work/data/detection/' + data_name + '/trainval'.format(p),
+            work_dir='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}'.format(p),
+        )
+        rpts = infer_main(**kargs)
+        with open('../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/eval_test_report.txt', 'a+') as fp:
+            line = '\n\n' + '=' * 36 + p + '=' * 36 + '\n'
+            fp.write(line)
+            for k, v in rpts.items():
+                fp.write(str(k) + ':\n' + str(v) + '\n')
+        hint()
 
         time.sleep(1800)
 

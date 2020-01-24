@@ -187,10 +187,10 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         Returns:
             dict[str, Tensor]: a dictionary of loss components
         """
-        x, x2 = self.extract_feat(img)
+        x, defect_out = self.extract_feat(img)
 
         gt_defects = []
-        for gt_label in gt_labels:
+        for i, gt_label in enumerate(gt_labels):
             bg_cnt = 0
             for l in gt_label:
                 if 1 == int(l):
@@ -205,8 +205,34 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         gt_defects = [torch.Tensor([x]).long().cuda() for x in gt_defects]
         gt_defects = torch.stack(gt_defects)
         gt_defects = gt_defects.squeeze()
-        defect_loss = self.criterion(x2, gt_defects)
+        defect_loss = self.criterion(defect_out, gt_defects)
         losses.update(defect_loss=defect_loss)
+
+        img2, img_meta2, gt_bboxes2, gt_labels2 = [], [], [], []
+        x2 = [[] for i in range(len(x))]
+        for i in range(len(gt_defects)):
+            if gt_defects[i] != 0:
+                img2.append(img[i])
+                img_meta2.append(img_meta[i])
+                gt_bboxes2.append(gt_bboxes[i])
+                gt_labels2.append(gt_labels[i])
+                for j in range(len(x2)):
+                    x2[j].append(x[j][i])
+
+        if len(img2) == 0 or len(x2[0]) == 0:
+            loss_zero = torch.Tensor([0]).float().cuda()
+            loss_one = torch.Tensor([1]).float().cuda()
+            losses.update(loss_rpn_cls=loss_zero, loss_rpn_bbox=loss_zero)
+            for i in range(self.num_stages):
+                for name in {'loss_cls', 'loss_bbox'}:
+                    losses['s{}.{}'.format(i, name)] = loss_zero
+                for name in {'acc'}:
+                    losses['s{}.{}'.format(i, name)] = loss_one
+            return losses
+
+        img = torch.stack(img2)
+        x = tuple([torch.stack(_) for _ in x2])
+        img_meta, gt_bboxes, gt_labels = img_meta2, gt_bboxes2, gt_labels2
 
         if self.with_rpn:
             rpn_outs = self.rpn_head(x)
@@ -336,7 +362,13 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         Returns:
             dict: results
         """
-        x = self.extract_feat(img)
+        x, x2 = self.extract_feat(img)
+
+        # new added by liphone
+        defect_score = nn.functional.softmax(x2, dim=1)
+        defect_label = torch.argmax(defect_score, dim=1)
+        if int(defect_label) == 0:
+            return int(defect_label)
 
         proposal_list = self.simple_test_rpn(
             x, img_meta, self.test_cfg.rpn) if proposals is None else proposals

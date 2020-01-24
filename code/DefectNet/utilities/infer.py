@@ -58,17 +58,21 @@ def infer_by_ann(model, img_dir, anns):
         start_t = time.time()
         result = inference_detector(model, path)
         fps_times.append(time.time() - start_t)
-        for idx, pred in enumerate(result):
-            # category_id = label2name[idx+1]
-            category_id = idx
-            for x in pred:
-                bbox_pred = {
-                    "image_id": img_id,
-                    "category_id": category_id,
-                    "bbox": [float(x[0]), float(x[1]), float(x[2] - x[0]), float(x[3] - x[1])],
-                    "score": float(x[4]),
-                }
-                results['annotations'].append(bbox_pred)
+        if isinstance(result, list):
+            for idx, pred in enumerate(result):
+                # category_id = label2name[idx+1]
+                category_id = idx
+                for x in pred:
+                    bbox_pred = {
+                        "image_id": img_id,
+                        "category_id": category_id,
+                        "bbox": [float(x[0]), float(x[1]), float(x[2] - x[0]), float(x[3] - x[1])],
+                        "score": float(x[4]),
+                    }
+                    results['annotations'].append(bbox_pred)
+        elif isinstance(result, int):
+            pass
+
     return results, fps_times
 
 
@@ -99,11 +103,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_no_bg.py',
         help='train config file path')
     parser.add_argument(
         '--resume_from',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg/epoch_12.pth',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_have_bg/epoch_12.pth',
         help='train config file path')
     parser.add_argument(
         '--ann_file',
@@ -113,7 +117,7 @@ def parse_args():
         default='/home/liphone/undone-work/data/detection/alcohol/trainval')
     parser.add_argument(
         '--work_dir',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/baseline_no_bg/',
+        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_have_bg/',
         help='train config file path')
     args = parser.parse_args()
 

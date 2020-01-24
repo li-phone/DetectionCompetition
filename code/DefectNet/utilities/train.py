@@ -19,7 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_have_bg.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_no_bg.py',
         help='train config file path',
     )
     parser.add_argument('--work_dir', help='the dir to save logs and models')

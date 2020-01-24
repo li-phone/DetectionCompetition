@@ -85,3 +85,45 @@ fps_defect:
 0.12989061746049524
 fps_no_defect:
 0.12041357888115777
+
+
+====================================DefectNet_have_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.85      0.91      0.88       225
+           1       0.97      0.95      0.96       679
+
+    accuracy                           0.94       904
+   macro avg       0.91      0.93      0.92       904
+weighted avg       0.94      0.94      0.94       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.301
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.519
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.318
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.161
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.243
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.247
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.350
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.396
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.399
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.241
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.331
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.305
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.032  | 瓶盖破损 | 13.766 | 瓶盖变形 | 27.423 |
+| 瓶盖坏边 | 12.554 | 瓶盖打旋 | 70.171 | 瓶盖断点 | 24.158 |
+| 标贴歪斜 | 52.253 | 标贴起皱 | 1.915  | 标贴气泡 | 2.153  |
+| 喷码正常 | 61.781 | 喷码异常 | 64.983 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.09411842659511398
+fps_defect:
+0.10518662462529448
+fps_no_defect:
+0.06071706453959147

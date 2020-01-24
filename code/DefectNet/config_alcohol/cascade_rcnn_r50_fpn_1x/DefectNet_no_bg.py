@@ -229,7 +229,7 @@ dataset_name = 'alcohol'
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/DefectNet_have_bg'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x' + '/DefectNet_no_bg'
 resume_from = None
 load_from = None
 workflow = [('train', 1)]
