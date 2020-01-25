@@ -127,3 +127,130 @@ fps_defect:
 0.10518662462529448
 fps_no_defect:
 0.06071706453959147
+
+
+====================================DefectNet_no_bg====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.85      0.91      0.88       225
+           1       0.97      0.95      0.96       679
+
+    accuracy                           0.94       904
+   macro avg       0.91      0.93      0.92       904
+weighted avg       0.94      0.94      0.94       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.339
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.577
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.364
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.190
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.277
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.281
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.377
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.432
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.434
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.283
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.360
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.379
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 17.917 | 瓶盖变形 | 31.094 |
+| 瓶盖坏边 | 15.828 | 瓶盖打旋 | 73.952 | 瓶盖断点 | 24.515 |
+| 标贴歪斜 | 61.613 | 标贴起皱 | 3.080  | 标贴气泡 | 3.152  |
+| 喷码正常 | 67.562 | 喷码异常 | 74.625 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.09513417308309437
+fps_defect:
+0.10660387946509473
+fps_no_defect:
+0.060521148045857745
+
+
+
+====================================DefectNet_no_bg 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch = 2x epoch =
+acc:
+              precision    recall  f1-score   support
+
+           0       0.87      0.89      0.88       225
+           1       0.96      0.96      0.96       679
+
+    accuracy                           0.94       904
+   macro avg       0.92      0.92      0.92       904
+weighted avg       0.94      0.94      0.94       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.341
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.581
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.371
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.193
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.281
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.282
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.376
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.431
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.432
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.288
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.363
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.356
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 18.105 | 瓶盖变形 | 31.048 |
+| 瓶盖坏边 | 16.321 | 瓶盖打旋 | 73.438 | 瓶盖断点 | 25.220 |
+| 标贴歪斜 | 60.521 | 标贴起皱 | 3.370  | 标贴气泡 | 4.056  |
+| 喷码正常 | 69.047 | 喷码异常 | 74.333 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.09400211868032946
+fps_defect:
+0.10525036209286225
+fps_no_defect:
+0.06005741967095269
+
+
+====================================DefectNet_no_bg_2_weight====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.87      0.90      0.88       225
+           1       0.97      0.95      0.96       679
+
+    accuracy                           0.94       904
+   macro avg       0.92      0.93      0.92       904
+weighted avg       0.94      0.94      0.94       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.365
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.605
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.384
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.211
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.302
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.331
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.389
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.453
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.456
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.297
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.390
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.406
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 22.881 | 瓶盖变形 | 34.316 |
+| 瓶盖坏边 | 18.854 | 瓶盖打旋 | 75.964 | 瓶盖断点 | 24.530 |
+| 标贴歪斜 | 67.031 | 标贴起皱 | 5.602  | 标贴气泡 | 4.688  |
+| 喷码正常 | 70.004 | 喷码异常 | 77.767 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.09524276483375414
+fps_defect:
+0.10657690902170622
+fps_no_defect:
+0.0610388363732232

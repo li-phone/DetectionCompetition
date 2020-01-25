@@ -206,7 +206,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         gt_defects = torch.stack(gt_defects)
         gt_defects = gt_defects.squeeze()
         defect_loss = self.criterion(defect_out, gt_defects)
-        losses.update(defect_loss=defect_loss)
+        losses.update(defect_loss=defect_loss / 4)
 
         img2, img_meta2, gt_bboxes2, gt_labels2 = [], [], [], []
         x2 = [[] for i in range(len(x))]

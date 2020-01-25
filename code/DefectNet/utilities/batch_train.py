@@ -27,7 +27,7 @@ def main():
         # 'baseline_34_have_bg',
         # 'baseline_34_no_bg',
         # 'DefectNet_have_bg',
-        'DefectNet_no_bg',
+        'DefectNet_no_bg_4_weight',
     ]
     train_params = [
         # 'instance_train_alcohol.json',
@@ -77,7 +77,7 @@ def main():
         from infer import infer_main
         kargs = dict(
             config='../config_' + data_name + '/cascade_rcnn_r50_fpn_1x/{}.py'.format(p),
-            resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/epoch_12.pth'.format(p),
+            resume_from='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}/latest.pth'.format(p),
             ann_file='/home/liphone/undone-work/data/detection/' + data_name + '/annotations/instance_test_alcohol.json',
             img_dir='/home/liphone/undone-work/data/detection/' + data_name + '/trainval'.format(p),
             work_dir='../work_dirs/' + data_name + '/cascade_rcnn_r50_fpn_1x/{}'.format(p),
