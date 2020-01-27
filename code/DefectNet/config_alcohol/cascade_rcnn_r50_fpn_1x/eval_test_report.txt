@@ -254,3 +254,45 @@ fps_defect:
 0.10657690902170622
 fps_no_defect:
 0.0610388363732232
+
+
+====================================DefectNet_no_bg_4_weight====================================
+acc:
+              precision    recall  f1-score   support
+
+           0       0.88      0.92      0.90       225
+           1       0.97      0.96      0.97       679
+
+    accuracy                           0.95       904
+   macro avg       0.93      0.94      0.93       904
+weighted avg       0.95      0.95      0.95       904
+
+mAP:
+
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.386
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.627
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.400
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.223
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.319
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.393
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.479
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.482
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.313
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.407
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.477
+
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 26.846 | 瓶盖变形 | 36.439 |
+| 瓶盖坏边 | 19.351 | 瓶盖打旋 | 78.348 | 瓶盖断点 | 24.959 |
+| 标贴歪斜 | 71.450 | 标贴起皱 | 8.004  | 标贴气泡 | 7.501  |
+| 喷码正常 | 71.346 | 喷码异常 | 80.101 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+fps:
+0.0942958079080666
+fps_defect:
+0.1055394967631142
+fps_no_defect:
+0.060364853541056314
