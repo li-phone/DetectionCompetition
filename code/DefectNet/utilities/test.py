@@ -84,7 +84,7 @@ def collect_results_cpu(result_part, size, tmpdir=None):
     if tmpdir is None:
         MAX_LEN = 512
         # 32 is whitespace
-        dir_tensor = torch.full((MAX_LEN, ),
+        dir_tensor = torch.full((MAX_LEN,),
                                 32,
                                 dtype=torch.uint8,
                                 device='cuda')
@@ -157,19 +157,19 @@ def parse_args():
     parser = argparse.ArgumentParser(description='MMDet test detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/baseline.py',
         help='test config file path')
     parser.add_argument(
         '--checkpoint',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1/latest.pth',
+        default=None,
         help='checkpoint file')
     parser.add_argument(
         '--out',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1/latest_epoch_12_out.pkl',
+        default=None,
         help='output result file')
     parser.add_argument(
         '--json_out',
-        default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n1/latest_epoch_12_out.json',
+        default=None,
         help='output result file name without extension',
         type=str)
     parser.add_argument(
@@ -177,7 +177,7 @@ def parse_args():
         type=str,
         nargs='+',
         choices=['proposal', 'proposal_fast', 'bbox', 'segm', 'keypoints'],
-        default='bbox',
+        default=['bbox'],
         help='eval types')
     parser.add_argument('--show', action='store_true', help='show results')
     parser.add_argument(
@@ -191,14 +191,17 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument('--mode', type=str, default='test')
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
     return args
 
 
-def main():
+def main(**kwargs):
     args = parse_args()
+    for k, v in kwargs.items():
+        args.__setattr__(k, v)
 
     assert args.out or args.show or args.json_out, \
         ('Please specify at least one operation (save or show the results) '
@@ -210,11 +213,16 @@ def main():
     if args.json_out is not None and args.json_out.endswith('.json'):
         args.json_out = args.json_out[:-5]
 
-    cfg = mmcv.Config.fromfile(args.config)
+    if isinstance(args.config, str):
+        cfg = mmcv.Config.fromfile(args.config)
+    else:
+        cfg = args.config
+
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
     cfg.model.pretrained = None
+    cfg.data.val.test_mode = True
     cfg.data.test.test_mode = True
 
     # init distributed env first, since logger depends on the dist info.
@@ -226,7 +234,10 @@ def main():
 
     # build the dataloader
     # TODO: support multiple images per gpu (only minor changes are needed)
-    dataset = build_dataset(cfg.data.test)
+    if args.mode == 'val':
+        dataset = build_dataset(cfg.data.val)
+    else:
+        dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
         imgs_per_gpu=1,
@@ -256,6 +267,7 @@ def main():
                                  args.gpu_collect)
 
     rank, _ = get_dist_info()
+    rpts = None
     if args.out and rank == 0:
         print('\nwriting results to {}'.format(args.out))
         mmcv.dump(outputs, args.out)
@@ -264,29 +276,33 @@ def main():
             print('Starting evaluate {}'.format(' and '.join(eval_types)))
             if eval_types == ['proposal_fast']:
                 result_file = args.out
-                coco_eval(result_file, eval_types, dataset.coco)
+                rpts = coco_eval(result_file, eval_types, dataset.coco, classwise=True)
             else:
                 if not isinstance(outputs[0], dict):
                     result_files = results2json(dataset, outputs, args.out)
-                    coco_eval(result_files, eval_types, dataset.coco)
+                    rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True)
                 else:
                     for name in outputs[0]:
                         print('\nEvaluating {}'.format(name))
                         outputs_ = [out[name] for out in outputs]
                         result_file = args.out + '.{}'.format(name)
-                        result_files = results2json(dataset, outputs_,
-                                                    result_file)
-                        coco_eval(result_files, eval_types, dataset.coco)
+                        result_files = results2json(dataset, outputs_, result_file)
+                        rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True)
 
     # Save predictions in the COCO json format
     if args.json_out and rank == 0:
         if not isinstance(outputs[0], dict):
-            results2json(dataset, outputs, args.json_out)
+            result_files = results2json(dataset, outputs, args.json_out)
+            eval_types = args.eval
+            if eval_types:
+                print('Starting evaluate {}'.format(' and '.join(eval_types)))
+                rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True)
         else:
             for name in outputs[0]:
                 outputs_ = [out[name] for out in outputs]
                 result_file = args.json_out + '.{}'.format(name)
                 results2json(dataset, outputs_, result_file)
+    return rpts
 
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
         '--config',
-        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/DefectNet_no_bg.py',
+        default='../config_alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3.py',
         help='train config file path',
     )
     parser.add_argument('--work_dir', help='the dir to save logs and models')
@@ -34,7 +34,7 @@ def parse_args():
         type=int,
         default=1,
         help='number of gpus to use '
-        '(only applicable to non-distributed training)')
+             '(only applicable to non-distributed training)')
     parser.add_argument('--seed', type=int, default=666, help='random seed')
     parser.add_argument(
         '--deterministic',
@@ -57,10 +57,16 @@ def parse_args():
     return args
 
 
-def main():
+def main(**kwargs):
     args = parse_args()
+    for k, v in kwargs.items():
+        args.__setattr__(k, v)
 
-    cfg = Config.fromfile(args.config)
+    if isinstance(args.config, str):
+        cfg = Config.fromfile(args.config)
+    else:
+        cfg = args.config
+
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
