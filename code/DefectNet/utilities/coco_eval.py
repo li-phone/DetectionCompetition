@@ -6,18 +6,6 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 
-def coco_evaluate(gt_file, dt_file):
-    print("start evaluate using coco api")
-    cocoGt = COCO(gt_file)
-    cocoDt = cocoGt.loadRes(dt_file)
-    cocoEval = COCOeval(cocoGt, cocoDt, "bbox")
-    # cocoEval.params.iouThrs = np.linspace(0.2, 0.8, 8)
-    cocoEval.evaluate()
-    cocoEval.accumulate()
-    report = cocoEval.summarize()
-    return report
-
-
 def main():
     parser = ArgumentParser(description='COCO Evaluation')
     parser.add_argument(

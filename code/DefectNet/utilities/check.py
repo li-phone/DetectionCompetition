@@ -13,6 +13,6 @@ for img_id in img_ids:
             bg_cnt += 1
     if bg_cnt != 0:
         if bg_cnt > 1:
-            print('bg_cng', bg_cnt)
+            print('bg_cnt', bg_cnt)
         if bg_cnt != len(anns):
             print('bg_cng/len(anns):', bg_cnt, len(anns))

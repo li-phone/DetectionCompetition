@@ -13,7 +13,8 @@ def coco_eval(result_files,
               result_types,
               coco,
               max_dets=(100, 300, 1000),
-              classwise=False):
+              classwise=False,
+              ignore_ids=None, ):
     for res_type in result_types:
         assert res_type in [
             'proposal', 'proposal_fast', 'bbox', 'segm', 'keypoints'
@@ -29,7 +30,7 @@ def coco_eval(result_files,
             print('AR@{}\t= {:.4f}'.format(num, ar[i]))
         return
 
-    reports = []
+    reports = {}
     for res_type in result_types:
         if isinstance(result_files, str):
             result_file = result_files
@@ -49,9 +50,9 @@ def coco_eval(result_files,
             cocoEval.params.maxDets = list(max_dets)
         cocoEval.evaluate()
         cocoEval.accumulate()
-        coco_rpt = cocoEval.summarize()
+        stats, coco_rpt = cocoEval.summarize(ignore_ids=ignore_ids)
 
-        cls_rpt = ''
+        class_rpt, classwise_data = '', {}
         if classwise:
             # Compute per-category AP
             # from https://github.com/facebookresearch/detectron2/blob/03064eb5bafe4a3e5750cc7a16672daf5afe8435/detectron2/evaluation/coco_evaluation.py#L259-L283 # noqa
@@ -71,6 +72,7 @@ def coco_eval(result_files,
                 results_per_category.append(
                     ('{}'.format(nm['name']),
                      '{:0.3f}'.format(float(ap * 100))))
+                classwise_data['{}'.format(nm['name'])] = ap
 
             N_COLS = min(6, len(results_per_category) * 2)
             results_flatten = list(itertools.chain(*results_per_category))
@@ -80,9 +82,13 @@ def coco_eval(result_files,
             table_data = [headers]
             table_data += [result for result in results_2d]
             table = AsciiTable(table_data)
-            cls_rpt = str(table.table)
-            print(cls_rpt)
-        reports.append((coco_rpt, cls_rpt))
+            class_rpt = str(table.table)
+            print(class_rpt)
+        stats = [x for x in stats]
+        reports[res_type] = dict(
+            log=dict(coco_eval=coco_rpt, classwise=class_rpt),
+            data=dict(coco_eval=stats, classwise=classwise_data),
+        )
     return reports
 
 
@@ -96,7 +102,7 @@ def fast_eval_recall(results,
     elif not isinstance(results, list):
         raise TypeError(
             'results must be a list of numpy arrays or a filename, not {}'.
-            format(type(results)))
+                format(type(results)))
 
     gt_bboxes = []
     img_ids = coco.getImgIds()

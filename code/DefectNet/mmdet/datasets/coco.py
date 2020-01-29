@@ -7,7 +7,6 @@ from .registry import DATASETS
 
 @DATASETS.register_module
 class CocoDataset(CustomDataset):
-
     CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                'train', 'truck', 'boat', 'traffic_light', 'fire_hydrant',
                'stop_sign', 'parking_meter', 'bench', 'bird', 'cat', 'dog',
@@ -23,13 +22,19 @@ class CocoDataset(CustomDataset):
                'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
                'vase', 'scissors', 'teddy_bear', 'hair_drier', 'toothbrush')
 
-    def load_annotations(self, ann_file):
+    def load_annotations(self, ann_file, background_train=False):
         self.coco = COCO(ann_file)
         self.cat_ids = self.coco.getCatIds()
-        self.cat2label = {
-            cat_id: i + 1
-            for i, cat_id in enumerate(self.cat_ids)
-        }
+        if not background_train and self.cat_ids[0] == 0:
+            self.cat2label = {
+                cat_id: i
+                for i, cat_id in enumerate(self.cat_ids)
+            }
+        else:
+            self.cat2label = {
+                cat_id: i + 1
+                for i, cat_id in enumerate(self.cat_ids)
+            }
         self.img_ids = self.coco.getImgIds()
         img_infos = []
         for i in self.img_ids:

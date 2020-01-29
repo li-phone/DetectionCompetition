@@ -18,6 +18,9 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
     def __init__(self,
                  num_stages,
                  backbone,
+                 find_weight=1.0,
+                 background_train=False,
+                 find_defect_loss=None,
                  neck=None,
                  shared_head=None,
                  rpn_head=None,
@@ -34,6 +37,12 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
 
         self.num_stages = num_stages
         self.backbone = builder.build_backbone(backbone)
+        self.find_weight = find_weight
+        self.background_train = background_train
+        if find_defect_loss is None:
+            self.find_defect_loss = nn.CrossEntropyLoss()
+        else:
+            self.find_defect_loss = nn.CrossEntropyLoss()
 
         if neck is not None:
             self.neck = builder.build_neck(neck)
@@ -85,8 +94,6 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         self.test_cfg = test_cfg
 
         self.init_weights(pretrained=pretrained)
-
-        self.criterion = nn.CrossEntropyLoss()
 
     @property
     def with_rpn(self):
@@ -189,50 +196,57 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         """
         x, defect_out = self.extract_feat(img)
 
+        # split defect image and normal image
+        bg_id = 1 if self.background_train else 0
         gt_defects = []
         for i, gt_label in enumerate(gt_labels):
             bg_cnt = 0
-            for l in gt_label:
-                if 1 == int(l):
+            for label in gt_label:
+                if bg_id == int(label):
                     bg_cnt += 1
-            if bg_cnt != 0 and bg_cnt == len(gt_label):
+            if bg_cnt != 0 and bg_cnt == gt_label.shape[0]:
                 gt_defects.append(0)
             else:
                 gt_defects.append(1)
 
+        # calculate find defect loss
         losses = dict()
-
         gt_defects = [torch.Tensor([x]).long().cuda() for x in gt_defects]
         gt_defects = torch.stack(gt_defects)
         gt_defects = gt_defects.squeeze()
-        defect_loss = self.criterion(defect_out, gt_defects)
-        losses.update(defect_loss=defect_loss / 4)
+        defect_loss = self.find_defect_loss(defect_out, gt_defects)
+        defect_loss = defect_loss * self.find_weight
+        losses.update(defect_loss=defect_loss)
 
-        img2, img_meta2, gt_bboxes2, gt_labels2 = [], [], [], []
-        x2 = [[] for i in range(len(x))]
-        for i in range(len(gt_defects)):
-            if gt_defects[i] != 0:
-                img2.append(img[i])
-                img_meta2.append(img_meta[i])
-                gt_bboxes2.append(gt_bboxes[i])
-                gt_labels2.append(gt_labels[i])
-                for j in range(len(x2)):
-                    x2[j].append(x[j][i])
+        if not self.background_train:
+            # delete the normal images
+            img2, img_meta2, gt_bboxes2, gt_labels2 = [], [], [], []
+            x2 = [[] for i in range(len(x))]
+            for i in range(gt_defects.shape[0]):
+                if gt_defects[i] != 0:
+                    img2.append(img[i])
+                    img_meta2.append(img_meta[i])
+                    gt_bboxes2.append(gt_bboxes[i])
+                    gt_labels2.append(gt_labels[i])
+                    for j in range(len(x2)):
+                        x2[j].append(x[j][i])
 
-        if len(img2) == 0 or len(x2[0]) == 0:
-            loss_zero = torch.Tensor([0]).float().cuda()
-            loss_one = torch.Tensor([1]).float().cuda()
-            losses.update(loss_rpn_cls=loss_zero, loss_rpn_bbox=loss_zero)
-            for i in range(self.num_stages):
-                for name in {'loss_cls', 'loss_bbox'}:
-                    losses['s{}.{}'.format(i, name)] = loss_zero
-                for name in {'acc'}:
-                    losses['s{}.{}'.format(i, name)] = loss_one
-            return losses
+            # if have no defect images, then set all loss to be 0 except find defect loss
+            if len(img2) == 0 or len(x2[0]) == 0:
+                loss_zero = torch.Tensor([0]).float().cuda()
+                loss_one = torch.Tensor([1]).float().cuda()
+                losses.update(loss_rpn_cls=loss_zero, loss_rpn_bbox=loss_zero)
+                for i in range(self.num_stages):
+                    for name in {'loss_cls', 'loss_bbox'}:
+                        losses['s{}.{}'.format(i, name)] = loss_zero
+                    for name in {'acc'}:
+                        losses['s{}.{}'.format(i, name)] = loss_one
+                return losses
 
-        img = torch.stack(img2)
-        x = tuple([torch.stack(_) for _ in x2])
-        img_meta, gt_bboxes, gt_labels = img_meta2, gt_bboxes2, gt_labels2
+            # update reference variable
+            img = torch.stack(img2)
+            x = tuple([torch.stack(_) for _ in x2])
+            img_meta, gt_bboxes, gt_labels = img_meta2, gt_bboxes2, gt_labels2
 
         if self.with_rpn:
             rpn_outs = self.rpn_head(x)
@@ -364,6 +378,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         """
         x, x2 = self.extract_feat(img)
 
+        # shortcut quit
         # new added by liphone
         defect_score = nn.functional.softmax(x2, dim=1)
         defect_label = torch.argmax(defect_score, dim=1)

@@ -4,6 +4,12 @@ import os.path as osp
 import pickle
 import shutil
 import tempfile
+import time
+import pandas as pd
+import numpy as np
+import json
+from pandas.io.json import json_normalize
+from sklearn.metrics import classification_report
 
 import mmcv
 import torch
@@ -18,21 +24,83 @@ from mmdet.models import build_detector
 
 def single_gpu_test(model, data_loader, show=False):
     model.eval()
-    results = []
+    results, result_times = [], []
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
         with torch.no_grad():
+            start_t = time.time()
             result = model(return_loss=False, rescale=not show, **data)
-        results.append(result)
+            result_times.append(time.time() - start_t)
+        if isinstance(result, list):
+            results.append(result)
+        elif isinstance(result, int):
+            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat_ids))]
+            results.append(r)
+        else:
+            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat_ids))]
+            results.append(r)
 
         if show:
             model.module.show_result(data, result)
-
         batch_size = data['img'][0].size(0)
         for _ in range(batch_size):
             prog_bar.update()
-    return results
+    return results, result_times
+
+
+def have_defect(anns, images, threshold=0.05):
+    if isinstance(anns, str):
+        with open(anns) as fp:
+            anns = json.load(fp)
+    if isinstance(anns, dict):
+        anns = anns['annotations']
+    assert isinstance(anns, list)
+    annotations = json_normalize(anns)
+    det_results = []
+    for image in images:
+        defect_num = 0
+        if annotations.shape[0] > 0:
+            ann = annotations[annotations['image_id'] == image['id']]
+            for j in range(ann.shape[0]):
+                a = ann.iloc[j]
+                if 'score' in a:
+                    if a['score'] > threshold and a['category_id'] > 0:
+                        defect_num += 1
+                else:
+                    if a['category_id'] > 0:
+                        defect_num += 1
+        if 0 == defect_num:
+            det_results.append(0)
+        else:
+            det_results.append(defect_num)
+    assert len(det_results) == len(images)
+    return det_results
+
+
+def defect_eval(det_result, gt_result, result_times):
+    pred_nums = have_defect(det_result, gt_result['images'])
+    y_pred = [0 if x == 0 else 1 for x in pred_nums]
+    true_nums = have_defect(gt_result, gt_result['images'])
+    y_true = [0 if x == 0 else 1 for x in true_nums]
+    assert len(y_pred) == len(y_true)
+
+    find_ability_rpt = classification_report(y_true, y_pred, output_dict=False)
+    find_ability = classification_report(y_true, y_pred, output_dict=True)
+    defect_fps = [result_times[i] for i, x in enumerate(y_true) if x != 0]
+    normal_fps = [result_times[i] for i, x in enumerate(y_true) if x == 0]
+
+    assert len(defect_fps) + len(normal_fps) == len(result_times)
+    return dict(
+        log=dict(
+            find_ability=find_ability_rpt, fps=np.mean(result_times),
+            defect_fps=np.mean(defect_fps), normal_fps=np.mean(normal_fps),
+        ),
+        data=dict(
+            find_ability=find_ability, fps=result_times,
+            defect_fps=defect_fps, normal_fps=normal_fps,
+        ),
+    )
 
 
 def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
@@ -192,6 +260,7 @@ def parse_args():
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
     parser.add_argument('--mode', type=str, default='test')
+    parser.add_argument('--imgs_per_gpu', type=int, default=1)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -239,17 +308,9 @@ def main(**kwargs):
     else:
         dataset = build_dataset(cfg.data.test)
 
-    # if exist result file, eval result directly, not again infer with wasting resources
-    eval_types = args.eval
-    if eval_types:
-        print('Starting evaluate {}'.format(' and '.join(eval_types)))
-        result_files = {t: '{}.{}.json'.format(args.json_out, t) for t in eval_types}
-        rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=[0])
-        return rpts
-
     data_loader = build_dataloader(
         dataset,
-        imgs_per_gpu=1,
+        imgs_per_gpu=args.imgs_per_gpu,
         workers_per_gpu=cfg.data.workers_per_gpu,
         dist=distributed,
         shuffle=False)
@@ -269,11 +330,11 @@ def main(**kwargs):
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs = single_gpu_test(model, data_loader, args.show)
+        outputs, result_times = single_gpu_test(model, data_loader, args.show)
     else:
         model = MMDistributedDataParallel(model.cuda())
-        outputs = multi_gpu_test(model, data_loader, args.tmpdir,
-                                 args.gpu_collect)
+        outputs, result_times = multi_gpu_test(model, data_loader, args.tmpdir,
+                                               args.gpu_collect)
 
     rank, _ = get_dist_info()
     rpts = {}
@@ -306,6 +367,9 @@ def main(**kwargs):
             if eval_types:
                 print('Starting evaluate {}'.format(' and '.join(eval_types)))
                 rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=[0])
+                defect_rpt = defect_eval(result_files['bbox'], dataset.coco.dataset, result_times)
+                rpts['bbox']['log']['defect_eval'] = defect_rpt['log']
+                rpts['bbox']['data']['defect_eval'] = defect_rpt['data']
         else:
             for name in outputs[0]:
                 outputs_ = [out[name] for out in outputs]

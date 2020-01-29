@@ -380,7 +380,7 @@ class ResNet(nn.Module):
     def __init__(self,
                  depth,
                  # new added by liphone
-                 num_classes=100,
+                 num_classes=1000,
                  in_channels=3,
                  num_stages=4,
                  strides=(1, 2, 2, 2),
