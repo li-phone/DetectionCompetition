@@ -36,7 +36,6 @@ class CustomDataset(Dataset):
     def __init__(self,
                  ann_file,
                  pipeline,
-                 background_train=True,
                  data_root=None,
                  img_prefix='',
                  seg_prefix=None,
@@ -64,7 +63,7 @@ class CustomDataset(Dataset):
                 self.proposal_file = osp.join(self.data_root,
                                               self.proposal_file)
         # load annotations (and proposals)
-        self.img_infos = self.load_annotations(self.ann_file, background_train=background_train)
+        self.img_infos = self.load_annotations(self.ann_file)
         if self.proposal_file is not None:
             self.proposals = self.load_proposals(self.proposal_file)
         else:

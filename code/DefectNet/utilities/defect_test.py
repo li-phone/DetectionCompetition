@@ -35,10 +35,10 @@ def single_gpu_test(model, data_loader, show=False):
         if isinstance(result, list):
             results.append(result)
         elif isinstance(result, int):
-            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat_ids))]
+            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat2label))]
             results.append(r)
         else:
-            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat_ids))]
+            r = [np.empty([0, 5], dtype=np.float32) for i in range(len(dataset.cat2label))]
             results.append(r)
 
         if show:
@@ -70,10 +70,7 @@ def have_defect(anns, images, threshold=0.05):
                 else:
                     if a['category_id'] > 0:
                         defect_num += 1
-        if 0 == defect_num:
-            det_results.append(0)
-        else:
-            det_results.append(defect_num)
+        det_results.append(defect_num)
     assert len(det_results) == len(images)
     return det_results
 

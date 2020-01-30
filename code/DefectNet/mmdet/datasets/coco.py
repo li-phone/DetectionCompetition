@@ -22,19 +22,16 @@ class CocoDataset(CustomDataset):
                'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
                'vase', 'scissors', 'teddy_bear', 'hair_drier', 'toothbrush')
 
-    def load_annotations(self, ann_file, background_train=False):
+    def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
-        self.cat_ids = self.coco.getCatIds()
-        if not background_train and self.cat_ids[0] == 0:
-            self.cat2label = {
-                cat_id: i
-                for i, cat_id in enumerate(self.cat_ids)
-            }
-        else:
-            self.cat2label = {
-                cat_id: i + 1
-                for i, cat_id in enumerate(self.cat_ids)
-            }
+        # self.cat_ids = self.coco.getCatIds()
+        self.cat_ids = [0] * (len(self.coco.cats) + 1)
+        for k, v in self.coco.cats.items():
+            self.cat_ids[v['id']] = v['id']
+        self.cat2label = {
+            cat_id: cat_id
+            for i, cat_id in enumerate(self.cat_ids)
+        }
         self.img_ids = self.coco.getImgIds()
         img_infos = []
         for i in self.img_ids:

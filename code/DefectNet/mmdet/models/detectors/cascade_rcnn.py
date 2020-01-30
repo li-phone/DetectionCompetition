@@ -38,6 +38,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         self.num_stages = num_stages
         self.backbone = builder.build_backbone(backbone)
         self.find_weight = find_weight
+        assert self.find_weight >= 0
         self.background_train = background_train
         if find_defect_loss is None:
             self.find_defect_loss = nn.CrossEntropyLoss()
@@ -197,21 +198,19 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         x, defect_out = self.extract_feat(img)
 
         # split defect image and normal image
-        bg_id = 1 if self.background_train else 0
+        bg_id = 0
         gt_defects = []
         for i, gt_label in enumerate(gt_labels):
-            bg_cnt = 0
+            defect_cnt = 0
             for label in gt_label:
-                if bg_id == int(label):
-                    bg_cnt += 1
-            if bg_cnt != 0 and bg_cnt == gt_label.shape[0]:
-                gt_defects.append(0)
-            else:
-                gt_defects.append(1)
+                if bg_id != int(label):
+                    defect_cnt += 1
+            gt_defects.append(defect_cnt)
 
         # calculate find defect loss
         losses = dict()
-        gt_defects = [torch.Tensor([x]).long().cuda() for x in gt_defects]
+        gt_defects = [0 if i == 0 else 1 for i in gt_defects]
+        gt_defects = [torch.Tensor([_]).long().cuda() for _ in gt_defects]
         gt_defects = torch.stack(gt_defects)
         gt_defects = gt_defects.squeeze()
         defect_loss = self.find_defect_loss(defect_out, gt_defects)
@@ -378,12 +377,13 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         """
         x, x2 = self.extract_feat(img)
 
-        # shortcut quit
-        # new added by liphone
-        defect_score = nn.functional.softmax(x2, dim=1)
-        defect_label = torch.argmax(defect_score, dim=1)
-        if int(defect_label) == 0:
-            return int(defect_label)
+        if self.find_weight > 0:
+            # shortcut quit
+            # new added by liphone
+            defect_score = nn.functional.softmax(x2, dim=1)
+            defect_label = torch.argmax(defect_score, dim=1)
+            if int(defect_label) == 0:
+                return int(defect_label)
 
         proposal_list = self.simple_test_rpn(
             x, img_meta, self.test_cfg.rpn) if proposals is None else proposals

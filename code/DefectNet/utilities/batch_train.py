@@ -62,11 +62,6 @@ def main():
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
         cfg.model['find_weight'] = base_weight * n
         cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
-        for v in cfg.model['bbox_head']:
-            v['num_classes'] += int(cfg.model['background_train'])
-        cfg.data['train']['background_train'] = cfg.model['background_train']
-        cfg.data['val']['background_train'] = cfg.model['background_train']
-        cfg.data['test']['background_train'] = cfg.model['background_train']
         cfgs.append(cfg)
 
     for cfg in tqdm(cfgs):
@@ -79,29 +74,32 @@ def main():
         print('{} train successfully!'.format(cfg_name))
         hint()
 
-        # eval for val set
-        eval_val_params = dict(
-            config=cfg,
-            checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-            json_out=osp.join(cfg.work_dir, 'eval_val_set.json'),
-            mode='val',
-        )
-        report = test_main(**eval_val_params)
-        eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='val')
-        print('{} eval val successfully!'.format(cfg_name))
-        hint()
+        try:
+            # eval for val set
+            eval_val_params = dict(
+                config=cfg,
+                checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
+                json_out=osp.join(cfg.work_dir, 'eval_val_set.json'),
+                mode='val',
+            )
+            report = test_main(**eval_val_params)
+            eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='val')
+            print('{} eval val successfully!'.format(cfg_name))
+            hint()
 
-        # eval for test set
-        eval_test_params = dict(
-            config=cfg,
-            checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-            json_out=osp.join(cfg.work_dir, 'eval_test_set.json'),
-            mode='test',
-        )
-        report = test_main(**eval_test_params)
-        eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='test')
-        print('{} eval test successfully!'.format(cfg_name))
-        hint()
+            # eval for test set
+            eval_test_params = dict(
+                config=cfg,
+                checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
+                json_out=osp.join(cfg.work_dir, 'eval_test_set.json'),
+                mode='test',
+            )
+            report = test_main(**eval_test_params)
+            eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='test')
+            print('{} eval test successfully!'.format(cfg_name))
+            hint()
+        except Exception as e:
+            print(e)
 
         # infer
         # infer_params = dict(
@@ -116,7 +114,7 @@ def main():
         # print('{} infer successfully!'.format(cfg_name))
         # hint()
 
-        # time.sleep(1800)
+        time.sleep(1800)
 
 
 if __name__ == '__main__':
