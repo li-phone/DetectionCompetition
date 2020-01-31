@@ -38,10 +38,6 @@ def eval_report(rpt_txt, rpts, cfg, mode='val'):
                         fp.write('\n' + k3 + ':\n' + str(v3) + '\n')
                 else:
                     fp.write('\n' + k2 + ':\n' + str(v2) + '\n')
-
-            fp.write('data' + ':\n')  # log
-            for k2, v2 in v1['data'].items():
-                fp.write('\n' + k2 + ':\n' + json.dumps(v2) + '\n')
     json_txt = rpt_txt[:-4]
     with open(json_txt + '.json', 'a+') as fp:
         jstr = json.dumps(dict(cfg=cfg, mode=mode, data=rpts))
@@ -56,25 +52,29 @@ def main():
 
     # watch train effects using different base cfg
     base_weight = 1.0
-    ns = [0.1 * i for i in range(0, 21, 2)]
+    ns = [0.1 * i for i in range(0, 21, 1)]
+    # ns = [1]
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
         cfg.model['find_weight'] = base_weight * n
         cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
+        cfg.resume_from = cfg.work_dir + '/latest.pth'
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
         cfgs.append(cfg)
 
     for cfg in tqdm(cfgs):
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
 
-        # train
-        train_params = dict(config=cfg)
-        train_main(**train_params)
-        print('{} train successfully!'.format(cfg_name))
-        hint()
-
         try:
+            # train
+            train_params = dict(config=cfg)
+            train_main(**train_params)
+            print('{} train successfully!'.format(cfg_name))
+            hint()
+
             # eval for val set
             eval_val_params = dict(
                 config=cfg,
