@@ -1,6 +1,5 @@
 # code dir
 code/ignores
-code/*/.*
 code/*/build
 code/*/work_dirs
 code/*/__pycache__
