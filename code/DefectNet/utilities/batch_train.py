@@ -52,11 +52,16 @@ def main():
 
     # watch train effects using different base cfg
     base_weight = 1.0
-    ns = [0.1 * i for i in range(0, 21, 1)]
-    # ns = [1]
+    times = [0.1 * i for i in range(0, 21, 1)]
+    ns = [0., 0.1, 1., 2.]
+    ns.extend(times)
+    ns = set(ns)
+    # ns.reverse()
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.model['find_weight'] = base_weight * n
         cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
         cfg.resume_from = cfg.work_dir + '/latest.pth'
@@ -116,7 +121,7 @@ def main():
         # print('{} infer successfully!'.format(cfg_name))
         # hint()
 
-        time.sleep(1800)
+        time.sleep(900)
 
 
 if __name__ == '__main__':
