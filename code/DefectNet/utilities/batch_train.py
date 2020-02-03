@@ -70,6 +70,7 @@ def main():
         cfgs.append(cfg)
 
     for cfg in tqdm(cfgs):
+        sleep_flag = False
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
 
@@ -79,6 +80,7 @@ def main():
             if not os.path.exists(last_epoch):
                 train_params = dict(config=cfg)
                 train_main(**train_params)
+                sleep_flag = True
             print('{} train successfully!'.format(cfg_name))
             hint()
 
@@ -122,8 +124,8 @@ def main():
         # infer_main(**infer_params)
         # print('{} infer successfully!'.format(cfg_name))
         # hint()
-
-        time.sleep(900)
+        if sleep_flag:
+            time.sleep(900)
 
 
 if __name__ == '__main__':
