@@ -75,34 +75,34 @@ def main():
 
         try:
             # train
-            train_params = dict(config=cfg)
             last_epoch = os.path.join(cfg.work_dir, 'epoch_{}.pth'.format(cfg.total_epochs))
             if not os.path.exists(last_epoch):
+                train_params = dict(config=cfg)
                 train_main(**train_params)
             print('{} train successfully!'.format(cfg_name))
             hint()
 
             # eval for val set
-            eval_val_params = dict(
-                config=cfg,
-                checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-                json_out=osp.join(cfg.work_dir, 'eval_val_set.json'),
-                mode='val',
-            )
             if not os.path.exists(osp.join(cfg.work_dir, 'eval_val_set.bbox.json')):
+                eval_val_params = dict(
+                    config=cfg,
+                    checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
+                    json_out=osp.join(cfg.work_dir, 'eval_val_set.json'),
+                    mode='val',
+                )
                 report = test_main(**eval_val_params)
                 eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='val')
                 print('{} eval val successfully!'.format(cfg_name))
                 hint()
 
             # eval for test set
-            eval_test_params = dict(
-                config=cfg,
-                checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-                json_out=osp.join(cfg.work_dir, 'eval_test_set.json'),
-                mode='test',
-            )
             if not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
+                eval_test_params = dict(
+                    config=cfg,
+                    checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
+                    json_out=osp.join(cfg.work_dir, 'eval_test_set.json'),
+                    mode='test',
+                )
                 report = test_main(**eval_test_params)
                 eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='test')
                 print('{} eval test successfully!'.format(cfg_name))
