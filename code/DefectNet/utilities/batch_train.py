@@ -64,7 +64,7 @@ def main():
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.model['find_weight'] = base_weight * n
         cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
-        cfg.resume_from = cfg.work_dir + '/latest.pth'
+        cfg.resume_from = cfg.work_dir + 'latest.pth'
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
         cfgs.append(cfg)
