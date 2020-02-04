@@ -76,11 +76,9 @@ def main():
 
         try:
             # train
-            last_epoch = os.path.join(cfg.work_dir, 'epoch_{}.pth'.format(cfg.total_epochs))
-            if not os.path.exists(last_epoch):
-                train_params = dict(config=cfg)
-                train_main(**train_params)
-                sleep_flag = True
+            train_params = dict(config=cfg)
+            train_main(**train_params)
+            sleep_flag = True
             print('{} train successfully!'.format(cfg_name))
             hint()
 

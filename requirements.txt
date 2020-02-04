@@ -22,7 +22,7 @@ jsonpointer==2.0
 kiwisolver==1.1.0
 matplotlib==3.2.0rc1
 mmcv==0.2.15
--e git+git@gitee.com:liphone/defectNet.git@20a1971a33797494b8b11e1631be2908d2d56e9d#egg=mmdet&subdirectory=code/DefectNet
+-e git+git@gitee.com:liphone/defectNet.git@c55c20d19ace6d5eafaeb768660a6b0fe6040cc2#egg=mmdet&subdirectory=code/DefectNet
 networkx==2.4
 numpy==1.18.0
 olefile==0.46
