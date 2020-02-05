@@ -53,9 +53,10 @@ def main():
     # watch train effects using different base cfg
     base_weight = 1.0
     times = [0.1 * i for i in range(0, 21, 1)]
-    ns = [0., 0.1, 1., 2.]
-    ns.extend(times)
-    ns = set(ns)
+    # ns = [0., 0.1, 1., 2.]
+    # ns.extend(times)
+    # ns = set(ns)
+    ns = times
     # ns.reverse()
     cfgs = []
     for i, n in enumerate(ns):
@@ -96,7 +97,7 @@ def main():
                 hint()
 
             # eval for test set
-            if not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
+            if True or not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
                 eval_test_params = dict(
                     config=cfg,
                     checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
