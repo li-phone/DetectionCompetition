@@ -133,7 +133,7 @@ def draw_figure():
         # plt.show()
 
     draw_speed_weight(axs[2])
-    plt.savefig(save_dir + '/result-defect_finding_weight.svg')
+    plt.savefig(save_dir + '/result-defect_finding_weight.eps')
     plt.show()
 
 
