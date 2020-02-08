@@ -52,7 +52,7 @@ def get_sns_data(data, x_name, y_names, type):
     return pd.DataFrame(dict(x=x, y=y, type=hue))
 
 
-def main():
+def draw_figure():
     data = phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json')
 
     sns.set(style="darkgrid")
@@ -66,13 +66,17 @@ def main():
     data[x_name] = ids
     data = data[data['mode'] == 'test']
 
-    def draw_ap_weight():
+    fig = plt.figure(figsize=(6.4 * 3, 4.8))
+    axs = [fig.add_subplot(1, 3, i) for i in range(1, 4)]
+
+    def draw_ap_weight(ax):
         y_names = ['AP', 'AP:0.50']
         type = {'AP': 'IoU=0.50:0.95', 'AP:0.50': 'IoU=0.50'}
         sns_data = get_sns_data(data, x_name, y_names, type)
         new_x, new_y = 'defect finding weight', 'average precision'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
+            ax=ax,
             x=new_x, y=new_y,
             hue="type",
             style="type",
@@ -81,18 +85,19 @@ def main():
             data=sns_data,
             ci=None
         )
-        plt.savefig('../results/imgs/AP-defect_finding_weight.svg')
-        plt.show()
+        # plt.savefig('../results/imgs/AP-defect_finding_weight.svg')
+        # plt.show()
 
-    draw_ap_weight()
+    draw_ap_weight(axs[0])
 
-    def draw_f1_score_weight():
+    def draw_f1_score_weight(ax):
         y_names = ['f1-score']
         type = {'f1-score': 'f1-score'}
         sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = 'defect finding weight', 'macro avg f1-score'
+        new_x, new_y = 'defect finding weight', 'macro average f1-score'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
+            ax=ax,
             x=new_x, y=new_y,
             hue="type",
             style="type",
@@ -101,18 +106,19 @@ def main():
             data=sns_data,
             ci=None
         )
-        plt.savefig('../results/imgs/f1_score-defect_finding_weight.svg')
-        plt.show()
+        # plt.savefig('../results/imgs/f1_score-defect_finding_weight.svg')
+        # plt.show()
 
-    draw_f1_score_weight()
+    draw_f1_score_weight(axs[1])
 
-    def draw_speed_weight():
+    def draw_speed_weight(ax):
         y_names = ['fps', 'defect_fps', 'normal_fps']
         type = dict(fps='all images', defect_fps='defect images', normal_fps='normal images')
         sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = 'defect finding weight', 'speed'
+        new_x, new_y = 'defect finding weight', 'average time(ms)'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
+            ax=ax,
             x=new_x, y=new_y,
             hue="type",
             style="type",
@@ -121,10 +127,40 @@ def main():
             data=sns_data,
             ci=None
         )
-        plt.savefig('../results/imgs/speed-defect_finding_weight.svg')
-        plt.show()
+        # plt.savefig('../results/imgs/speed-defect_finding_weight.svg')
+        # plt.show()
 
-    draw_speed_weight()
+    draw_speed_weight(axs[2])
+    plt.savefig('../results/imgs/result-defect_finding_weight.svg')
+    plt.show()
+
+
+def count_data(ann_file, head=None):
+    from pycocotools.coco import COCO
+    coco = COCO(ann_file)
+    defect_nums = np.empty(0, dtype=int)
+    for image in coco.dataset['images']:
+        cnt = 0
+        annIds = coco.getAnnIds(imgIds=image['id'])
+        anns = coco.loadAnns(annIds)
+        for ann in anns:
+            if ann['category_id'] != 0:
+                cnt += 1
+        defect_nums = np.append(defect_nums, cnt)
+    normal_cnt = np.where(defect_nums == 0)[0]
+    if head is not None:
+        print(head + ':\n')
+    print('All images count:', len(coco.dataset['images']))
+    print('Normal images count:', normal_cnt.shape[0])
+    print('Defect images count:', defect_nums.shape[0] - normal_cnt.shape[0])
+
+
+def main():
+    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instances_train_20191223_annotations.json',
+               'all')
+    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json', 'train')
+    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json', 'test')
+    draw_figure()
 
 
 if __name__ == '__main__':
