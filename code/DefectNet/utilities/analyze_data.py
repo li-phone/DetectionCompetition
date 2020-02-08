@@ -137,7 +137,7 @@ def draw_figure():
     # plt.gca().yaxis.set_major_locator(plt.NullLocator())
     # plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
     # plt.margins(0, 0)
-    plt.subplots_adjust(left=0.045, right=0.97)
+    plt.subplots_adjust(left=0.05, right=0.97)
     plt.savefig(save_dir + '/result-defect_finding_weight.svg')
     plt.savefig(save_dir + '/result-defect_finding_weight.eps')
     plt.savefig(save_dir + '/result-defect_finding_weight.jpg')
