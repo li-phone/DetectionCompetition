@@ -53,8 +53,10 @@ def get_sns_data(data, x_name, y_names, type):
 
 
 def draw_figure():
+    save_dir = '../results/imgs'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     data = phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json')
-
     sns.set(style="darkgrid")
     ids = []
     for i in range(data.shape[0]):
@@ -131,7 +133,7 @@ def draw_figure():
         # plt.show()
 
     draw_speed_weight(axs[2])
-    plt.savefig('../results/imgs/result-defect_finding_weight.svg')
+    plt.savefig(save_dir + '/result-defect_finding_weight.svg')
     plt.show()
 
 
