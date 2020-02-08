@@ -52,11 +52,13 @@ def get_sns_data(data, x_name, y_names, type):
     return pd.DataFrame(dict(x=x, y=y, type=hue))
 
 
-def draw_figure():
-    save_dir = '../results/imgs'
+def draw_figure(json_path, save_path):
+    save_path = save_path[:-4]
+    save_path = save_path.replace('\\', '/')
+    save_dir = save_path[:save_path.rfind('/')]
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    data = phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json')
+    data = phrase_json(json_path)
     sns.set(style="darkgrid")
     ids = []
     for i in range(data.shape[0]):
@@ -138,9 +140,9 @@ def draw_figure():
     # plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
     # plt.margins(0, 0)
     plt.subplots_adjust(left=0.05, right=0.97)
-    plt.savefig(save_dir + '/result-defect_finding_weight.svg')
-    plt.savefig(save_dir + '/result-defect_finding_weight.eps')
-    plt.savefig(save_dir + '/result-defect_finding_weight.jpg')
+    plt.savefig(save_path + '.svg')
+    plt.savefig(save_path + '.eps')
+    plt.savefig(save_path + '.jpg')
     plt.show()
 
 
@@ -156,12 +158,15 @@ def count_data(ann_file, head=None):
             if ann['category_id'] != 0:
                 cnt += 1
         defect_nums = np.append(defect_nums, cnt)
-    normal_cnt = np.where(defect_nums == 0)[0]
+    normal_shape = np.where(defect_nums == 0)[0]
     if head is not None:
         print(head + ':\n')
-    print('All images count:', len(coco.dataset['images']))
-    print('Normal images count:', normal_cnt.shape[0])
-    print('Defect images count:', defect_nums.shape[0] - normal_cnt.shape[0])
+    all_cnt, normal_cnt = len(coco.dataset['images']), normal_shape.shape[0]
+    defect_cnt = defect_nums.shape[0] - normal_shape.shape[0]
+    print('All images count:', all_cnt)
+    print('Normal images count:', normal_cnt)
+    print('Defect images count:', defect_cnt)
+    print('Normal images : Defect images is ', normal_cnt / defect_cnt)
 
 
 def main():
@@ -169,7 +174,10 @@ def main():
                'all')
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json', 'train')
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json', 'test')
-    draw_figure()
+    draw_figure(
+        '../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json',
+        '../../../doc/figures/result-defect_finding_weight.jpg',
+    )
 
 
 if __name__ == '__main__':

@@ -44,20 +44,14 @@ def eval_report(rpt_txt, rpts, cfg, mode='val'):
         fp.write(jstr + '\n')
 
 
-def main():
+def batch_train(sleep_time=900):
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
-    # mode_paths = [os.path.join(cfg_dir, m) for m in cfg_names]
-    # cfgs = [mmcv.Config.fromfile(p) for p in mode_paths]
 
     # watch train effects using different base cfg
     base_weight = 1.0
-    times = [0.1 * i for i in range(0, 21, 1)]
-    # ns = [0., 0.1, 1., 2.]
-    # ns.extend(times)
-    # ns = set(ns)
-    ns = times
-    # ns.reverse()
+    ratios = [0.1 * i for i in range(0, 21, 1)]
+    ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
@@ -71,7 +65,6 @@ def main():
         cfgs.append(cfg)
 
     for cfg in tqdm(cfgs):
-        sleep_flag = False
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
 
@@ -97,7 +90,7 @@ def main():
                 hint()
 
             # eval for test set
-            if True or not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
+            if not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
                 eval_test_params = dict(
                     config=cfg,
                     checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
@@ -123,8 +116,11 @@ def main():
         # infer_main(**infer_params)
         # print('{} infer successfully!'.format(cfg_name))
         # hint()
-        if sleep_flag:
-            time.sleep(900)
+        time.sleep(sleep_time)
+
+
+def main():
+    batch_train()
 
 
 if __name__ == '__main__':
