@@ -18,7 +18,7 @@ def read_json(json_path):
         for line in lines:
             r = json.loads(line)
             d = r['data']['bbox']['data']
-            result = dict(cfg=r['cfg'], mode=r['mode'])
+            result = dict(cfg=r['cfg'], uid=r['uid'], mode=r['mode'])
             for k, v in zip(np_names, d['coco_eval']):
                 result[k] = v
             for k, v in d['classwise'].items():
@@ -52,7 +52,7 @@ def get_sns_data(data, x_name, y_names, type):
     return pd.DataFrame(dict(x=x, y=y, type=hue))
 
 
-def draw_figure(json_path, save_path):
+def draw_figure(json_path, save_path, x_name):
     save_path = save_path[:-4]
     save_path = save_path.replace('\\', '/')
     save_dir = save_path[:save_path.rfind('/')]
@@ -60,14 +60,13 @@ def draw_figure(json_path, save_path):
         os.makedirs(save_dir)
     data = phrase_json(json_path)
     sns.set(style="darkgrid")
-    ids = []
-    for i in range(data.shape[0]):
-        r = data.iloc[i]
-        arrs = r['cfg'].split('_')
-        ids.append(float(arrs[1][:-1]))
+    # ids = []
+    # for i in range(data.shape[0]):
+    #     r = data.iloc[i]
+    #     arrs = r['cfg'].split('_')
+    #     ids.append(float(arrs[1][:-1]))
 
-    x_name = 'defect finding weight'
-    data[x_name] = ids
+    data[x_name] = data['uid']
     data = data[data['mode'] == 'test']
 
     fig = plt.figure(figsize=(6.4 * 3, 4.8))
@@ -77,7 +76,7 @@ def draw_figure(json_path, save_path):
         y_names = ['AP', 'AP:0.50']
         type = {'AP': 'IoU=0.50:0.95', 'AP:0.50': 'IoU=0.50'}
         sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = 'defect finding weight', 'average precision'
+        new_x, new_y = x_name, 'average precision'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
             ax=ax,
@@ -98,7 +97,7 @@ def draw_figure(json_path, save_path):
         y_names = ['f1-score']
         type = {'f1-score': 'f1-score'}
         sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = 'defect finding weight', 'macro average f1-score'
+        new_x, new_y = x_name, 'macro average f1-score'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
             ax=ax,
@@ -119,7 +118,7 @@ def draw_figure(json_path, save_path):
         y_names = ['fps', 'defect_fps', 'normal_fps']
         type = dict(fps='all images', defect_fps='defect images', normal_fps='normal images')
         sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = 'defect finding weight', 'average time(ms)'
+        new_x, new_y = x_name, 'average time(ms)'
         sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
         ax = sns.lineplot(
             ax=ax,
@@ -174,9 +173,19 @@ def main():
                'all')
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json', 'train')
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json', 'test')
+
+    # eval_alcohol_dataset_report
+    # draw_figure(
+    #     '../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json',
+    #     '../../../doc/figures/result-defect_finding_weight.jpg',
+    #     x_name='defect finding weight'
+    # )
+
+    # eval_alcohol_dataset_report
     draw_figure(
-        '../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json',
-        '../../../doc/figures/result-defect_finding_weight.jpg',
+        '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
+        '../../../doc/figures/result-different_normal_image_ratio_test.jpg',
+        x_name='normal_image_ratio'
     )
 
 
