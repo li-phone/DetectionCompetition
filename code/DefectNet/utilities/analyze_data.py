@@ -59,6 +59,7 @@ def draw_figure(json_path, save_path, x_name):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     data = phrase_json(json_path)
+    data = data[:20]
     sns.set(style="darkgrid")
     # ids = []
     # for i in range(data.shape[0]):
