@@ -38,7 +38,7 @@ def eval_report(rpt_txt, rpts, cfg, uid=None, mode='val'):
         fp.write(jstr + '\n')
 
 
-def batch_test(cfgs, save_dir, sleep_time=0):
+def batch_test(cfgs, save_dir, sleep_time=0, mode='test'):
     save_name = os.path.basename(save_dir)
     save_name = save_name[:save_name.rfind('.')]
     save_dir = save_dir.replace('\\', '/')
@@ -54,7 +54,7 @@ def batch_test(cfgs, save_dir, sleep_time=0):
             mode='test',
         )
         report = test_main(**eval_test_params)
-        eval_report(osp.join(save_dir, save_name + '.txt'), report, cfg=cfg_name, uid=cfg.uid, mode='test')
+        eval_report(osp.join(save_dir, save_name + '.txt'), report, cfg=cfg_name, uid=cfg.uid, mode=mode)
         print('{} eval test successfully!'.format(cfg_name))
         time.sleep(sleep_time)
 
