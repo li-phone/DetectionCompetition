@@ -50,7 +50,7 @@ def batch_test(cfgs, save_dir, sleep_time=0, mode='test'):
         eval_test_params = dict(
             config=cfg,
             checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-            json_out=osp.join(cfg.work_dir, os.path.basename(cfg.data['test']['ann_file'])),
+            json_out=osp.join(cfg.work_dir, os.path.basename(cfg.data[mode]['ann_file'])),
             mode='test',
         )
         report = test_main(**eval_test_params)
