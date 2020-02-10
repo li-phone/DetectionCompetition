@@ -186,7 +186,7 @@ def main():
     draw_figure(
         '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
         '../results/imgs/result-different_normal_image_ratio_test.jpg',
-        x_name='normal_image_ratio'
+        x_name='normal : defective'
     )
 
 
