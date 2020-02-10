@@ -78,7 +78,7 @@ def draw_figure(json_path, save_path, x_name):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     data = phrase_json(json_path)
-    data = data[:20]
+    data = data
     sns.set(style="darkgrid")
     # ids = []
     # for i in range(data.shape[0]):
@@ -161,11 +161,11 @@ def main():
     # )
 
     # eval_alcohol_dataset_report
-    # draw_figure(
-    #     '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
-    #     '../results/imgs/result-different_normal_image_ratio_test.jpg',
-    #     x_name='normal : defective'
-    # )
+    draw_figure(
+        '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
+        '../results/imgs/result-different_normal_image_ratio_test.jpg',
+        x_name='normal : defective'
+    )
 
     def draw_avg_infer_time_and_efficient():
         t = 0.5
