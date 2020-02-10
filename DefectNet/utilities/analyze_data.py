@@ -6,6 +6,8 @@ import os
 import pandas as pd
 import numpy as np
 
+sns.set(style="darkgrid")
+
 
 def read_json(json_path):
     results = []
@@ -52,6 +54,23 @@ def get_sns_data(data, x_name, y_names, type):
     return pd.DataFrame(dict(x=x, y=y, type=hue))
 
 
+def lineplot(sns_data, new_x, new_y, ax=None, markers=True):
+    sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
+    ax = sns.lineplot(
+        ax=ax,
+        x=new_x, y=new_y,
+        hue="type",
+        style="type",
+        markers=markers,
+        dashes=False,
+        data=sns_data,
+        ci=None
+    )
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles=handles[1:], labels=labels[1:])
+    return ax
+
+
 def draw_figure(json_path, save_path, x_name):
     save_path = save_path[:-4]
     save_path = save_path.replace('\\', '/')
@@ -73,68 +92,27 @@ def draw_figure(json_path, save_path, x_name):
     fig = plt.figure(figsize=(6.4 * 3, 4.8))
     axs = [fig.add_subplot(1, 3, i) for i in range(1, 4)]
 
-    def draw_ap_weight(ax):
-        y_names = ['AP', 'AP:0.50']
-        type = {'AP': 'IoU=0.50:0.95', 'AP:0.50': 'IoU=0.50'}
-        sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = x_name, 'average precision'
-        sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
-        ax = sns.lineplot(
-            ax=ax,
-            x=new_x, y=new_y,
-            hue="type",
-            style="type",
-            markers=True,
-            dashes=False,
-            data=sns_data,
-            ci=None
-        )
-        # plt.savefig('../results/imgs/AP-defect_finding_weight.svg')
-        # plt.show()
+    # draw_ap_weight
+    y_names = ['AP', 'AP:0.50']
+    type = {'AP': 'IoU=0.50:0.95', 'AP:0.50': 'IoU=0.50'}
+    sns_data = get_sns_data(data, x_name, y_names, type)
+    new_x, new_y = x_name, 'average precision'
+    lineplot(sns_data, new_x, new_y, axs[0])
 
-    draw_ap_weight(axs[0])
+    # draw_f1_score_weight
+    y_names = ['f1-score']
+    type = {'f1-score': 'f1-score'}
+    sns_data = get_sns_data(data, x_name, y_names, type)
+    new_x, new_y = x_name, 'macro average f1-score'
+    lineplot(sns_data, new_x, new_y, axs[1])
 
-    def draw_f1_score_weight(ax):
-        y_names = ['f1-score']
-        type = {'f1-score': 'f1-score'}
-        sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = x_name, 'macro average f1-score'
-        sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
-        ax = sns.lineplot(
-            ax=ax,
-            x=new_x, y=new_y,
-            hue="type",
-            style="type",
-            markers=True,
-            dashes=False,
-            data=sns_data,
-            ci=None
-        )
-        # plt.savefig('../results/imgs/f1_score-defect_finding_weight.svg')
-        # plt.show()
+    # draw_speed_weight
+    y_names = ['fps', 'defect_fps', 'normal_fps']
+    type = dict(fps='all images', defect_fps='defect images', normal_fps='normal images')
+    sns_data = get_sns_data(data, x_name, y_names, type)
+    new_x, new_y = x_name, 'average time(ms)'
+    lineplot(sns_data, new_x, new_y, axs[2])
 
-    draw_f1_score_weight(axs[1])
-
-    def draw_speed_weight(ax):
-        y_names = ['fps', 'defect_fps', 'normal_fps']
-        type = dict(fps='all images', defect_fps='defect images', normal_fps='normal images')
-        sns_data = get_sns_data(data, x_name, y_names, type)
-        new_x, new_y = x_name, 'average time(ms)'
-        sns_data = sns_data.rename(columns={'x': new_x, 'y': new_y})
-        ax = sns.lineplot(
-            ax=ax,
-            x=new_x, y=new_y,
-            hue="type",
-            style="type",
-            markers=True,
-            dashes=False,
-            data=sns_data,
-            ci=None
-        )
-        # plt.savefig('../results/imgs/speed-defect_finding_weight.svg')
-        # plt.show()
-
-    draw_speed_weight(axs[2])
     # plt.gca().xaxis.set_major_locator(plt.NullLocator())
     # plt.gca().yaxis.set_major_locator(plt.NullLocator())
     # plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
@@ -183,11 +161,32 @@ def main():
     # )
 
     # eval_alcohol_dataset_report
-    draw_figure(
-        '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
-        '../results/imgs/result-different_normal_image_ratio_test.jpg',
-        x_name='normal : defective'
-    )
+    # draw_figure(
+    #     '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
+    #     '../results/imgs/result-different_normal_image_ratio_test.jpg',
+    #     x_name='normal : defective'
+    # )
+
+    def draw_avg_infer_time_and_efficient():
+        t = 0.5
+        tau = [t] * 50000
+        rs = np.linspace(0, 50, 50000)
+        avg_t = [1 - (1 - t) / (1 + 1 / r) for r in rs]
+        e = [(1 - t) / (1 + 1 / r) for r in rs]
+        data = pd.DataFrame({'r': rs, 't': avg_t, 'e': e, 'τ': tau})
+
+        y_names = ['t', 'e', 'τ']
+        type = {'t': 't', 'e': 'e', 'τ': 'τ'}
+        x_name = 'r'
+        sns_data = get_sns_data(data, x_name, y_names, type)
+        new_x, new_y = x_name, ''
+        ax = lineplot(sns_data, new_x, new_y, markers=False)
+        plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.jpg')
+        plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.svg')
+        plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.eps')
+        plt.show()
+
+    draw_avg_infer_time_and_efficient()
 
 
 if __name__ == '__main__':
