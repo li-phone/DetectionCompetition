@@ -181,7 +181,7 @@ def main():
         sns_data = get_sns_data(data, x_name, y_names, type)
         new_x, new_y = x_name, ''
         ax = lineplot(sns_data, new_x, new_y, markers=False)
-        plt.subplots_adjust(left=0.05, right=0.97)
+        plt.subplots_adjust(left=0.1, right=0.925)
         plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.jpg')
         plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.svg')
         plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.eps')
