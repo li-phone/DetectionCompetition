@@ -24,32 +24,36 @@ def hint(wav_file='./wav/qq.wav', n=5):
         pygame.mixer.music.play()
 
 
-def eval_report(rpt_txt, rpts, cfg, mode='val'):
-    with open(rpt_txt, 'a+') as fp:
-        head = '\n\n{} {}@{} {}\n'.format('=' * 36, cfg, mode, '=' * 36)
-        fp.write(head)
-        for k1, v1 in rpts.items():
-            fp.write(k1 + ':\n')  # bbox
+def batch_train(cfgs, sleep_time=0):
+    for cfg in tqdm(cfgs):
+        cfg_name = os.path.basename(cfg.work_dir)
+        print('\ncfg: {}'.format(cfg_name))
 
-            fp.write('log' + ':\n')  # log
-            for k2, v2 in v1['log'].items():
-                if isinstance(v2, dict):
-                    for k3, v3 in v2.items():
-                        fp.write('\n' + k3 + ':\n' + str(v3) + '\n')
-                else:
-                    fp.write('\n' + k2 + ':\n' + str(v2) + '\n')
-    json_txt = rpt_txt[:-4]
-    with open(json_txt + '.json', 'a+') as fp:
-        jstr = json.dumps(dict(cfg=cfg, mode=mode, data=rpts))
-        fp.write(jstr + '\n')
+        # train
+        train_params = dict(config=cfg)
+        train_main(**train_params)
+        print('{} train successfully!'.format(cfg_name))
+        hint()
+        time.sleep(sleep_time)
+    # infer
+    # infer_params = dict(
+    #     config=cfg,
+    #     resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
+    #     img_dir=osp.join(cfg.data_root, 'test'),
+    #     work_dir=cfg.work_dir,
+    #     submit_out=osp.join(cfg.work_dir, '{}_submit_epoch_12.json'.format(cfg_name)),
+    #     have_bg=True,
+    # )
+    # infer_main(**infer_params)
+    # print('{} infer successfully!'.format(cfg_name))
+    # hint()
 
 
-def batch_train(sleep_time=900):
+def fixed_defect_finding_weight_train():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
     # watch train effects using different base cfg
-    base_weight = 1.0
     ratios = [0.1 * i for i in range(0, 21, 1)]
     ns = ratios
     cfgs = []
@@ -57,70 +61,25 @@ def batch_train(sleep_time=900):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-        cfg.model['find_weight'] = base_weight * n
-        cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
+        cfg.model['find_weight'] = n
+        cfg.cfg_name = 'fixed_defect_finding_weight'
+        cfg.uid = None
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(n))
+
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
         cfgs.append(cfg)
-
-    for cfg in tqdm(cfgs):
-        cfg_name = os.path.basename(cfg.work_dir)
-        print('\ncfg: {}'.format(cfg_name))
-
-        try:
-            # train
-            train_params = dict(config=cfg)
-            train_main(**train_params)
-            sleep_flag = True
-            print('{} train successfully!'.format(cfg_name))
-            hint()
-
-            # eval for val set
-            if not os.path.exists(osp.join(cfg.work_dir, 'eval_val_set.bbox.json')):
-                eval_val_params = dict(
-                    config=cfg,
-                    checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-                    json_out=osp.join(cfg.work_dir, 'eval_val_set.json'),
-                    mode='val',
-                )
-                report = test_main(**eval_val_params)
-                eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='val')
-                print('{} eval val successfully!'.format(cfg_name))
-                hint()
-
-            # eval for test set
-            if not os.path.exists(osp.join(cfg.work_dir, 'eval_test_set.bbox.json')):
-                eval_test_params = dict(
-                    config=cfg,
-                    checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-                    json_out=osp.join(cfg.work_dir, 'eval_test_set.json'),
-                    mode='test',
-                )
-                report = test_main(**eval_test_params)
-                eval_report(osp.join(cfg_dir, 'eval_alcohol_dataset_report.txt'), report, cfg_name, mode='test')
-                print('{} eval test successfully!'.format(cfg_name))
-                hint()
-        except Exception as e:
-            print(e)
-
-        # infer
-        # infer_params = dict(
-        #     config=cfg,
-        #     resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
-        #     img_dir=osp.join(cfg.data_root, 'test'),
-        #     work_dir=cfg.work_dir,
-        #     submit_out=osp.join(cfg.work_dir, '{}_submit_epoch_12.json'.format(cfg_name)),
-        #     have_bg=True,
-        # )
-        # infer_main(**infer_params)
-        # print('{} infer successfully!'.format(cfg_name))
-        # hint()
-        time.sleep(sleep_time)
+    batch_train(cfgs, sleep_time=60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'fixed_defect_finding_weight.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
 def main():
-    batch_train()
+    fixed_defect_finding_weight_train()
 
 
 if __name__ == '__main__':
