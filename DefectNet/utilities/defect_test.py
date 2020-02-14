@@ -57,6 +57,7 @@ def have_defect(anns, images, threshold=0.05):
         anns = anns['annotations']
     assert isinstance(anns, list)
     annotations = json_normalize(anns)
+    # assert annotations.shape[0] == annotations[annotations['score'] > 0.05].shape[0]
     det_results = []
     for image in images:
         defect_num = 0
@@ -75,10 +76,10 @@ def have_defect(anns, images, threshold=0.05):
     return det_results
 
 
-def defect_eval(det_result, gt_result, result_times):
-    pred_nums = have_defect(det_result, gt_result['images'])
+def defect_eval(det_result, gt_result, result_times, threshold=0.05):
+    pred_nums = have_defect(det_result, gt_result['images'], threshold)
     y_pred = [0 if x == 0 else 1 for x in pred_nums]
-    true_nums = have_defect(gt_result, gt_result['images'])
+    true_nums = have_defect(gt_result, gt_result['images'], threshold)
     y_true = [0 if x == 0 else 1 for x in true_nums]
     assert len(y_pred) == len(y_true)
 
@@ -364,7 +365,8 @@ def main(**kwargs):
             if eval_types:
                 print('Starting evaluate {}'.format(' and '.join(eval_types)))
                 rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=[0])
-                defect_rpt = defect_eval(result_files['bbox'], dataset.coco.dataset, result_times)
+                defect_rpt = defect_eval(result_files['bbox'], dataset.coco.dataset, result_times,
+                                         threshold=cfg.test_cfg['rcnn']['score_thr'])
                 rpts['bbox']['log']['defect_eval'] = defect_rpt['log']
                 rpts['bbox']['data']['defect_eval'] = defect_rpt['data']
         else:

@@ -38,25 +38,130 @@ def eval_report(rpt_txt, rpts, cfg, uid=None, mode='val'):
         fp.write(jstr + '\n')
 
 
-def batch_test(cfgs, save_dir, sleep_time=0, mode='test'):
+def batch_test(cfgs, save_dir, sleep_time=0, mode='test', json_out_heads=None):
     save_name = os.path.basename(save_dir)
     save_name = save_name[:save_name.rfind('.')]
     save_dir = save_dir.replace('\\', '/')
     save_dir = save_dir[:save_dir.rfind('/')]
-    for cfg in tqdm(cfgs):
+    for i, cfg in tqdm(enumerate(cfgs)):
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
 
+        json_out_head = ''
+        if json_out_heads is not None:
+            if isinstance(json_out_heads, list):
+                json_out_head = json_out_heads[i]
+            elif isinstance(json_out_heads, str):
+                json_out_head = json_out_heads
         eval_test_params = dict(
             config=cfg,
             checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
-            json_out=osp.join(cfg.work_dir, os.path.basename(cfg.data[mode]['ann_file'])),
+            json_out=osp.join(cfg.work_dir, 'mode={},{}.json'.format(mode, json_out_head)),
             mode=mode,
         )
         report = test_main(**eval_test_params)
         eval_report(osp.join(save_dir, save_name + '.txt'), report, cfg=cfg_name, uid=cfg.uid, mode=mode)
         print('{} eval test successfully!'.format(cfg_name))
         time.sleep(sleep_time)
+
+
+def one_model_with_background_test():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = 'background=Yes'
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=Yes')
+        cfg.data['train']['ignore_ids'] = None
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=Yes,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+
+def one_model_no_background_test():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = 'background=No'
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=No,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+
+def load_json(f):
+    with open(f) as fp:
+        return json.load(fp)
+
+
+def save_json(o, f):
+    with open(f, 'w') as fp:
+        return json.dump(o, fp)
+
+
+def filter_boxes(anns, threshold=0.05):
+    for i in range(len(anns) - 1, -1, -1):
+        ann = anns[i]
+        if ann['score'] < threshold:
+            anns.pop(i)
+    return anns
+
+
+def different_threshold_no_background_test():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    ratios = np.linspace(0, 0.99, 100)
+    ns = ratios
+    cfgs = []
+    json_out_heads = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+
+        cfg.test_cfg['rcnn']['score_thr'] = n
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = n
+        json_out_head = 'threshold={:.2f},'.format(n)
+        json_out_heads.append(json_out_head)
+
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    save_name = 'different_threshold_test,background=No,'
+    save_path = os.path.join(cfg_dir, save_name + '.txt')
+    batch_test(cfgs, save_path, 60, mode='test', json_out_heads=json_out_heads)
 
 
 def different_defect_finding_weight_test():
@@ -148,7 +253,8 @@ def different_normal_image_ratio_test():
 
 def main():
     # different_defect_finding_weight_test()
-    different_normal_image_ratio_test()
+    # different_normal_image_ratio_test()
+    pass
 
 
 if __name__ == '__main__':

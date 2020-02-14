@@ -6,6 +6,7 @@ from mmdet.core import coco_eval
 import mmcv
 import copy
 import json
+import numpy as np
 import os.path as osp
 from train import main as train_main
 from defect_test import main as test_main
@@ -49,19 +50,75 @@ def batch_train(cfgs, sleep_time=0):
     # hint()
 
 
-def fixed_defect_finding_weight_train():
+def baseline_model_train():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    cfg_names = ['defectnet.py', ]
+    cfg_names = ['baseline.py', ]
 
     # watch train effects using different base cfg
-    ratios = [0.1 * i for i in range(0, 21, 1)]
+    ratios = [1]
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-        cfg.model['find_weight'] = n
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = None
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model=None')
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    batch_train(cfgs, sleep_time=60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'baseline_model_train_report.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+
+def baseline_model_train_with_background():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = None
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=Yes')
+        cfg.data['train']['ignore_ids'] = None
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfg.total_epochs=13
+        cfgs.append(cfg)
+    batch_train(cfgs, sleep_time=60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'baseline_model_train_report.txt')
+    # batch_test(cfgs, save_path, 60 * 2, mode='val')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+def batch_fixed_defect_finding_weight_train():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['defectnet.py', ]
+
+    # watch train effects using different base cfg
+    ratios = np.linspace(0.1, 2, 20)
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.model['dfn_weight'] = n
         cfg.cfg_name = 'fixed_defect_finding_weight'
         cfg.uid = None
         cfg.work_dir = os.path.join(
@@ -74,12 +131,12 @@ def fixed_defect_finding_weight_train():
     batch_train(cfgs, sleep_time=60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, 'fixed_defect_finding_weight.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    # batch_test(cfgs, save_path, 60 * 2, mode='val')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
 def main():
-    fixed_defect_finding_weight_train()
+    batch_fixed_defect_finding_weight_train()
 
 
 if __name__ == '__main__':

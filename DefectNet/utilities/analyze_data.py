@@ -168,7 +168,39 @@ def draw_avg_infer_time_and_efficient():
     plt.show()
 
 
+def draw_avg_infer_time_and_efficient():
+    t = 0.5
+    tau = [t] * 50000
+    rs = np.linspace(0, 50, 50000)
+    avg_t = [1 - (1 - t) / (1 + 1 / r) for r in rs]
+    e = [(1 - t) / (1 + 1 / r) for r in rs]
+    data = pd.DataFrame({'r': rs, 't': avg_t, 'e': e, 'τ': tau})
+
+    y_names = ['t', 'e', 'τ']
+    type = {'t': 't', 'e': 'e', 'τ': 'τ'}
+    x_name = 'r'
+    sns_data = get_sns_data(data, x_name, y_names, type)
+    new_x, new_y = x_name, ''
+    ax = lineplot(sns_data, new_x, new_y, markers=False)
+    plt.subplots_adjust(left=0.1, right=0.925)
+    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.jpg')
+    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.svg')
+    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.eps')
+    plt.show()
+
+
 def main():
+    # one model
+    draw_figure(
+        json_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/different_threshold_test,background=No,.json',
+        save_path='../results/imgs/different_threshold=0.00-0.99.jpg',
+        x_name='threshold',
+    )
+
+    # two model
+
+    # defect network
+
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instances_train_20191223_annotations.json',
                'all')
     count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json', 'train')

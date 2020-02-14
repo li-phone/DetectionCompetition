@@ -36,12 +36,14 @@ class CustomDataset(Dataset):
     def __init__(self,
                  ann_file,
                  pipeline,
+                 ignore_ids=None,
                  data_root=None,
                  img_prefix='',
                  seg_prefix=None,
                  proposal_file=None,
                  test_mode=False,
                  filter_empty_gt=True):
+        self.ignore_ids = ignore_ids
         self.ann_file = ann_file
         self.data_root = data_root
         self.img_prefix = img_prefix
@@ -137,6 +139,15 @@ class CustomDataset(Dataset):
     def prepare_train_img(self, idx):
         img_info = self.img_infos[idx]
         ann_info = self.get_ann_info(idx)
+
+        if self.ignore_ids is not None:
+            for i, id in enumerate(self.ignore_ids):
+                ind = np.where(ann_info['labels'] != id)
+                ann_info['labels'] = ann_info['labels'][ind]
+                ann_info['bboxes'] = ann_info['bboxes'][ind]
+        if len(ann_info['labels']) == 0 or len(ann_info['bboxes']) == 0:
+            return None
+
         results = dict(img_info=img_info, ann_info=ann_info)
         if self.proposals is not None:
             results['proposals'] = self.proposals[idx]

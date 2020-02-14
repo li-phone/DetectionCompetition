@@ -8,6 +8,7 @@ from mmdet.models.plugins import GeneralizedAttention
 from mmdet.ops import ContextBlock, DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_conv_layer, build_norm_layer
+from ..builder import build_loss
 
 import torch
 
@@ -380,7 +381,8 @@ class ResNet(nn.Module):
     def __init__(self,
                  depth,
                  # new added by liphone
-                 num_classes=1000,
+                 num_classes=None,
+                 loss_cls=None,
                  in_channels=3,
                  num_stages=4,
                  strides=(1, 2, 2, 2),
@@ -404,9 +406,6 @@ class ResNet(nn.Module):
         if depth not in self.arch_settings:
             raise KeyError('invalid depth {} for resnet'.format(depth))
         self.depth = depth
-
-        # new added by liphone
-        self.num_classes = num_classes
 
         self.num_stages = num_stages
         assert num_stages >= 1 and num_stages <= 4
@@ -470,8 +469,19 @@ class ResNet(nn.Module):
                 len(self.stage_blocks) - 1)
 
         # new added by liphone
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * 4, self.num_classes)
+        self.num_classes = num_classes
+        if self.num_classes is None:
+            # compatible with original version
+            self.avgpool = None
+            self.fc = None
+            self.loss_fun = None
+        else:
+            self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+            self.fc = nn.Linear(self.feat_dim, self.num_classes)
+            if loss_cls['type'] == 'nn.CrossEntropyLoss':
+                self.loss_fun = nn.CrossEntropyLoss()
+            else:
+                self.loss_fun = build_loss(loss_cls)
 
     @property
     def norm1(self):
@@ -531,7 +541,11 @@ class ResNet(nn.Module):
         else:
             raise TypeError('pretrained must be a str or None')
 
-    def forward(self, x):
+    def forward(self, img, detector=False, **ann):
+        # 1. compatible with original version
+        # 2. compatible with defect network
+        # 3. compatible with image classification network
+        x = img
         x = self.conv1(x)
         x = self.norm1(x)
         x = self.relu(x)
@@ -543,12 +557,33 @@ class ResNet(nn.Module):
             if i in self.out_indices:
                 outs.append(x)
 
-        # new added by liphone
+        # 1. compatible with original version
+        if self.num_classes is None:
+            return outs
+
         x2 = self.avgpool(outs[len(outs) - 1])
         x2 = torch.flatten(x2, 1)
         x2 = self.fc(x2)
 
-        return tuple([outs, x2])
+        # 2. compatible with defect network
+        if detector:
+            # test mode, no targets
+            if len(ann) == 0:
+                return outs, x2
+            else:
+                loss = self.loss_fun(x2, ann['targets'])
+                loss_dict = dict(loss=loss)
+                return outs, loss_dict
+
+        # 3. compatible with image classification network
+        else:
+            # test mode, no targets
+            if len(ann) == 0:
+                return x2
+            else:
+                loss = self.loss_fun(x2, ann['targets'])
+                loss_dict = dict(loss=loss)
+                return loss_dict
 
     def train(self, mode=True):
         super(ResNet, self).train(mode)
