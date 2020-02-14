@@ -57,7 +57,7 @@ log = dict(
 # train process settings
 train_mode = ['train', ]
 val_mode = ['val']
-total_epochs = 13
+total_epochs = 13 * 4
 work_dir = './work_dirs/' + data_name + '/' + model_config['name']
 resume_from = work_dir + '/latest.pth'
 # resume_from = r'C:\Users\zl\liphone\home\fabric_detection\uselessNet\code\onecla\work_dirs\pneumonia\resnet50\InverseLoss\epoch_000029.pth'
@@ -69,8 +69,8 @@ mix = dict(
 optimizer = dict(
     type='SGD',
     # type='Adam',
-    Adam=dict(lr=0.00125, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False),
-    SGD=dict(lr=0.00125, momentum=0, dampening=0, weight_decay=0, nesterov=False)
+    Adam=dict(lr=0.0025, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, amsgrad=False),
+    SGD=dict(lr=0.0025, momentum=0, dampening=0, weight_decay=0, nesterov=False)
 )
 lr_scheduler = dict(
     type='CosineAnnealingLR',
