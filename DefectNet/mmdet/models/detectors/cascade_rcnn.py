@@ -123,13 +123,15 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
 
     def extract_feat(self, img, targets=None):
         if targets is None:
-            xs = self.backbone(img, detector=True)
+            x1 = self.backbone(img, detector=True)
+            if self.with_neck:
+                x1 = self.neck(x1)
+            return x1
         else:
-            xs = self.backbone(img, detector=True, targets=targets)
-        xs = list(xs)
-        if self.with_neck:
-            xs[0] = self.neck(xs[0])
-        return tuple(xs)
+            x1, x2 = self.backbone(img, detector=True, targets=targets)
+            if self.with_neck:
+                x1 = self.neck(x1)
+            return x1, x2
 
     def forward_dummy(self, img):
         outs = ()

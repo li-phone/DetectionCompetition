@@ -25,13 +25,13 @@ def hint(wav_file='./wav/qq.wav', n=5):
         pygame.mixer.music.play()
 
 
-def batch_train(cfgs, sleep_time=0):
+def batch_train(cfgs, sleep_time=0, detector=True):
     for cfg in tqdm(cfgs):
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
 
         # train
-        train_params = dict(config=cfg)
+        train_params = dict(config=cfg, detector=detector)
         train_main(**train_params)
         print('{} train successfully!'.format(cfg_name))
         hint()
@@ -50,35 +50,7 @@ def batch_train(cfgs, sleep_time=0):
     # hint()
 
 
-def baseline_model_train():
-    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    cfg_names = ['baseline.py', ]
-
-    # watch train effects using different base cfg
-    ratios = [1]
-    ns = ratios
-    cfgs = []
-    for i, n in enumerate(ns):
-        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.data['imgs_per_gpu'] = 2
-        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-        cfg.cfg_name = 'baseline_one_model'
-        cfg.uid = None
-        cfg.work_dir = os.path.join(
-            cfg.work_dir, cfg.cfg_name, 'baseline_one_model=None')
-
-        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-        if not os.path.exists(cfg.resume_from):
-            cfg.resume_from = None
-        cfgs.append(cfg)
-    batch_train(cfgs, sleep_time=60 * 2)
-    from batch_test import batch_test
-    save_path = os.path.join(cfg_dir, 'baseline_model_train_report.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='val')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
-
-
-def baseline_model_train_with_background():
+def baseline_one_model_train_with_background():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['baseline.py', ]
 
@@ -98,20 +70,47 @@ def baseline_model_train_with_background():
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
-        cfg.total_epochs=13
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2)
     from batch_test import batch_test
-    save_path = os.path.join(cfg_dir, 'baseline_model_train_report.txt')
-    # batch_test(cfgs, save_path, 60 * 2, mode='val')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=Yes,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+
+
+def baseline_one_model_train_no_background():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = 'background=No'
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    batch_train(cfgs, sleep_time=60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=No,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+
 
 def batch_fixed_defect_finding_weight_train():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
     # watch train effects using different base cfg
-    ratios = np.linspace(0.1, 2, 20)
+    ratios = np.linspace(0., 2, 21)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -119,8 +118,9 @@ def batch_fixed_defect_finding_weight_train():
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.model['dfn_weight'] = n
+
         cfg.cfg_name = 'fixed_defect_finding_weight'
-        cfg.uid = None
+        cfg.uid = n
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(n))
 
@@ -130,13 +130,48 @@ def batch_fixed_defect_finding_weight_train():
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2)
     from batch_test import batch_test
-    save_path = os.path.join(cfg_dir, 'fixed_defect_finding_weight.txt')
-    # batch_test(cfgs, save_path, 60 * 2, mode='val')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+
+
+def two_model_first_model_train():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['first_model.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = 'two_model'
+        cfg.uid = 'model=first'
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'model=first')
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    batch_train(cfgs, sleep_time=60 * 2, detector=False)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'two_model_first_model_test,model=first,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
 def main():
-    batch_fixed_defect_finding_weight_train()
+    # one model
+    # baseline_one_model_train_with_background()
+    # baseline_one_model_train_no_background()
+
+    # two model
+    two_model_first_model_train()
+
+    # defect network
+    # batch_fixed_defect_finding_weight_train()
 
 
 if __name__ == '__main__':

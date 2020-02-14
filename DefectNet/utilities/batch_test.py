@@ -38,6 +38,24 @@ def eval_report(rpt_txt, rpts, cfg, uid=None, mode='val'):
         fp.write(jstr + '\n')
 
 
+def load_json(f):
+    with open(f) as fp:
+        return json.load(fp)
+
+
+def save_json(o, f):
+    with open(f, 'w') as fp:
+        return json.dump(o, fp)
+
+
+def filter_boxes(anns, threshold=0.05):
+    for i in range(len(anns) - 1, -1, -1):
+        ann = anns[i]
+        if ann['score'] < threshold:
+            anns.pop(i)
+    return anns
+
+
 def batch_test(cfgs, save_dir, sleep_time=0, mode='test', json_out_heads=None):
     save_name = os.path.basename(save_dir)
     save_name = save_name[:save_name.rfind('.')]
@@ -75,16 +93,11 @@ def one_model_with_background_test():
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.data['imgs_per_gpu'] = 2
-        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.cfg_name = 'baseline_one_model'
         cfg.uid = 'background=Yes'
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=Yes')
-        cfg.data['train']['ignore_ids'] = None
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-        if not os.path.exists(cfg.resume_from):
-            cfg.resume_from = None
         cfgs.append(cfg)
     save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=Yes,.txt')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
@@ -100,37 +113,14 @@ def one_model_no_background_test():
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.data['imgs_per_gpu'] = 2
-        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.cfg_name = 'baseline_one_model'
         cfg.uid = 'background=No'
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
-
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-        if not os.path.exists(cfg.resume_from):
-            cfg.resume_from = None
         cfgs.append(cfg)
     save_path = os.path.join(cfg_dir, 'baseline_one_model_test,background=No,.txt')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
-
-
-def load_json(f):
-    with open(f) as fp:
-        return json.load(fp)
-
-
-def save_json(o, f):
-    with open(f, 'w') as fp:
-        return json.dump(o, fp)
-
-
-def filter_boxes(anns, threshold=0.05):
-    for i in range(len(anns) - 1, -1, -1):
-        ann = anns[i]
-        if ann['score'] < threshold:
-            anns.pop(i)
-    return anns
 
 
 def different_threshold_no_background_test():
@@ -144,23 +134,16 @@ def different_threshold_no_background_test():
     json_out_heads = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-
         cfg.test_cfg['rcnn']['score_thr'] = n
         cfg.cfg_name = 'baseline_one_model'
         cfg.uid = n
         json_out_head = 'threshold={:.2f},'.format(n)
         json_out_heads.append(json_out_head)
-
-        cfg.data['imgs_per_gpu'] = 2
-        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-        if not os.path.exists(cfg.resume_from):
-            cfg.resume_from = None
         cfgs.append(cfg)
-    save_name = 'different_threshold_test,background=No,'
-    save_path = os.path.join(cfg_dir, save_name + '.txt')
+    save_path = os.path.join(cfg_dir, 'different_threshold_test,background=No,.txt')
     batch_test(cfgs, save_path, 60, mode='test', json_out_heads=json_out_heads)
 
 
@@ -168,18 +151,21 @@ def different_defect_finding_weight_test():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
-    base_weight = 1.0
-    ratios = [0.1 * i for i in range(0, 21, 1)]
+    ratios = np.linspace(0, 2, 21)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.model['find_weight'] = base_weight * n
-        cfg.work_dir += '_{:.1f}x_find_weight'.format(n)
+        cfg.model['dfn_weight'] = n
+        cfg.cfg_name = 'fixed_defect_finding_weight'
+        cfg.uid = n
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(n))
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
 
-    batch_test(cfgs, cfg_dir + '/different_defect_finding_weight_test.txt', 60)
+    save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
 def different_normal_image_ratio_test():
@@ -239,21 +225,31 @@ def different_normal_image_ratio_test():
     cfgs = []
     for i, ann_file in enumerate(ann_files):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.model['find_weight'] = 0.1
+        cfg.model['dfn_weight'] = 0.1
         cfg.data['test']['ann_file'] = ann_file
-        cfg.cfg_name = 'fixed_defectnet_finding_weight'
-        cfg.uid = uids[i]
+
+        cfg.cfg_name = 'fixed_defect_finding_weight'
+        cfg.uid = 0.1
         cfg.work_dir = os.path.join(
-            cfg.work_dir, cfg.cfg_name, 'fixed_defectnet_finding_weight={:.1f}'.format(cfg.model['find_weight']))
+            cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(cfg.uid))
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
 
-    batch_test(cfgs, cfg_dir + '/different_normal_image_ratio_test.txt', 60)
+    batch_test(cfgs, cfg_dir + '/different_normal_image_ratio_test.txt', 60, mode='test')
 
 
 def main():
-    # different_defect_finding_weight_test()
-    # different_normal_image_ratio_test()
+    # one model
+    one_model_no_background_test()
+    one_model_with_background_test()
+    different_threshold_no_background_test()
+
+    # two model
+
+    # defect network
+    different_defect_finding_weight_test()
+    different_normal_image_ratio_test()
+
     pass
 
 

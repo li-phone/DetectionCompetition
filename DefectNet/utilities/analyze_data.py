@@ -168,55 +168,34 @@ def draw_avg_infer_time_and_efficient():
     plt.show()
 
 
-def draw_avg_infer_time_and_efficient():
-    t = 0.5
-    tau = [t] * 50000
-    rs = np.linspace(0, 50, 50000)
-    avg_t = [1 - (1 - t) / (1 + 1 / r) for r in rs]
-    e = [(1 - t) / (1 + 1 / r) for r in rs]
-    data = pd.DataFrame({'r': rs, 't': avg_t, 'e': e, 'τ': tau})
-
-    y_names = ['t', 'e', 'τ']
-    type = {'t': 't', 'e': 'e', 'τ': 'τ'}
-    x_name = 'r'
-    sns_data = get_sns_data(data, x_name, y_names, type)
-    new_x, new_y = x_name, ''
-    ax = lineplot(sns_data, new_x, new_y, markers=False)
-    plt.subplots_adjust(left=0.1, right=0.925)
-    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.jpg')
-    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.svg')
-    plt.savefig('../results/imgs/draw_avg_infer_time_and_efficient.eps')
-    plt.show()
-
-
 def main():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    rst_dir = '../results/imgs'
+    data_root = '/home/liphone/undone-work/data/detection/alcohol'
+
     # one model
     draw_figure(
-        json_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/different_threshold_test,background=No,.json',
-        save_path='../results/imgs/different_threshold=0.00-0.99.jpg',
+        json_path=cfg_dir + '/different_threshold_test,background=No,.json',
+        save_path=rst_dir + '/different_threshold_test,threshold=0.00-0.99,background=No,.jpg',
         x_name='threshold',
     )
 
     # two model
 
     # defect network
+    count_data(data_root + '/annotations/instances_train_20191223_annotations.json', 'all')
+    count_data(data_root + '/annotations/instance_train_alcohol.json', 'train')
+    count_data(data_root + '/annotations/instance_test_alcohol.json', 'test')
 
-    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instances_train_20191223_annotations.json',
-               'all')
-    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json', 'train')
-    count_data('/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json', 'test')
-
-    # eval_alcohol_dataset_report
     # draw_figure(
-    #     '../config_alcohol/cascade_rcnn_r50_fpn_1x/eval_alcohol_dataset_report.json',
-    #     '../../../doc/figures/result-defect_finding_weight.jpg',
+    #     json_path=cfg_dir + '/different_dfn_weight,background=No,.json',
+    #     save_path=rst_dir + '/different_dfn_weight,threshold=0.00-2.00,background=No,.jpg',
     #     x_name='defect finding weight'
     # )
 
-    # eval_alcohol_dataset_report
     draw_figure(
-        '../config_alcohol/cascade_rcnn_r50_fpn_1x/different_normal_image_ratio_test.json',
-        '../results/imgs/result-different_normal_image_ratio_test.jpg',
+        cfg_dir + '/different_ratio_test,background=No,.json',
+        rst_dir + '/different_ratio_test,ratio=0.00-12.00,background=No,.jpg',
         x_name='normal : defective'
     )
 

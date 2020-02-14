@@ -12,7 +12,7 @@ from mmcv.runner import init_dist
 from mmdet import __version__
 from mmdet.apis import get_root_logger, set_random_seed, train_detector
 from mmdet.datasets import build_dataset
-from mmdet.models import build_detector
+from mmdet.models import build_detector,build_backbone
 
 
 def parse_args():
@@ -50,6 +50,7 @@ def parse_args():
         '--autoscale-lr',
         action='store_true',
         help='automatically scale lr with the number of gpus')
+    parser.add_argument('--detector', type=bool, default=True)
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -106,8 +107,11 @@ def main(**kwargs):
             args.seed, args.deterministic))
         set_random_seed(args.seed, deterministic=args.deterministic)
 
-    model = build_detector(
-        cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
+    if args.detector:
+        model = build_detector(
+            cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
+    else:
+        model = build_backbone(cfg.model['backbone'])
 
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
