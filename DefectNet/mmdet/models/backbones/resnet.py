@@ -568,7 +568,7 @@ class ResNet(nn.Module):
         # 2. compatible with defect network
         if detector:
             # test mode, no targets
-            if len(ann) == 0:
+            if len(ann) == 0 or ('return_loss' in ann and not ann['return_loss']):
                 return outs, x2
             else:
                 loss = self.loss_fun(x2, ann['targets'])
@@ -578,7 +578,7 @@ class ResNet(nn.Module):
         # 3. compatible with image classification network
         else:
             # test mode, no targets
-            if len(ann) == 0:
+            if len(ann) == 0 or ('return_loss' in ann and not ann['return_loss']):
                 return x2
             else:
                 if 'targets' not in ann:

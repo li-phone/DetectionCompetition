@@ -148,7 +148,7 @@ def two_model_first_model_train():
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = 'two_model'
-        cfg.uid = 'model=first'
+        cfg.uid = 'model=first,loss=CrossEntropyLoss'
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name, 'model=first')
 
@@ -157,9 +157,9 @@ def two_model_first_model_train():
             cfg.resume_from = None
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2, detector=False)
-    from batch_test import batch_test
+    from batch_test import cls_batch_test
     save_path = os.path.join(cfg_dir, 'two_model_first_model_test,model=first,.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    cls_batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
 def main():

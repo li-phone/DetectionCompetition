@@ -56,6 +56,34 @@ def filter_boxes(anns, threshold=0.05):
     return anns
 
 
+def cls_batch_test(cfgs, save_dir, sleep_time=0, mode='test', json_out_heads=None):
+    save_name = os.path.basename(save_dir)
+    save_name = save_name[:save_name.rfind('.')]
+    save_dir = save_dir.replace('\\', '/')
+    save_dir = save_dir[:save_dir.rfind('/')]
+    for i, cfg in tqdm(enumerate(cfgs)):
+        cfg_name = os.path.basename(cfg.work_dir)
+        print('\ncfg: {}'.format(cfg_name))
+
+        json_out_head = ''
+        if json_out_heads is not None:
+            if isinstance(json_out_heads, list):
+                json_out_head = json_out_heads[i]
+            elif isinstance(json_out_heads, str):
+                json_out_head = json_out_heads
+        eval_test_params = dict(
+            config=cfg,
+            checkpoint=osp.join(cfg.work_dir, 'latest.pth'),
+            json_out=osp.join(cfg.work_dir, 'mode={},{}.json'.format(mode, json_out_head)),
+            mode=mode,
+        )
+        from cls_test import main as cls_test_main
+        report = cls_test_main(**eval_test_params)
+        eval_report(osp.join(save_dir, save_name + '.txt'), report, cfg=cfg_name, uid=cfg.uid, mode=mode)
+        print('{} eval test successfully!'.format(cfg_name))
+        time.sleep(sleep_time)
+
+
 def batch_test(cfgs, save_dir, sleep_time=0, mode='test', json_out_heads=None):
     save_name = os.path.basename(save_dir)
     save_name = save_name[:save_name.rfind('.')]
