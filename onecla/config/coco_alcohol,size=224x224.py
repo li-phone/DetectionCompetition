@@ -17,35 +17,30 @@ dataset = dict(
     raw_train_path=data_root + '/annotations/instance_train_alcohol.csv',
     raw_test_path=data_root + '/annotations/instance_train_alcohol.csv',
     balance=False,
-    train=[
-        dict(
-            name='train',
-            ratio=1,
-            ann_file=data_root + '/annotations/train.csv',
-            img_prefix=data_root + '/trainval/',
-            img_scale=(1333, 800),
-            keep_ratio=True,
-            img_norm_cfg=img_norm_cfg,
-        ),
-        dict(
-            name='val',
-            ratio=1,
-            ann_file=data_root + '/annotations/train.csv',
-            img_prefix=data_root + '/trainval/',
-            img_scale=(1333, 800),
-            img_norm_cfg=img_norm_cfg,
-        ),
-    ],
-    test=[
-        dict(
-            name='test',
-            ratio=1,
-            ann_file=data_root + '/annotations/test.csv',
-            img_prefix=data_root + '/trainval/',
-            img_scale=(1333, 800),
-            img_norm_cfg=img_norm_cfg,
-        ),
-    ],
+    train=dict(
+        name='train',
+        ann_file=data_root + '/annotations/instance_train_alcohol.csv',
+        img_prefix=data_root + '/trainval/',
+        img_scale=(224, 224),
+        keep_ratio=False,
+        img_norm_cfg=img_norm_cfg,
+    ),
+    val=dict(
+        name='val',
+        ann_file=data_root + '/annotations/instance_train_alcohol.csv',
+        img_prefix=data_root + '/trainval/',
+        img_scale=(224, 224),
+        keep_ratio=False,
+        img_norm_cfg=img_norm_cfg,
+    ),
+    test=dict(
+        name='test',
+        ann_file=data_root + '/annotations/instance_test_alcohol.csv',
+        img_prefix=data_root + '/trainval/',
+        img_scale=(224, 224),
+        keep_ratio=False,
+        img_norm_cfg=img_norm_cfg,
+    ),
 )
 
 # log settings
@@ -56,11 +51,10 @@ log = dict(
 
 # train process settings
 train_mode = ['train', ]
-val_mode = ['val']
-total_epochs = 13 * 4
+val_mode = ['val', 'test']
+total_epochs = 13 * 4 + 1
 work_dir = './work_dirs/' + data_name + '/' + model_config['name']
 resume_from = work_dir + '/latest.pth'
-# resume_from = r'C:\Users\zl\liphone\home\fabric_detection\uselessNet\code\onecla\work_dirs\pneumonia\resnet50\InverseLoss\epoch_000029.pth'
 load_from = None
 mix = dict(
     type='none',
@@ -91,5 +85,5 @@ data_loader = dict(
     batch_size=2, shuffle=True,
 )
 val_data_loader = dict(
-    batch_size=2, shuffle=False,
+    batch_size=8, shuffle=False,
 )

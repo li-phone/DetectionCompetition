@@ -144,8 +144,9 @@ def two_model_first_model_train():
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.data['imgs_per_gpu'] = 2
-        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.data['imgs_per_gpu'] = 32
+        # cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+        cfg.optimizer['lr'] = 0.001
 
         cfg.cfg_name = 'two_model'
         cfg.uid = 'model=first,loss=CrossEntropyLoss'
@@ -155,6 +156,7 @@ def two_model_first_model_train():
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
+        cfg.total_epochs=12
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2, detector=False)
     from batch_test import cls_batch_test

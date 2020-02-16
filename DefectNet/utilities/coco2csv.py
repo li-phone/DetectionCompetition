@@ -16,6 +16,6 @@ def main(ann_path, save_name):
 
 if __name__ == '__main__':
     main(
-        '/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.json',
-        '/home/liphone/undone-work/data/detection/alcohol/annotations/instance_train_alcohol.csv'
+        '/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.json',
+        '/home/liphone/undone-work/data/detection/alcohol/annotations/instance_test_alcohol.csv'
     )

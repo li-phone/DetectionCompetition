@@ -155,7 +155,7 @@ class Metrics:
         ets = ((self.metric['total_epoch'] - self.metric['epoch']) * self.metric['total_iter'] \
                - self.metric['iter']) * self.metric['time']['avg']
         ets = get_et_time(ets)
-        msg = 'Epoch [{}/{}], iter [{}/{}], eta {}, lr {:.4f}, {} {:.4f}({:.4f})'.format(
+        msg = 'Epoch [{}/{}], iter [{}/{}], eta {}, lr {:.6f}, {} {:.4f}({:.4f})'.format(
             self.metric['epoch'], self.metric['total_epoch'],
             self.metric['iter'], self.metric['total_iter'],
             ets, self.metric['lr'], self.watch,

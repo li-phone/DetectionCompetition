@@ -169,8 +169,11 @@ def build_optimizer(model, optimizer_cfg):
     paramwise_options = optimizer_cfg.pop('paramwise_options', None)
     # if no paramwise option is specified, just use the global setting
     if paramwise_options is None:
+        for param in model.parameters():
+            param.requires_grad = True
+        trainable_vars = [param for param in model.parameters() if param.requires_grad]
         return obj_from_dict(optimizer_cfg, torch.optim,
-                             dict(params=model.parameters()))
+                             dict(params=trainable_vars))
     else:
         assert isinstance(paramwise_options, dict)
         # get base lr and weight decay

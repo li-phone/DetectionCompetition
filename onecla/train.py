@@ -3,6 +3,7 @@ from torchvision.models import resnet34, resnet101
 import argparse
 import numpy as np
 import os
+from tqdm import tqdm
 import torch.nn as nn
 from torch.autograd import Variable
 from torchnet import meter
@@ -13,14 +14,16 @@ from utils import *
 from data_reader import DataReader, collate_fn
 
 
-def eval(model, cfg, cuda=True):
-    ann_files = [r['ann_file'] for r in cfg.dataset['train'] if r['name'] in cfg.val_mode]
-    img_dirs = [r['img_prefix'] for r in cfg.dataset['train'] if r['name'] in cfg.val_mode]
-    data_reader = DataReader(ann_files, img_dirs, transform=None)
+def eval(model, cfg, mode='val', cuda=True):
+    data_info = cfg.dataset[mode]
+    data_reader = DataReader(
+        ann_files=[data_info['ann_file']], img_dirs=[data_info['img_prefix']], transform=None, mode='val',
+        img_scale=data_info['img_scale'], keep_ratio=data_info['keep_ratio'],
+    )
     data_loader = DataLoader(data_reader, collate_fn=collate_fn, **cfg.val_data_loader)
     y_true, y_pred = [], []
     model.eval()
-    for step, (data, target) in enumerate(data_loader):
+    for step, (data, target) in tqdm(enumerate(data_loader)):
         inputs = torch.stack(data)
         target = torch.from_numpy(np.array(target)).type(torch.LongTensor)
         if cuda:
@@ -38,9 +41,16 @@ def eval(model, cfg, cuda=True):
 
 
 def train_one_epoch(model, cfg, optimizer, lr_scheduler, loss_func, loss_metric, cuda=True):
-    ann_files = [r['ann_file'] for r in cfg.dataset['train'] if r['name'] in cfg.train_mode]
-    img_dirs = [r['img_prefix'] for r in cfg.dataset['train'] if r['name'] in cfg.train_mode]
-    data_reader = DataReader(ann_files, img_dirs, transform=None, mode='train')
+    ann_files, img_dirs = [], []
+    data_info = cfg.dataset[cfg.train_mode[0]]
+    for mode in cfg.train_mode:
+        data_info = cfg.dataset[mode]
+        ann_files.append(data_info['ann_file'])
+        img_dirs.append(data_info['img_prefix'])
+    data_reader = DataReader(
+        ann_files=ann_files, img_dirs=img_dirs, transform=None, mode='train',
+        img_scale=data_info['img_scale'], keep_ratio=data_info['keep_ratio'],
+    )
     data_loader = DataLoader(data_reader, collate_fn=collate_fn, **cfg.data_loader)
     loss_metric.update(total_iter=len(data_loader))
     for step, (data, target) in enumerate(data_loader):
@@ -96,10 +106,11 @@ def train(model, optimizer, lr_scheduler, last_epoch, cfg):
             )
 
         lr_scheduler.step()
-        rpt, rpts = eval(model, cfg)
-        with open(os.path.join(cfg.work_dir, cfg.log['out_file']), 'a+') as fp:
-            fp.write(rpts + '\n')
-        logger.info('\n' + rpts)
+        for mode in cfg.val_mode:
+            data_info, print_info = eval(model, cfg, mode=mode)
+            with open(os.path.join(cfg.work_dir, cfg.log['out_file']), 'a+') as fp:
+                fp.write('{}:\n{}\n{}\n'.format(mode, data_info, print_info))
+            logger.info('{}:\n{}\n'.format(mode, print_info))
 
         # loss_meter = meter.AverageValueMeter()
         # confusion_matrix = meter.ConfusionMeter(9)
@@ -112,7 +123,29 @@ def train(model, optimizer, lr_scheduler, last_epoch, cfg):
         # recalls, precisions, f1_scores = evaluate_confusion_matrix(confusion_matrix)
 
 
+def test(cfg, epochs):
+    if isinstance(cfg, str):
+        cfg = import_module(cfg)
+    mkdirs(cfg.work_dir)
+
+    cfg.gpus = prase_gpus(cfg.gpus)
+    model = build_network(**cfg.model_config, gpus=cfg.gpus)
+
+    logger.info("start test...")
+    for epoch in epochs:
+        cfg.resume_from = os.path.join(cfg.work_dir, 'epoch_{:06d}.pth'.format(epoch))
+        model, optimizer, lr_scheduler, last_epoch = resume_network(model, cfg)
+        for mode in cfg.val_mode:
+            data_info, print_info = eval(model, cfg, mode=mode)
+            with open(os.path.join(cfg.work_dir, cfg.log['out_file']), 'a+') as fp:
+                fp.write('{}:\n{}\n{}\n'.format(mode, data_info, print_info))
+            logger.info('{}:\n{}\n'.format(mode, print_info))
+    logger.info('test successfully!')
+
+
 def main(cfg):
+    if isinstance(cfg, str):
+        cfg = import_module(cfg)
     mkdirs(cfg.work_dir)
 
     cfg.gpus = prase_gpus(cfg.gpus)

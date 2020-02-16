@@ -49,7 +49,8 @@ def single_gpu_test(model, data_loader, show=False):
     return results, result_times
 
 
-def have_defect(anns, images, threshold=0.05):
+def have_defect(anns, images, threshold=0.05, background_id=0):
+    assert background_id == 0
     if isinstance(anns, str):
         with open(anns) as fp:
             anns = json.load(fp)
@@ -66,10 +67,10 @@ def have_defect(anns, images, threshold=0.05):
             for j in range(ann.shape[0]):
                 a = ann.iloc[j]
                 if 'score' in a:
-                    if a['score'] > threshold and a['category_id'] > 0:
+                    if a['score'] > threshold and a['category_id'] != background_id:
                         defect_num += 1
                 else:
-                    if a['category_id'] > 0:
+                    if a['category_id'] != background_id:
                         defect_num += 1
         det_results.append(defect_num)
     assert len(det_results) == len(images)
