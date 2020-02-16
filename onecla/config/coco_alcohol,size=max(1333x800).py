@@ -21,24 +21,24 @@ dataset = dict(
         name='train',
         ann_file=data_root + '/annotations/instance_train_alcohol.csv',
         img_prefix=data_root + '/trainval/',
-        img_scale=(224, 224),
-        keep_ratio=False,
+        img_scale=(1333, 800),
+        keep_ratio=True,
         img_norm_cfg=img_norm_cfg,
     ),
     val=dict(
         name='val',
         ann_file=data_root + '/annotations/instance_train_alcohol.csv',
         img_prefix=data_root + '/trainval/',
-        img_scale=(224, 224),
-        keep_ratio=False,
+        img_scale=(1333, 800),
+        keep_ratio=True,
         img_norm_cfg=img_norm_cfg,
     ),
     test=dict(
         name='test',
         ann_file=data_root + '/annotations/instance_test_alcohol.csv',
         img_prefix=data_root + '/trainval/',
-        img_scale=(224, 224),
-        keep_ratio=False,
+        img_scale=(1333, 800),
+        keep_ratio=True,
         img_norm_cfg=img_norm_cfg,
     ),
 )
@@ -78,7 +78,7 @@ loss = dict(
 )
 freq_cfg = dict(
     checkpoint_save=1,
-    log_print=10,
+    log_print=20,
 )
 gpus = '0'
 data_loader = dict(

@@ -11,9 +11,7 @@ def batch_train_with_size_224x224():
         cfg.loss['type'] = type
         cfg.work_dir = os.path.join(cfg.work_dir, 'coco_alcohol,loss={},size=224x224'.format(type))
         cfg.resume_from = cfg.work_dir + '/latest.pth'
-        # train_main(cfg)
-        from train import test
-        test(cfg, [11, 52])
+        train_main(cfg)
 
 
 def batch_train_with_size_max_1333x800():
@@ -28,8 +26,8 @@ def batch_train_with_size_max_1333x800():
 
 
 def main():
-    # batch_train_with_size_224x224()
     batch_train_with_size_max_1333x800()
+    batch_train_with_size_224x224()
 
 
 if __name__ == '__main__':

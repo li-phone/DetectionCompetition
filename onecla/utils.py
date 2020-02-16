@@ -12,6 +12,20 @@ import torch
 
 
 # ===================================== Common Functions =====================================
+def check_input(imgs, targets):
+    import cv2 as cv
+    import numpy as np
+    for idx, target in enumerate(targets):
+        img = imgs[idx]
+        img = img.permute(1, 2, 0)  # C x H x W --> H x W x C
+        image = np.array(img.cpu()).copy()
+        image = np.array(image[..., ::-1])  # RGB --> BGR
+        org = tuple([int(_ / 2) for _ in image.shape])
+        cv.putText(image, str(target), tuple(org[:2][::-1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+        cv.imshow("img", image)
+        cv.waitKey(0)
+
+
 def get_et_time(t):
     t = int(t)
     ets = []

@@ -24,16 +24,18 @@ def eval(model, cfg, mode='val', cuda=True):
     y_true, y_pred = [], []
     model.eval()
     for step, (data, target) in tqdm(enumerate(data_loader)):
-        inputs = torch.stack(data)
-        target = torch.from_numpy(np.array(target)).type(torch.LongTensor)
+        # inputs = torch.stack(data)
+        # target = torch.from_numpy(np.array(target)).type(torch.LongTensor)
+        inputs = data
+        targets = target
         if cuda:
             inputs = inputs.cuda()
-            target = target.cuda()
+            targets = targets.cuda()
         with torch.no_grad():
             outputs = model(inputs)
         outs = nn.functional.softmax(outputs, dim=1)
         pred = torch.argmax(outs, dim=1)
-        y_true.extend(list(target.cpu().detach().numpy()))
+        y_true.extend(list(targets.cpu().detach().numpy()))
         y_pred.extend(list(pred.cpu().detach().numpy()))
     model.train()
     return classification_report(y_true, y_pred, output_dict=True), \
@@ -54,12 +56,13 @@ def train_one_epoch(model, cfg, optimizer, lr_scheduler, loss_func, loss_metric,
     data_loader = DataLoader(data_reader, collate_fn=collate_fn, **cfg.data_loader)
     loss_metric.update(total_iter=len(data_loader))
     for step, (data, target) in enumerate(data_loader):
-        inputs = torch.stack(data)
-        targets = torch.from_numpy(np.array(target)).type(torch.LongTensor)
+        # inputs = torch.stack(data)
+        # targets = torch.from_numpy(np.array(target)).type(torch.LongTensor)
+        inputs = data
+        targets = target
         if cuda:
             inputs = inputs.cuda()
             targets = targets.cuda()
-
         if cfg.mix['type'] == 'mixup':
             alpha = cfg.mix['alpha']
             lam = np.random.beta(alpha, alpha)

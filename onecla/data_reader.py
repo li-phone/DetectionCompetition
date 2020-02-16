@@ -18,10 +18,13 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def collate_fn(batch):
-    if (isinstance(batch[0], tuple) or isinstance(batch[0], list)) and len(batch[0]) != 1:
-        return tuple(zip(*batch))
-    else:
-        return tuple(batch)
+    img = [b['img'] for b in batch]
+    img = torch.stack(img)
+    target = [b['target'] for b in batch]
+    target = torch.Tensor(target).long()
+    # from utils import check_input
+    # check_input(img,target)
+    return tuple([img, target])
 
 
 class DataReader(data.Dataset):
@@ -75,13 +78,36 @@ class DataReader(data.Dataset):
     def __getitem__(self, index):
         image_path = self.image_paths[index]
         img = Image.open(image_path).convert('RGB')
-        img = self.transforms(img)
+        if self.keep_ratio:
+            img_shape = img.size
+            ratio = [self.img_scale[0] / img_shape[0], self.img_scale[1] / img_shape[1]]
+            ind = int(np.argmax(ratio))
+            scale = [_ for _ in self.img_scale]
+            scale[ind] = int(img_shape[ind] * min(ratio))
+
+            transforms = T.Compose([
+                T.Resize((scale[1], scale[0])),
+                # T.CenterCrop((224, 224)),
+                # T.RandomHorizontalFlip(0.5),
+                # T.RandomVerticalFlip(0.5),
+                T.ToTensor(),
+                T.Normalize(mean=[0.485, 0.456, 0.406],
+                            std=[0.229, 0.224, 0.225])
+            ])
+            img = transforms(img)
+            img_pad = torch.zeros((3, self.img_scale[1], self.img_scale[0]))
+            x1, x2, x3 = img.shape
+            img_pad[:x1, :x2, :x3] = img
+            img = img_pad
+        else:
+            img = self.transforms(img)
+
         if len(self.annotations) == 0:
             return img
         else:
             target = self.annotations[index]
             target = int(target)
-            return img, target
+            return dict(img=img, target=target)
 
     def __len__(self):
         return len(self.image_paths)
