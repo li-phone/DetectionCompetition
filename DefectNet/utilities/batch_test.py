@@ -282,8 +282,8 @@ def two_model_test():
     first_model_path = [
         'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=max(1333x800)/epoch_000011.pth',
         'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=max(1333x800)/epoch_000051.pth',
-        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,size=224x224/epoch_000011.pth',
-        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,size=224x224/epoch_000051.pth',
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=224x224/epoch_000011.pth',
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=224x224/epoch_000051.pth',
     ]
     sizes = ['1333x800', '1333x800', '224x224', '224x224', ]
     epochs = [12, 52, 12, 52]
@@ -311,11 +311,11 @@ def two_model_test():
 def main():
     # one model
     # one_model_no_background_test()
-    one_model_with_background_test()
+    # one_model_with_background_test()
     # different_threshold_no_background_test()
 
     # two model
-    # two_model_test()
+    two_model_test()
 
     # defect network
     # different_defect_finding_weight_test()

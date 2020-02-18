@@ -10,7 +10,7 @@ def batch_train_with_size_224x224():
         cfg.gpus = '1'
         cfg.loss['type'] = type
         cfg.work_dir = os.path.join(cfg.work_dir,
-                                    'coco_alcohol,loss={},size=224x224'.format(type))
+                                    'coco_alcohol,loss={},seed=666,size=224x224'.format(type))
         cfg.resume_from = cfg.work_dir + '/latest.pth'
         train_main(cfg)
 
