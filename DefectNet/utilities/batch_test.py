@@ -315,10 +315,10 @@ def main():
     # different_threshold_no_background_test()
 
     # two model
-    two_model_test()
+    # two_model_test()
 
     # defect network
-    # different_defect_finding_weight_test()
+    different_defect_finding_weight_test()
     # different_normal_image_ratio_test()
 
     pass

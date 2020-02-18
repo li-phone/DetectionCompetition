@@ -110,7 +110,8 @@ def batch_fixed_defect_finding_weight_train():
     cfg_names = ['defectnet.py', ]
 
     # watch train effects using different base cfg
-    ratios = np.linspace(0., 2, 21)
+    # ratios = np.linspace(0., 2, 21)
+    ratios = np.linspace(0.02, 0.1, 5)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -119,10 +120,12 @@ def batch_fixed_defect_finding_weight_train():
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.model['dfn_weight'] = n
 
-        cfg.cfg_name = 'fixed_defect_finding_weight'
+        cfg.cfg_name = 'different_fixed_defect_finding_weight'
         cfg.uid = n
         cfg.work_dir = os.path.join(
-            cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(n))
+            cfg.work_dir, cfg.cfg_name,
+            'different_fixed_defect_finding_weight,loss={},weight={:.2f}'.format(
+                cfg.model['backbone']['loss_cls']['type'], n))
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
@@ -130,7 +133,9 @@ def batch_fixed_defect_finding_weight_train():
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2)
     from batch_test import batch_test
-    save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
+    save_path = os.path.join(
+        cfg_dir,
+        'different_dfn_weight_test,loss={},weight=0.00-2.00,.txt'.format(cfgs[0].model['backbone']['loss_cls']['type']))
     batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
@@ -156,7 +161,7 @@ def two_model_first_model_train():
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
-        cfg.total_epochs=12
+        cfg.total_epochs = 12
         cfgs.append(cfg)
     batch_train(cfgs, sleep_time=60 * 2, detector=False)
     from batch_test import cls_batch_test
@@ -170,10 +175,10 @@ def main():
     # baseline_one_model_train_no_background()
 
     # two model
-    two_model_first_model_train()
+    # two_model_first_model_train()
 
     # defect network
-    # batch_fixed_defect_finding_weight_train()
+    batch_fixed_defect_finding_weight_train()
 
 
 if __name__ == '__main__':
