@@ -172,14 +172,14 @@ def different_threshold_no_background_test():
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
     save_path = os.path.join(cfg_dir, 'different_threshold_test,background=No,.txt')
-    batch_test(cfgs, save_path, 60, mode='test', json_out_heads=json_out_heads)
+    batch_test(cfgs, save_path, 60 * 2, mode='test', json_out_heads=json_out_heads)
 
 
 def different_defect_finding_weight_test():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
-    ratios = np.linspace(0.1, 2, 20)
+    ratios = np.linspace(0., 2, 21)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -193,7 +193,7 @@ def different_defect_finding_weight_test():
         cfgs.append(cfg)
 
     save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
-    batch_test(cfgs, save_path, 0*60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
 def different_normal_image_ratio_test():
@@ -305,20 +305,20 @@ def two_model_test():
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
     save_path = os.path.join(cfg_dir, 'two_model_test,background=No,.txt')
-    batch_test(cfgs, save_path, 0*60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
 def main():
-    # # one model
+    # one model
     # one_model_no_background_test()
-    # one_model_with_background_test()
+    one_model_with_background_test()
     # different_threshold_no_background_test()
 
     # two model
-    two_model_test()
+    # two_model_test()
 
     # defect network
-    different_defect_finding_weight_test()
+    # different_defect_finding_weight_test()
     # different_normal_image_ratio_test()
 
     pass

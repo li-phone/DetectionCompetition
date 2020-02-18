@@ -1076,3 +1076,248 @@ defect_fps:
 
 normal_fps:
 0.03721083111233182
+
+
+==================================== fixed_defect_finding_weight=0.1, uid=0.1, mode=test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.469
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.747
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.474
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.298
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.394
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.500
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.491
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.567
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.569
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.383
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.499
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.585
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 29.928 | 瓶盖变形 | 38.525 |
+| 瓶盖坏边 | 20.160 | 瓶盖打旋 | 79.911 | 瓶盖断点 | 31.930 |
+| 标贴歪斜 | 79.021 | 标贴起皱 | 15.815 | 标贴气泡 | 17.293 |
+| 喷码正常 | 75.062 | 喷码异常 | 81.794 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.87      0.92      0.90       225
+           1       0.97      0.96      0.97       679
+
+    accuracy                           0.95       904
+   macro avg       0.92      0.94      0.93       904
+weighted avg       0.95      0.95      0.95       904
+
+
+fps:
+0.06685874288061024
+
+defect_fps:
+0.07788358205196959
+
+normal_fps:
+0.033588228225708006
+
+
+==================================== fixed_defect_finding_weight=0.2, uid=0.2, mode=test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.458
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.729
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.471
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.321
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.380
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.456
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.481
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.555
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.559
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.416
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.484
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.539
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 29.934 | 瓶盖变形 | 37.187 |
+| 瓶盖坏边 | 20.692 | 瓶盖打旋 | 80.322 | 瓶盖断点 | 32.436 |
+| 标贴歪斜 | 75.151 | 标贴起皱 | 13.652 | 标贴气泡 | 11.510 |
+| 喷码正常 | 75.590 | 喷码异常 | 81.209 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.88      0.93      0.90       225
+           1       0.98      0.96      0.97       679
+
+    accuracy                           0.95       904
+   macro avg       0.93      0.94      0.94       904
+weighted avg       0.95      0.95      0.95       904
+
+
+fps:
+0.0676563957096201
+
+defect_fps:
+0.07893308027152285
+
+normal_fps:
+0.03362586763170031
+
+
+==================================== fixed_defect_finding_weight=0.3, uid=0.3, mode=test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.448
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.711
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.456
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.304
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.372
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.448
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.474
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.551
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.554
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.396
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.476
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.547
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 28.052 | 瓶盖变形 | 36.888 |
+| 瓶盖坏边 | 20.073 | 瓶盖打旋 | 80.273 | 瓶盖断点 | 32.726 |
+| 标贴歪斜 | 76.286 | 标贴起皱 | 10.796 | 标贴气泡 | 9.538  |
+| 喷码正常 | 73.650 | 喷码异常 | 79.771 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.87      0.92      0.89       225
+           1       0.97      0.95      0.96       679
+
+    accuracy                           0.94       904
+   macro avg       0.92      0.93      0.93       904
+weighted avg       0.95      0.94      0.94       904
+
+
+fps:
+0.06980277479222391
+
+defect_fps:
+0.08136325275775083
+
+normal_fps:
+0.03491582128736708
+
+
+==================================== fixed_defect_finding_weight=0.4, uid=0.4, mode=test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.435
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.704
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.447
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.276
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.368
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.431
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.462
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.531
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.534
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.384
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.467
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.523
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 26.767 | 瓶盖变形 | 33.806 |
+| 瓶盖坏边 | 18.815 | 瓶盖打旋 | 78.522 | 瓶盖断点 | 31.731 |
+| 标贴歪斜 | 72.251 | 标贴起皱 | 9.269  | 标贴气泡 | 7.739  |
+| 喷码正常 | 74.899 | 喷码异常 | 81.504 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.87      0.93      0.90       225
+           1       0.98      0.95      0.97       679
+
+    accuracy                           0.95       904
+   macro avg       0.92      0.94      0.93       904
+weighted avg       0.95      0.95      0.95       904
+
+
+fps:
+0.06910987132418472
+
+defect_fps:
+0.08062793263981725
+
+normal_fps:
+0.034350921842787
+
+
+==================================== fixed_defect_finding_weight=0.5, uid=0.5, mode=test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.426
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.691
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.447
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.283
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.362
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.402
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.455
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.531
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.534
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.404
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.466
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.502
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 瓶盖破损 | 27.639 | 瓶盖变形 | 35.196 |
+| 瓶盖坏边 | 18.990 | 瓶盖打旋 | 77.077 | 瓶盖断点 | 32.614 |
+| 标贴歪斜 | 65.350 | 标贴起皱 | 7.022  | 标贴气泡 | 8.109  |
+| 喷码正常 | 73.830 | 喷码异常 | 80.286 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.88      0.91      0.89       225
+           1       0.97      0.96      0.96       679
+
+    accuracy                           0.95       904
+   macro avg       0.92      0.93      0.93       904
+weighted avg       0.95      0.95      0.95       904
+
+
+fps:
+0.07217744335664057
+
+defect_fps:
+0.08420977957645467
+
+normal_fps:
+0.03586652649773492
