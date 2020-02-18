@@ -22,16 +22,38 @@ from mmdet.datasets import build_dataloader, build_dataset
 from mmdet.models import build_detector
 
 
-def single_gpu_test(model, data_loader, show=False):
+def single_gpu_test(model, data_loader, show=False, first_model=None):
+    if first_model is not None:
+        first_model.model.eval()
     model.eval()
     results, result_times = [], []
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
         with torch.no_grad():
-            start_t = time.time()
-            result = model(return_loss=False, rescale=not show, **data)
-            result_times.append(time.time() - start_t)
+            if first_model is not None:
+                img_path = data['img_meta'][0].data[0][0]['filename']
+                first_result, first_data_times, first_infer_times = first_model.infer(img_path)
+                if first_result[0] == 0:
+                    # no defect
+                    result = 0
+                    result_times.append(first_infer_times[0])
+                else:
+                    torch.cuda.synchronize()
+                    start_t = time.time()
+                    result = model(return_loss=False, rescale=not show, **data)
+                    torch.cuda.synchronize()
+                    end_t = time.time()
+                    result_times.append(end_t - start_t + first_infer_times[0])
+
+            else:
+                torch.cuda.synchronize()
+                start_t = time.time()
+                result = model(return_loss=False, rescale=not show, **data)
+                torch.cuda.synchronize()
+                end_t = time.time()
+                result_times.append(end_t - start_t)
+
         if isinstance(result, list):
             results.append(result)
         elif isinstance(result, int):
@@ -266,6 +288,16 @@ def parse_args():
     return args
 
 
+def import_module(path):
+    py_idx = path.rfind('.py')
+    if py_idx != -1:
+        path = path[:py_idx]
+    _module_path = path.replace('\\', '/')
+    _module_path = _module_path.replace('/', '.')
+    import importlib
+    return importlib.import_module(_module_path)
+
+
 def main(**kwargs):
     args = parse_args()
     for k, v in kwargs.items():
@@ -286,7 +318,13 @@ def main(**kwargs):
     else:
         cfg = args.config
 
-    # set cudnn_benchmark
+    # have first model?
+    first_model = None
+    if cfg.first_model_cfg is not None:
+        first_code_py = import_module(cfg.first_code_py)
+        first_model = first_code_py.Inference(cfg.first_model_cfg, cfg.first_model_path)
+
+        # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
     cfg.model.pretrained = None
@@ -329,7 +367,7 @@ def main(**kwargs):
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs, result_times = single_gpu_test(model, data_loader, args.show)
+        outputs, result_times = single_gpu_test(model, data_loader, args.show, first_model=first_model)
     else:
         model = MMDistributedDataParallel(model.cuda())
         outputs, result_times = multi_gpu_test(model, data_loader, args.tmpdir,

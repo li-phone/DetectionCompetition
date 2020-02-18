@@ -226,6 +226,7 @@ log_config = dict(
 # yapf:enable
 # runtime settings
 dataset_name = 'alcohol'
+first_model_cfg = None
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'

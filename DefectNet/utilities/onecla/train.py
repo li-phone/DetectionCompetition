@@ -9,9 +9,9 @@ from torch.autograd import Variable
 from torchnet import meter
 from sklearn.metrics.classification import classification_report
 from torch.utils.data import *
-from build_network import *
-from utils import *
-from data_reader import DataReader, collate_fn
+from .build_network import *
+from .utils import *
+from .data_reader import DataReader, collate_fn
 
 
 def eval(model, cfg, mode='val', cuda=True):
@@ -53,8 +53,10 @@ def train_one_epoch(model, cfg, optimizer, lr_scheduler, loss_func, loss_metric,
         ann_files=ann_files, img_dirs=img_dirs, transform=None, mode='train',
         img_scale=data_info['img_scale'], keep_ratio=data_info['keep_ratio'],
     )
+
     data_loader = DataLoader(data_reader, collate_fn=collate_fn, **cfg.data_loader)
     loss_metric.update(total_iter=len(data_loader))
+    model.train()
     for step, (data, target) in enumerate(data_loader):
         # inputs = torch.stack(data)
         # targets = torch.from_numpy(np.array(target)).type(torch.LongTensor)
@@ -146,7 +148,17 @@ def test(cfg, epochs):
     logger.info('test successfully!')
 
 
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    import random
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+
+
 def main(cfg):
+    setup_seed(666)
     if isinstance(cfg, str):
         cfg = import_module(cfg)
     mkdirs(cfg.work_dir)

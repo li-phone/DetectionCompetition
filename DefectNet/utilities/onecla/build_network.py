@@ -5,7 +5,7 @@ import torch.nn as nn
 import os
 import torch.nn as nn
 from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
-from utils import *
+from .utils import *
 import torchvision
 
 
@@ -102,6 +102,7 @@ def resume_network(model, cfg):
         logger.info("resume from {}".format(resume_from))
     else:
         optimizer, lr_scheduler = build_optimizer(model, cfg)
+        logger.info("warning... resume from {} failed!".format(cfg.resume_from))
 
     model.train()
     return model, optimizer, lr_scheduler, last_epoch
@@ -115,7 +116,7 @@ def build_network(type, name, num_classes, gpus=[], **kwargs):
         model.fc = nn.Linear(model.fc.in_features, num_classes)
     elif 'classifier' in obj_list:
         model.classifier = nn.Sequential(nn.Dropout(p=0.8, inplace=True),
-                                    nn.Linear(1280, num_classes))
+                                         nn.Linear(1280, num_classes))
     # model = FocalModel(model)
     if torch.cuda.device_count() > 1:
         torch.cuda.set_device(gpus[0])

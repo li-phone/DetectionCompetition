@@ -9,10 +9,53 @@ from torchnet import meter
 from sklearn.metrics.classification import classification_report
 import pandas as pd
 from tqdm import tqdm
+import time
 from torch.utils.data import *
-from build_network import *
-from utils import *
-from data_reader import DataReader, collate_fn
+from .build_network import *
+from .utils import *
+from .data_reader import DataReader, collate_fn, transform_compose
+
+
+class Inference(object):
+    def __init__(self, cfg, model_path=None):
+        if isinstance(cfg, str):
+            cfg = import_module(cfg)
+        self.cfg = cfg
+        if model_path is not None:
+            self.cfg.resume_from = model_path
+        self.cfg.gpus = prase_gpus(self.cfg.gpus)
+        self.model = build_network(**self.cfg.model_config, gpus=self.cfg.gpus)
+        self.model, optimizer, lr_scheduler, last_epoch = resume_network(self.model, self.cfg)
+        self.transform_compose = transform_compose
+        self.mode = 'test'
+        self.img_scale = self.cfg.dataset[self.mode]['img_scale']
+        self.keep_ratio = self.cfg.dataset[self.mode]['keep_ratio']
+
+    def infer(self, img_paths):
+        if isinstance(img_paths, str):
+            img_paths = [img_paths]
+        results, data_times, infer_times = [], [], []
+        for img_path in img_paths:
+            torch.cuda.synchronize()
+            start_time = time.time()
+            img = self.transform_compose(img_path, img_scale=self.img_scale, keep_ratio=self.keep_ratio, mode=self.mode)
+            img = img.unsqueeze(dim=0).cuda()
+            torch.cuda.synchronize()
+            end_time = time.time()
+            data_times.append(end_time - start_time)
+
+            torch.cuda.synchronize()
+            start_time = time.time()
+            out = self.model(img)
+            score = out.softmax(dim=1)
+            label = score.argmax(dim=1)
+            torch.cuda.synchronize()
+            end_time = time.time()
+            infer_times.append(end_time - start_time)
+
+            results.append(int(label))
+
+        return results, data_times, infer_times
 
 
 def infer(model, cfg, cuda=True):

@@ -179,7 +179,7 @@ def different_defect_finding_weight_test():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
-    ratios = np.linspace(0, 2, 21)
+    ratios = np.linspace(0.1, 2, 20)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -193,7 +193,7 @@ def different_defect_finding_weight_test():
         cfgs.append(cfg)
 
     save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 0*60 * 2, mode='test')
 
 
 def different_normal_image_ratio_test():
@@ -266,17 +266,60 @@ def different_normal_image_ratio_test():
     batch_test(cfgs, cfg_dir + '/different_normal_image_ratio_test.txt', 60, mode='test')
 
 
+def two_model_test():
+    import torchvision.models.resnet
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['baseline.py', ]
+
+    # watch train effects using different base cfg
+    first_model_cfg = [
+        'onecla/config/coco_alcohol,size=max(1333x800).py',
+        'onecla/config/coco_alcohol,size=max(1333x800).py',
+        'onecla/config/coco_alcohol,size=224x224.py',
+        'onecla/config/coco_alcohol,size=224x224.py',
+    ]
+    first_code_py = 'onecla/infer.py'
+    first_model_path = [
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=max(1333x800)/epoch_000011.pth',
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,seed=666,size=max(1333x800)/epoch_000051.pth',
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,size=224x224/epoch_000011.pth',
+        'onecla/work_dirs/coco_alcohol/resnet50/coco_alcohol,loss=CrossEntropyLoss,size=224x224/epoch_000051.pth',
+    ]
+    sizes = ['1333x800', '1333x800', '224x224', '224x224', ]
+    epochs = [12, 52, 12, 52]
+
+    ratios = [1, 2, 3, 4]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+
+        cfg.first_model_cfg = first_model_cfg[i]
+        cfg.first_code_py = first_code_py
+        cfg.first_model_path = first_model_path[i]
+
+        cfg.cfg_name = 'baseline_one_model'
+        cfg.uid = 'size={},epoch={},background=No'.format(sizes[i], epochs[i])
+        cfg.work_dir = os.path.join(
+            cfg.work_dir, cfg.cfg_name, 'baseline_one_model,background=No')
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        cfgs.append(cfg)
+    save_path = os.path.join(cfg_dir, 'two_model_test,background=No,.txt')
+    batch_test(cfgs, save_path, 0*60 * 2, mode='test')
+
+
 def main():
-    # one model
-    one_model_no_background_test()
-    one_model_with_background_test()
-    different_threshold_no_background_test()
+    # # one model
+    # one_model_no_background_test()
+    # one_model_with_background_test()
+    # different_threshold_no_background_test()
 
     # two model
+    two_model_test()
 
     # defect network
     different_defect_finding_weight_test()
-    different_normal_image_ratio_test()
+    # different_normal_image_ratio_test()
 
     pass
 

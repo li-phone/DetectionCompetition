@@ -121,12 +121,22 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                     self.mask_roi_extractor[i].init_weights()
                 self.mask_head[i].init_weights()
 
+    def old_extract_feat(self, img):
+        x1 = self.backbone(img, detector=True)
+        if self.with_neck:
+            x1 = self.neck(x1)
+        return x1
+
     def extract_feat(self, img, targets=None):
         if targets is None:
-            x1 = self.backbone(img, detector=True)
+            x1, x2 = self.backbone(img, detector=True)
+            score = x2.softmax(dim=1)
+            label = int(score.argmax(dim=1))
+            if label == 0:
+                return x1, label
             if self.with_neck:
                 x1 = self.neck(x1)
-            return x1
+            return x1, label
         else:
             x1, x2 = self.backbone(img, detector=True, targets=targets)
             if self.with_neck:
@@ -204,7 +214,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         losses = dict()
 
         if self.dfn_weight is None:
-            x = self.extract_feat(img)
+            x = self.old_extract_feat(img)
         else:
             # split the images into defect(1) image and normal(0) image
             defect_nums = []
@@ -385,15 +395,15 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             dict: results
         """
         if self.dfn_weight is None:
-            x = self.extract_feat(img)
+            x = self.old_extract_feat(img)
+        elif self.dfn_weight == 0:
+            x, x2 = self.extract_feat(img)
+            if self.with_neck:
+                x = self.neck(x)
         else:
             x, x2 = self.extract_feat(img)
-            # shortcut quit
-            # new added by liphone
-            defect_score = nn.functional.softmax(x2, dim=1)
-            defect_label = torch.argmax(defect_score, dim=1)
-            if int(defect_label) == 0:
-                return int(defect_label)
+            if x2 == 0:
+                return x2
 
         proposal_list = self.simple_test_rpn(
             x, img_meta, self.test_cfg.rpn) if proposals is None else proposals

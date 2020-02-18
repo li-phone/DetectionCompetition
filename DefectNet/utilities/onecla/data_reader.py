@@ -27,6 +27,55 @@ def collate_fn(batch):
     return tuple([img, target])
 
 
+def transform_compose(image_path, img_scale, keep_ratio=False, mode='train', mean=None, std=None, ):
+    if img_scale is None:
+        img_scale = [224, 224]
+    if mean is None:
+        mean = [0.485, 0.456, 0.406]
+    if std is None:
+        std = [0.229, 0.224, 0.225]
+    img = Image.open(image_path).convert('RGB')
+    if keep_ratio:
+        img_shape = img.size
+        ratio = [img_scale[0] / img_shape[0], img_scale[1] / img_shape[1]]
+        ind = int(np.argmax(ratio))
+        scale = [_ for _ in img_scale]
+        scale[ind] = int(img_shape[ind] * min(ratio))
+
+        transforms = T.Compose([
+            T.Resize((scale[1], scale[0])),
+            # T.CenterCrop((224, 224)),
+            # T.RandomHorizontalFlip(0.5),
+            # T.RandomVerticalFlip(0.5),
+            T.ToTensor(),
+            T.Normalize(mean=mean, std=std)
+        ])
+        img = transforms(img)
+        img_pad = torch.zeros((3, img_scale[1], img_scale[0]))
+        x1, x2, x3 = img.shape
+        img_pad[:x1, :x2, :x3] = img
+        image = img_pad
+    else:
+        if mode == 'train':
+            transforms = T.Compose([
+                T.Resize(img_scale),
+                # T.CenterCrop((224, 224)),
+                # T.RandomHorizontalFlip(0.5),
+                # T.RandomVerticalFlip(0.5),
+                T.ToTensor(),
+                T.Normalize(mean=mean, std=std)
+            ])
+        else:
+            transforms = T.Compose([
+                T.Resize(img_scale),
+                # T.CenterCrop((224, 224)),
+                T.ToTensor(),
+                T.Normalize(mean=mean, std=std)
+            ])
+        image = transforms(img)
+    return image
+
+
 class DataReader(data.Dataset):
 
     def __init__(self, ann_files, img_dirs, transform=None, mode=None, img_scale=(224, 224), keep_ratio=False):
@@ -37,24 +86,7 @@ class DataReader(data.Dataset):
         self.keep_ratio = keep_ratio
 
         if transform is None:
-            if self.mode == 'train':
-                self.transforms = T.Compose([
-                    T.Resize(img_scale),
-                    # T.CenterCrop((224, 224)),
-                    # T.RandomHorizontalFlip(0.5),
-                    # T.RandomVerticalFlip(0.5),
-                    T.ToTensor(),
-                    T.Normalize(mean=[0.485, 0.456, 0.406],
-                                std=[0.229, 0.224, 0.225])
-                ])
-            else:
-                self.transforms = T.Compose([
-                    T.Resize(img_scale),
-                    # T.CenterCrop((224, 224)),
-                    T.ToTensor(),
-                    T.Normalize(mean=[0.485, 0.456, 0.406],
-                                std=[0.229, 0.224, 0.225])
-                ])
+            self.transforms = transform_compose
         else:
             self.transforms = transform
         self._read_ann_file()
@@ -77,31 +109,7 @@ class DataReader(data.Dataset):
 
     def __getitem__(self, index):
         image_path = self.image_paths[index]
-        img = Image.open(image_path).convert('RGB')
-        if self.keep_ratio:
-            img_shape = img.size
-            ratio = [self.img_scale[0] / img_shape[0], self.img_scale[1] / img_shape[1]]
-            ind = int(np.argmax(ratio))
-            scale = [_ for _ in self.img_scale]
-            scale[ind] = int(img_shape[ind] * min(ratio))
-
-            transforms = T.Compose([
-                T.Resize((scale[1], scale[0])),
-                # T.CenterCrop((224, 224)),
-                # T.RandomHorizontalFlip(0.5),
-                # T.RandomVerticalFlip(0.5),
-                T.ToTensor(),
-                T.Normalize(mean=[0.485, 0.456, 0.406],
-                            std=[0.229, 0.224, 0.225])
-            ])
-            img = transforms(img)
-            img_pad = torch.zeros((3, self.img_scale[1], self.img_scale[0]))
-            x1, x2, x3 = img.shape
-            img_pad[:x1, :x2, :x3] = img
-            img = img_pad
-        else:
-            img = self.transforms(img)
-
+        img = self.transforms(image_path, self.img_scale, self.keep_ratio, self.mode)
         if len(self.annotations) == 0:
             return img
         else:
