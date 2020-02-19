@@ -15,7 +15,7 @@ model = dict(
         style='pytorch',
         num_classes=2,
         loss_cls=dict(
-            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)),
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],

@@ -111,7 +111,7 @@ def batch_fixed_defect_finding_weight_train():
 
     # watch train effects using different base cfg
     # ratios = np.linspace(0., 2, 21)
-    ratios = np.linspace(0.02, 0.1, 5)
+    ratios = np.linspace(0.02, 0.12, 6)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -120,18 +120,18 @@ def batch_fixed_defect_finding_weight_train():
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
         cfg.model['dfn_weight'] = n
 
-        cfg.cfg_name = 'different_fixed_defect_finding_weight'
+        cfg.cfg_name = 'different_fixed_dfn_weight'
         cfg.uid = n
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name,
-            'different_fixed_defect_finding_weight,loss={},weight={:.2f}'.format(
-                cfg.model['backbone']['loss_cls']['type'], n))
+            'different_fixed_dfn_weight,weight={:.2f},loss={}'.format(
+                n,cfg.model['backbone']['loss_cls']['type']))
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
         cfgs.append(cfg)
-    batch_train(cfgs, sleep_time=60 * 2)
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(
         cfg_dir,
@@ -149,9 +149,8 @@ def two_model_first_model_train():
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-        cfg.data['imgs_per_gpu'] = 32
-        # cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-        cfg.optimizer['lr'] = 0.001
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = 'two_model'
         cfg.uid = 'model=first,loss=CrossEntropyLoss'

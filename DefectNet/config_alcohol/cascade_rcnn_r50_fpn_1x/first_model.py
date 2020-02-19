@@ -12,7 +12,7 @@ model = dict(
         style='pytorch',
         num_classes=2,
         loss_cls=dict(
-            type='nn.CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)),
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
 )
 # model training and testing settings
 train_cfg = dict()
