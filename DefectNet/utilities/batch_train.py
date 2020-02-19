@@ -169,7 +169,36 @@ def two_model_first_model_train():
     cls_batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
+def garbage_baseline_train():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = ['garbage.py', ]
+
+    # watch train effects using different base cfg
+    ratios = [1]
+    ns = ratios
+    cfgs = []
+    for i, n in enumerate(ns):
+        cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = 'garbage_baseline'
+        cfg.uid = 'garbage_baseline'
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, 'garbage_baseline')
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+        cfgs.append(cfg)
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, 'garbage_test.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
+
+
 def main():
+    garbage_baseline_train()
+
     # one model
     # baseline_one_model_train_with_background()
     # baseline_one_model_train_no_background()
