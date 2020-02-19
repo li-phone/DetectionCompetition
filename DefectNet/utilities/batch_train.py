@@ -111,7 +111,8 @@ def batch_fixed_defect_finding_weight_train():
 
     # watch train effects using different base cfg
     # ratios = np.linspace(0., 2, 21)
-    ratios = np.linspace(0.02, 0.12, 6)
+    ratios = np.linspace(0., 0.1, 6)
+    ratios = np.append(ratios, np.linspace(0.2, 2, 10))
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -125,7 +126,7 @@ def batch_fixed_defect_finding_weight_train():
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name,
             'different_fixed_dfn_weight,weight={:.2f},loss={}'.format(
-                n,cfg.model['backbone']['loss_cls']['type']))
+                n, cfg.model['backbone']['loss_cls']['type']))
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
@@ -136,7 +137,7 @@ def batch_fixed_defect_finding_weight_train():
     save_path = os.path.join(
         cfg_dir,
         'different_dfn_weight_test,loss={},weight=0.00-2.00,.txt'.format(cfgs[0].model['backbone']['loss_cls']['type']))
-    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    # batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
 def two_model_first_model_train():

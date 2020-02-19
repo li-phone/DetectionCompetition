@@ -179,20 +179,26 @@ def different_defect_finding_weight_test():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
-    ratios = np.linspace(0., 2, 21)
+    ratios = np.linspace(0.1, 0.1, 1)
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
         cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
         cfg.model['dfn_weight'] = n
-        cfg.cfg_name = 'fixed_defect_finding_weight'
+
+        cfg.cfg_name = 'different_fixed_dfn_weight'
         cfg.uid = n
         cfg.work_dir = os.path.join(
-            cfg.work_dir, cfg.cfg_name, 'fixed_defect_finding_weight={:.1f}'.format(n))
+            cfg.work_dir, cfg.cfg_name,
+            'different_fixed_dfn_weight,weight={:.2f},loss={}'.format(
+                n,cfg.model['backbone']['loss_cls']['type']))
+
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
 
-    save_path = os.path.join(cfg_dir, 'different_dfn_weight_test,weight=0.00-2.00,.txt')
+    save_path = os.path.join(
+        cfg_dir,
+        'different_dfn_weight_test,loss={},weight=0.00-2.00,.txt'.format(cfgs[0].model['backbone']['loss_cls']['type']))
     batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
