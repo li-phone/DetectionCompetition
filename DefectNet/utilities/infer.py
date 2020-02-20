@@ -11,18 +11,37 @@ from utilities.draw_util import draw_coco
 
 def save_json(results, submit_filename):
     with open(submit_filename, 'w') as fp:
-        json.dump(results, fp, indent=4, separators=(',', ': '))
+        json.dump(results, fp, )
 
 
-def infer(model, images, have_bg=False):
+def infer(model, infer_object, img_dir=None, have_bg=False):
+    images = None
+    if isinstance(infer_object, list):
+        images = infer_object
+    elif isinstance(infer_object, str):
+        if infer_object[-5:] == '.json':
+            from batch_test import load_json
+            coco = load_json(infer_object)
+            images = coco['images']
+        else:
+            img_dir = infer_object
+            images = glob.glob(infer_object)
+            images = [{'file_name': os.path.basename(p) for p in images}]
+    assert images is not None
+
     results = dict(images=[], annotations=[])
-    # name2label = {1: 1, 9: 2, 5: 3, 3: 4, 4: 5, 0: 6, 2: 7, 8: 8, 6: 9, 10: 10, 7: 11}
-    # label2name = {v: k for k, v in name2label.items()}
-    for img_id, path in tqdm(enumerate(images)):
-        results['images'].append(dict(file_name=os.path.basename(path), id=img_id))
-        result = inference_detector(model, path)
+    for i, image in tqdm(enumerate(images)):
+        if 'id' in image:
+            img_id = image['id']
+        elif 'image_id' in image:
+            img_id = image['image_id']
+        else:
+            img_id = i
+
+        results['images'].append(dict(file_name=os.path.basename(image['file_name']), id=img_id))
+        img_path = os.path.join(img_dir, os.path.basename(image['file_name']))
+        result = inference_detector(model, img_path)
         for idx, pred in enumerate(result):
-            # category_id = label2name[idx+1]
             if have_bg:
                 category_id = idx
             else:
@@ -54,6 +73,9 @@ def parse_args():
         default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3/epoch_12.pth',
         help='train config file path')
     parser.add_argument(
+        '--infer_object',
+        default='/home/liphone/undone-work/data/detection/alcohol/test')
+    parser.add_argument(
         '--img_dir',
         default='/home/liphone/undone-work/data/detection/alcohol/test')
     parser.add_argument(
@@ -66,21 +88,11 @@ def parse_args():
     return args
 
 
-def draw(img_dir, work_dir, ann_file):
-    defect_name2label = {
-        0: '背景',
-        1: '瓶盖破损',
-        2: '瓶盖变形',
-        3: '瓶盖坏边',
-        4: '瓶盖打旋',
-        5: '瓶盖断点',
-        6: '标贴歪斜',
-        7: '标贴起皱',
-        8: '标贴气泡',
-        9: '喷码正常',
-        10: '喷码异常'
-    }
-    label_list = [v for k, v in defect_name2label.items()]
+def draw(img_dir, work_dir, ann_file, gt_file):
+    from utilities.utils import save_dict, load_dict
+    coco = load_dict(gt_file)
+    label_list = [r['name'] for r in coco['categories']]
+    label_list.insert(0, '背景')
     draw_coco(
         ann_file,
         img_dir,
@@ -95,11 +107,11 @@ def main(**kwargs):
         args.__setattr__(k, v)
 
     model = init_detector(args.config, args.resume_from, device='cuda:0')
-    image_paths = glob.glob(os.path.join(args.img_dir, '*'))
 
-    results = infer(model, image_paths, args.have_bg)
-    save_json(results, args.submit_out)
-    # draw(args.img_dir, args.work_dir, submit_filename)
+    # results = infer(model, args.infer_object, args.img_dir, args.have_bg)
+    # save_json(results['annotations'], args.submit_out[:-5] + '.submit.json')
+    # save_json(results, args.submit_out[:-5] + '.bbox.json')
+    draw(args.img_dir, args.work_dir, args.submit_out[:-5] + '.bbox.json', args.infer_object)
 
 
 if __name__ == '__main__':

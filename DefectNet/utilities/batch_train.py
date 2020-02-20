@@ -32,7 +32,8 @@ def batch_infer(cfgs):
         infer_params = dict(
             config=cfg,
             resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
-            img_dir=osp.join(cfg.data_root, 'val/images'),
+            infer_object=cfg.data['test']['ann_file'],
+            img_dir=cfg.data['test']['img_prefix'],
             work_dir=cfg.work_dir,
             submit_out=osp.join(cfg.work_dir, '{}_submit,epoch={},.json'.format(cfg_name, 12)),
             have_bg=False,
@@ -199,7 +200,7 @@ def garbage_baseline_train():
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, 'garbage_test.txt')
     # batch_test(cfgs, save_path, 60 * 2, mode='val')
-    # batch_infer(cfgs)
+    batch_infer(cfgs)
 
 
 def main():

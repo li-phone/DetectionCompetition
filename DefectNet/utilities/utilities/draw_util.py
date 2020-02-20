@@ -140,7 +140,8 @@ def draw_coco(ann_file, img_dir, save_dir, label_list, on='image_id', thresh=0.1
         anns = json.load(fp, )
 
     images = json_normalize(anns['images'])
-    images.rename(columns={'id': 'image_id'}, inplace=True)
+    if 'id' in list(images.columns):
+        images.rename(columns={'id': 'image_id'}, inplace=True)
     annotations = json_normalize(anns['annotations'])
     results = pd.merge(annotations, images, on=on)
     columns = list(results.columns)

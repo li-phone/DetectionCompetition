@@ -53,7 +53,7 @@ def check_image(img_dir):
         cv.imwrite(p, img)
 
 
-check_image('/home/liphone/undone-work/data/detection/garbage/train/images', )
+check_image('/home/liphone/undone-work/data/detection/garbage/val/images', )
 check_coco(
     '/home/liphone/undone-work/data/detection/garbage/train/train.json',
     '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
