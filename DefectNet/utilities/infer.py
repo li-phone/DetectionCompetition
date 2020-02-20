@@ -33,7 +33,7 @@ def infer(model, infer_object, img_dir=None, have_bg=False):
     for i, image in tqdm(enumerate(images)):
         if 'id' in image:
             img_id = image['id']
-        elif 'image_id' in image:
+        elif not 'image_id' in image:
             img_id = image['image_id']
         else:
             img_id = i
@@ -108,9 +108,9 @@ def main(**kwargs):
 
     model = init_detector(args.config, args.resume_from, device='cuda:0')
 
-    # results = infer(model, args.infer_object, args.img_dir, args.have_bg)
-    # save_json(results['annotations'], args.submit_out[:-5] + '.submit.json')
-    # save_json(results, args.submit_out[:-5] + '.bbox.json')
+    results = infer(model, args.infer_object, args.img_dir, args.have_bg)
+    save_json(results['annotations'], args.submit_out[:-5] + '.submit.json')
+    save_json(results, args.submit_out[:-5] + '.bbox.json')
     draw(args.img_dir, args.work_dir, args.submit_out[:-5] + '.bbox.json', args.infer_object)
 
 
