@@ -14,11 +14,11 @@ def save_json(results, submit_filename):
         json.dump(results, fp, indent=4, separators=(',', ': '))
 
 
-def infer(model, image_paths, have_bg=False):
+def infer(model, images, have_bg=False):
     results = dict(images=[], annotations=[])
     # name2label = {1: 1, 9: 2, 5: 3, 3: 4, 4: 5, 0: 6, 2: 7, 8: 8, 6: 9, 10: 10, 7: 11}
     # label2name = {v: k for k, v in name2label.items()}
-    for img_id, path in tqdm(enumerate(image_paths)):
+    for img_id, path in tqdm(enumerate(images)):
         results['images'].append(dict(file_name=os.path.basename(path), id=img_id))
         result = inference_detector(model, path)
         for idx, pred in enumerate(result):

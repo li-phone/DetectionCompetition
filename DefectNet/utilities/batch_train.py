@@ -25,6 +25,23 @@ def hint(wav_file='./wav/qq.wav', n=5):
         pygame.mixer.music.play()
 
 
+def batch_infer(cfgs):
+    for cfg in tqdm(cfgs):
+        cfg_name = os.path.basename(cfg.work_dir)
+        print('\ncfg: {}'.format(cfg_name))
+        infer_params = dict(
+            config=cfg,
+            resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
+            img_dir=osp.join(cfg.data_root, 'val/images'),
+            work_dir=cfg.work_dir,
+            submit_out=osp.join(cfg.work_dir, '{}_submit,epoch={},.json'.format(cfg_name, 12)),
+            have_bg=False,
+        )
+        infer_main(**infer_params)
+        print('{} infer successfully!'.format(cfg_name))
+        hint()
+
+
 def batch_train(cfgs, sleep_time=0, detector=True):
     for cfg in tqdm(cfgs):
         cfg_name = os.path.basename(cfg.work_dir)
@@ -36,18 +53,6 @@ def batch_train(cfgs, sleep_time=0, detector=True):
         print('{} train successfully!'.format(cfg_name))
         hint()
         time.sleep(sleep_time)
-    # infer
-    # infer_params = dict(
-    #     config=cfg,
-    #     resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
-    #     img_dir=osp.join(cfg.data_root, 'test'),
-    #     work_dir=cfg.work_dir,
-    #     submit_out=osp.join(cfg.work_dir, '{}_submit_epoch_12.json'.format(cfg_name)),
-    #     have_bg=True,
-    # )
-    # infer_main(**infer_params)
-    # print('{} infer successfully!'.format(cfg_name))
-    # hint()
 
 
 def baseline_one_model_train_with_background():
@@ -190,10 +195,11 @@ def garbage_baseline_train():
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
         cfgs.append(cfg)
-    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    # batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, 'garbage_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='val')
+    # batch_test(cfgs, save_path, 60 * 2, mode='val')
+    # batch_infer(cfgs)
 
 
 def main():
