@@ -179,7 +179,8 @@ def different_defect_finding_weight_test():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = ['defectnet.py', ]
 
-    ratios = np.linspace(0.1, 0.1, 1)
+    ratios = np.linspace(0., 0.1, 6)
+    ratios = np.append(ratios, np.linspace(0.2, 2, 10))
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -191,7 +192,7 @@ def different_defect_finding_weight_test():
         cfg.work_dir = os.path.join(
             cfg.work_dir, cfg.cfg_name,
             'different_fixed_dfn_weight,weight={:.2f},loss={}'.format(
-                n,cfg.model['backbone']['loss_cls']['type']))
+                n, cfg.model['backbone']['loss_cls']['type']))
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         cfgs.append(cfg)
@@ -200,6 +201,7 @@ def different_defect_finding_weight_test():
         cfg_dir,
         'different_dfn_weight_test,loss={},weight=0.00-2.00,.txt'.format(cfgs[0].model['backbone']['loss_cls']['type']))
     batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode='val')
 
 
 def different_normal_image_ratio_test():
