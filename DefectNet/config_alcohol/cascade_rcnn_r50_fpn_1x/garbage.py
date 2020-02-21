@@ -191,13 +191,12 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/train/instance_train.json',
+        ann_file=data_root + '/train/instance_train_rate=0.75.json',
         img_prefix=data_root + '/train/images/',
-        # ignore_ids=[1],
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/train/instance_train.json',
+        ann_file=data_root + '/train/instance_test_rate=0.75.json',
         img_prefix=data_root + '/train/images/',
         pipeline=test_pipeline),
     test=dict(

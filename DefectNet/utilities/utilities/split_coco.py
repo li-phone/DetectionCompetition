@@ -54,9 +54,9 @@ def split_coco(ann_path, save_dir, mode='34', rate=0.8, random_state=666):
 
 
 def main():
-    ann_path = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_20_all_have_bg.json'
-    save_dir = '/home/liphone/undone-work/data/detection/fabric/annotations'
-    split_coco(ann_path, save_dir, mode='fabric_20')
+    ann_path = '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
+    save_dir = '/home/liphone/undone-work/data/detection/garbage/train'
+    split_coco(ann_path, save_dir, mode='rate={:.2f}'.format(0.75), rate=0.75)
 
 
 if __name__ == '__main__':

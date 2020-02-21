@@ -52,7 +52,11 @@ def check_image(img_dir):
         img = cv.imread(p)
         cv.imwrite(p, img)
 
-
+draw(
+    '/home/liphone/undone-work/data/detection/garbage/val/images',
+    '/home/liphone/undone-work/data/detection/garbage/val/',
+    '/home/liphone/undone-work/data/detection/garbage/val_sample.json',
+)
 check_image('/home/liphone/undone-work/data/detection/garbage/val/images', )
 check_coco(
     '/home/liphone/undone-work/data/detection/garbage/train/train.json',

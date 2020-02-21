@@ -118,7 +118,7 @@ def batch_fixed_defect_finding_weight_train():
     # watch train effects using different base cfg
     # ratios = np.linspace(0., 2, 21)
     ratios = np.linspace(0., 0.1, 6)
-    ratios = np.append(ratios, np.linspace(0.2, 2, 10))
+    ratios = np.append(ratios, np.linspace(0.3, 1.9, 9))
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
@@ -199,12 +199,12 @@ def garbage_baseline_train():
     # batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, 'garbage_test.txt')
-    # batch_test(cfgs, save_path, 60 * 2, mode='val')
+    # batch_test(cfgs, save_path, 60 * 2, mode='test')
     batch_infer(cfgs)
 
 
 def main():
-    garbage_baseline_train()
+    # garbage_baseline_train()
 
     # one model
     # baseline_one_model_train_with_background()

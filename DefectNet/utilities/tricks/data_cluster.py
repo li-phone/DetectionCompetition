@@ -39,12 +39,11 @@ def kmeans(x, n=3):
     return centroids
 
 
-def get_cluster(x, save_name, n=3):
-    sns.distplot(x)
-    plt.savefig(save_name)
+def get_cluster(x, n=3):
     centroids = kmeans(x, n)
     centroids = np.sort(centroids.reshape(-1))
-    print('=' * 24, save_name, '=' * 24, '\n', centroids)
+    print('=' * 24, 'get_cluster', '=' * 24, '\n', centroids)
+    return centroids
 
 
 def iou_cluster(anns, n=3):
@@ -52,14 +51,19 @@ def iou_cluster(anns, n=3):
     get_cluster(ious, 'iou.png', n=n)
 
 
-def bbox_cluster(anns, n=3):
-    boxes = [a['bbox'] for k, a in anns.items()]
+def anchor_cluster(anns, n=3):
+    if isinstance(anns, str):
+        coco = COCO(anns)
+        anns = coco.dataset['annotations']
+    elif isinstance(anns, dict):
+        anns = anns['annotations']
+
+    boxes = [a['bbox'] for a in anns]
     boxes = np.array(boxes)
     aspect_ratio = boxes[:, 3] / boxes[:, 2]
-    hor_ver_ratio = boxes[:, 2] / boxes[:, 3]
-
-    get_cluster(aspect_ratio, 'aspect_ratio.png', n=n)
-    get_cluster(hor_ver_ratio, 'hor_ver_ratio.png', n=n)
+    return list(get_cluster(aspect_ratio, n=n))
+    # hor_ver_ratio = boxes[:, 2] / boxes[:, 3]
+    # get_cluster(hor_ver_ratio, 'hor_ver_ratio.png', n=n)
 
 
 def main():
@@ -68,10 +72,8 @@ def main():
     # label2name = {v: k for k, v in name2label.items()}
     # label_weight = {label2name[k]:v for k,v in name_weight.items()}
 
-    ann_file = '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
-    coco = COCO(ann_file)
-    anns = coco.anns
-    bbox_cluster(anns, n=10)
+    # ann_file = '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
+    # bbox_cluster(anns, n=10)
     pass
 
 

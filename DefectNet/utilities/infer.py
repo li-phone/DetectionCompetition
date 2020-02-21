@@ -11,7 +11,7 @@ from utilities.draw_util import draw_coco
 
 def save_json(results, submit_filename):
     with open(submit_filename, 'w') as fp:
-        json.dump(results, fp, )
+        json.dump(results, fp)
 
 
 def infer(model, infer_object, img_dir=None, have_bg=False):
@@ -33,7 +33,7 @@ def infer(model, infer_object, img_dir=None, have_bg=False):
     for i, image in tqdm(enumerate(images)):
         if 'id' in image:
             img_id = image['id']
-        elif not 'image_id' in image:
+        elif 'image_id' in image:
             img_id = image['image_id']
         else:
             img_id = i
@@ -53,8 +53,8 @@ def infer(model, infer_object, img_dir=None, have_bg=False):
             for x in pred:
                 bbox_pred = {
                     "image_id": img_id,
-                    "category_id": category_id,
                     "bbox": [float(x[0]), float(x[1]), float(x[2] - x[0]), float(x[3] - x[1])],
+                    "category_id": category_id,
                     "score": float(x[4]),
                 }
                 results['annotations'].append(bbox_pred)
