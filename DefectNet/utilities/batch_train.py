@@ -116,9 +116,9 @@ def batch_fixed_defect_finding_weight_train():
     cfg_names = ['defectnet.py', ]
 
     # watch train effects using different base cfg
-    # ratios = np.linspace(0., 2, 21)
-    ratios = np.linspace(0., 0.1, 6)
-    ratios = np.append(ratios, np.linspace(0.3, 1.9, 9))
+    ratios = np.linspace(0.1, 0.2, 6)
+    # ratios = np.linspace(0., 0.1, 6)
+    # ratios = np.append(ratios, np.linspace(0.3, 1.9, 9))
     ns = ratios
     cfgs = []
     for i, n in enumerate(ns):
