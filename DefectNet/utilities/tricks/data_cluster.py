@@ -29,7 +29,8 @@ def get_ious(anns):
 
 def kmeans(x, n=3):
     x = np.array(x)
-    x = x.reshape(-1, 1)
+    if len(x.shape) == 1:
+        x = x.reshape(-1, 1)
     # 假如我要构造一个聚类数为3的聚类器
     estimator = KMeans(n_clusters=n)  # 构造聚类器
     estimator.fit(x)  # 聚类
@@ -39,16 +40,16 @@ def kmeans(x, n=3):
     return centroids
 
 
-def get_cluster(x, n=3):
-    centroids = kmeans(x, n)
-    centroids = np.sort(centroids.reshape(-1))
-    print('=' * 24, 'get_cluster', '=' * 24, '\n', centroids)
-    return centroids
+# def get_cluster(x, n=3):
+#     centroids = kmeans(x, n)
+#     # centroids = np.sort(centroids.reshape(-1))
+#     print('=' * 24, 'get_cluster', '=' * 24, '\n', centroids)
+#     return centroids
 
 
-def iou_cluster(anns, n=3):
-    ious, iou_nums = get_ious(anns)
-    get_cluster(ious, 'iou.png', n=n)
+# def iou_cluster(anns, n=3):
+#     ious, iou_nums = get_ious(anns)
+#     get_cluster(ious, 'iou.png', n=n)
 
 
 def anchor_cluster(anns, n=3):
@@ -61,9 +62,27 @@ def anchor_cluster(anns, n=3):
     boxes = [a['bbox'] for a in anns]
     boxes = np.array(boxes)
     aspect_ratio = boxes[:, 3] / boxes[:, 2]
-    return list(get_cluster(aspect_ratio, n=n))
+    centroids = kmeans(aspect_ratio, n)
+    centroids = centroids.squeeze()
+    centroids = np.sort(centroids, axis=0)
+    return list(centroids)
     # hor_ver_ratio = boxes[:, 2] / boxes[:, 3]
     # get_cluster(hor_ver_ratio, 'hor_ver_ratio.png', n=n)
+
+
+def box_cluster(anns, n=3, sind=2, eind=4):
+    if isinstance(anns, str):
+        coco = COCO(anns)
+        anns = coco.dataset['annotations']
+    elif isinstance(anns, dict):
+        anns = anns['annotations']
+
+    boxes = [a['bbox'] for a in anns]
+    boxes = np.array(boxes)
+    boxes = boxes[:, sind:eind]
+    centroids = kmeans(boxes, n, )
+    centroids = np.sort(centroids, axis=0)
+    return list(centroids)
 
 
 def main():

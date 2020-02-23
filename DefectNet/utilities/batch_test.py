@@ -18,7 +18,7 @@ os.chdir(BASH_DIR)
 
 def eval_report(rpt_txt, rpts, cfg, uid=None, mode='val'):
     with open(rpt_txt, 'a+') as fp:
-        head = '\n\n{} {}, uid={}, mode={} {}\n'.format('=' * 36, cfg, uid, mode, '=' * 36)
+        head = '\n\n{} {}, uid: {}, mode: {} {}\n'.format('=' * 36, cfg, uid, mode, '=' * 36)
         fp.write(head)
         for k1, v1 in rpts.items():
             fp.write(k1 + ':\n')  # bbox
