@@ -420,6 +420,56 @@ def anchor_scales_cluster_train():
     batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
+def global_context_train():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = [DATA_NAME + '.py', ]
+
+    cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+    cfg.model['bbox_roi_extractor']['global_context'] = True
+
+    cfg.data['imgs_per_gpu'] = 2
+    cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+    cfg.cfg_name = DATA_NAME + '_baseline'
+    cfg.uid = 'global_context=True'
+    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+
+    cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+    if not os.path.exists(cfg.resume_from):
+        cfg.resume_from = None
+
+    cfgs = [cfg]
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+
+def score_thr_train(score_thr=0.02):
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = [DATA_NAME + '.py', ]
+
+    cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+    cfg.test_cfg['rcnn']['score_thr'] = score_thr
+
+    cfg.data['imgs_per_gpu'] = 2
+    cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+    cfg.cfg_name = DATA_NAME + '_baseline'
+    cfg.uid = 'mode=baseline'
+    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+
+    cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+    if not os.path.exists(cfg.resume_from):
+        cfg.resume_from = None
+
+    cfgs = [cfg]
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+
+
 def main():
     # trick 0: baseline
     baseline_train()
@@ -458,6 +508,12 @@ def main():
 
     # trick 11:
     anchor_scales_cluster_train()
+
+    # trick 12: global context
+    global_context_train()
+
+    # trick 13: low score_thr
+    score_thr_train()
     pass
 
 

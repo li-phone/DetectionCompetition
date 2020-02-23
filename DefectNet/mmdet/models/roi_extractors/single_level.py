@@ -26,11 +26,18 @@ class SingleRoIExtractor(nn.Module):
                  roi_layer,
                  out_channels,
                  featmap_strides,
+                 global_context=False,
                  finest_scale=56):
         super(SingleRoIExtractor, self).__init__()
         self.roi_layers = self.build_roi_layers(roi_layer, featmap_strides)
         self.out_channels = out_channels
         self.featmap_strides = featmap_strides
+        self.global_context = global_context
+        if self.global_context:
+            out_size = self.roi_layers[0].out_size
+            self.global_avg_pool = torch.nn.AdaptiveAvgPool2d(out_size)
+        else:
+            self.global_avg_pool = None
         self.finest_scale = finest_scale
         self.fp16_enabled = False
 
@@ -86,7 +93,7 @@ class SingleRoIExtractor(nn.Module):
         new_rois = torch.stack((rois[:, 0], x1, y1, x2, y2), dim=-1)
         return new_rois
 
-    @force_fp32(apply_to=('feats', ), out_fp16=True)
+    @force_fp32(apply_to=('feats',), out_fp16=True)
     def forward(self, feats, rois, roi_scale_factor=None):
         if len(feats) == 1:
             return self.roi_layers[0](feats[0], rois)
@@ -103,5 +110,9 @@ class SingleRoIExtractor(nn.Module):
             if inds.any():
                 rois_ = rois[inds, :]
                 roi_feats_t = self.roi_layers[i](feats[i], rois_)
+                if self.global_context:
+                    avg_out = self.global_avg_pool(feats[i])
+                    avg_out = avg_out.mean(dim=0)
+                    roi_feats_t += avg_out
                 roi_feats[inds] = roi_feats_t
         return roi_feats
