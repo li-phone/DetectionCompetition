@@ -149,7 +149,7 @@ def larger_lr_train():
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
 
     cfg.data['imgs_per_gpu'] = 2
-    cfg.optimizer['lr'] *= 1.5
+    cfg.optimizer['lr'] *= 1.
 
     cfg.cfg_name = 'garbage_baseline'
     cfg.uid = 'lr={:.2f}'.format(cfg.optimizer['lr'])
@@ -219,10 +219,10 @@ def the_same_ratio_train():
 
 def main():
     # trick 0: baseline
-    baseline_train()
+    # baseline_train()
 
     # trick 1: anchor cluster
-    anchor_cluster_train()
+    # anchor_cluster_train()
 
     # trick 2: larger lr
     larger_lr_train()

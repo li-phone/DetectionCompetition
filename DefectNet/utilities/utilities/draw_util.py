@@ -133,11 +133,16 @@ def set_colors(types_len):
     return colors
 
 
-def draw_coco(ann_file, img_dir, save_dir, label_list, on='image_id', thresh=0.1, format='coco'):
+def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thresh=0.1, format='coco'):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     with open(ann_file, "r") as fp:
         anns = json.load(fp, )
+    if label_list is None:
+        if 'categories' in anns:
+            label_list = [None] * (len(anns['categories']) + 1)
+            for i, v in enumerate(anns['categories']):
+                label_list[v['id']] = v['name']
 
     images = json_normalize(anns['images'])
     if 'id' in list(images.columns):
