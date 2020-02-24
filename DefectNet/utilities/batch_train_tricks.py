@@ -163,7 +163,7 @@ def the_same_ratio_train(img_scale=[1333, 545]):
     cfg_names = [DATA_NAME + '.py', ]
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    cfg.train_pipline[2]['img_scale'] = img_scale
+    cfg.train_pipeline[2]['img_scale'] = img_scale
     cfg.test_pipeline[1]['img_scale'] = img_scale
 
     cfg.data['imgs_per_gpu'] = 2
@@ -472,19 +472,22 @@ def score_thr_train(score_thr=0.02):
 
 def main():
     # trick 0: baseline
-    baseline_train()
+    # baseline_train()
 
     # trick 1: anchor cluster
-    anchor_ratios_cluster_train()
+    # anchor_ratios_cluster_train()
 
     # trick 2: larger lr
-    larger_lr_train()
+    # larger_lr_train()
 
     # trick 3: 2x epochs
     # twice_epochs_train()
 
     # trick 4: keep the same ratio with input image
-    the_same_ratio_train()
+    # the_same_ratio_train()
+
+    # trick 12: global context
+    global_context_train()
 
     # trick 5:
     OHEMSampler_train()
@@ -509,11 +512,11 @@ def main():
     # trick 11:
     anchor_scales_cluster_train()
 
-    # trick 12: global context
-    global_context_train()
-
     # trick 13: low score_thr
     score_thr_train()
+
+    from analyze_data import phrase_json
+    phrase_json(DATA_NAME + '_test.json')
     pass
 
 
