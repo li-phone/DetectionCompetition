@@ -31,13 +31,16 @@ def coco_summary(coco):
     if isinstance(coco, str):
         coco = COCO(coco)
     img_cnts = count_image(coco)
-    print('total images: {}, normal images: {}, defect images: {}, normal : defective: {}\n'
+    print('total images: {}, normal images: {}, defect images: {}, normal : defective: {}'
           .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / img_cnts[2]))
+    print('total defect number: {}\n'
+          .format(len(coco.dataset['annotations'])))
 
 
 def main():
-    coco_file = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json'
-    coco_summary(coco_file)
+    coco_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json')
+    coco_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json')
+    coco_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json')
 
 
 if __name__ == '__main__':

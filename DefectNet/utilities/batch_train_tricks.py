@@ -36,7 +36,7 @@ def batch_infer(cfgs):
             infer_object=cfg.data['test']['ann_file'],
             img_dir=cfg.data['test']['img_prefix'],
             work_dir=cfg.work_dir,
-            submit_out=osp.join(cfg.work_dir, '{}_submit_epoch_{}.json'.format(cfg_name, 12)),
+            submit_out=osp.join(cfg.work_dir, '{}_submit,epoch_{}.json'.format(cfg_name, 12)),
             have_bg=False,
         )
         infer_main(**infer_params)
@@ -79,6 +79,8 @@ def baseline_train():
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
+    # from batch_train import batch_infer
+    # batch_infer(cfgs)
 
 
 def anchor_ratios_cluster_train():
@@ -107,6 +109,8 @@ def anchor_ratios_cluster_train():
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
+    # from batch_train import batch_infer
+    # batch_infer(cfgs)
 
 
 def larger_lr_train():
@@ -231,7 +235,7 @@ def multi_scale_train(img_scale=[(1333, 800), (1333, 1200)]):
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'img_scale=[(1333,750)]'
+    cfg.uid = 'img_scale={}'.format(str(img_scale))
     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
@@ -347,8 +351,10 @@ def SWA_train():
     def swa(cfg, epoch_inds, alpha=0.7):
         ###########################注意，此py文件没有更新batchnorm层，所以只有在mmdetection默认冻住BN情况下使用，如果训练时BN层被解冻，不应该使用此py　＃＃＃＃＃
         #########逻辑上会　score　会高一点不会太多，需要指定的参数是　[config_dir , epoch_indices ,  alpha]　　######################
-
-        config = mmcv.Config.fromfile(cfg)
+        if isinstance(cfg, str):
+            config = mmcv.Config.fromfile(cfg)
+        else:
+            config = cfg
         work_dir = config.work_dir
         model_dir_list = [os.path.join(work_dir, 'epoch_{}.pth'.format(epoch)) for epoch in epoch_inds]
 
@@ -369,16 +375,17 @@ def SWA_train():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = [DATA_NAME + '.py', ]
 
-    ensemble_path = swa(os.path.join(cfg_dir, cfg_names[0]), [10, 11, 12])
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
 
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'model=baseline'
-    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+    cfg.uid = 'SWA=[10,11,12]'
 
+    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + 'mode=baseline')
+
+    ensemble_path = swa(cfg, [10, 11, 12])
     cfg.resume_from = ensemble_path
     if not os.path.exists(cfg.resume_from):
         cfg.resume_from = None
@@ -400,13 +407,18 @@ def anchor_scales_cluster_train():
     boxes = box_cluster(cfg.data['train']['ann_file'], n=5)
     anchor_scales = np.sqrt(boxes[0][0] * boxes[0][1])
     anchor_scales = min(anchor_scales * 1333 / 2446, anchor_scales * 800 / 1000) / 4
-    cfg.model['rpn_head']['anchor_scales'] = list([int(anchor_scales)])
+    anchor_scales = int(anchor_scales)
+    cfg.model['rpn_head']['anchor_scales'] = list([anchor_scales])
 
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'anchor_cluster=6'
+    if anchor_scales == 8:
+        cfg.uid = 'mode=baseline'
+        print('This trick is the same with baseline model.')
+    else:
+        cfg.uid = 'anchor_scales_cluster=6'
     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
@@ -456,15 +468,15 @@ def score_thr_train(score_thr=0.02):
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'mode=baseline'
-    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
+    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + 'mode=baseline')
     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
     if not os.path.exists(cfg.resume_from):
         cfg.resume_from = None
 
+    cfg.uid = 'score_thr={}'.format(score_thr)
     cfgs = [cfg]
-    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    # batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     batch_test(cfgs, save_path, 60 * 2, mode='test')
@@ -487,36 +499,36 @@ def main():
     # the_same_ratio_train()
 
     # trick 12: global context
-    global_context_train()
+    # global_context_train()
 
     # trick 5:
-    OHEMSampler_train()
+    # OHEMSampler_train()
 
     # trick 6: multiple scales train
-    multi_scale_train()
+    # multi_scale_train()
 
     # trick 7: load pretrained model train
     # load_pretrain_train()
 
     # trick 8: backbone_dcn_train
-    backbone_dcn_train()
+    # backbone_dcn_train()
 
     # trick 9:
-    iou_thr_train([0.5, 0.6, 0.7])
-    iou_thr_train([0.6, 0.7, 0.8])
-    iou_thr_train([0.4, 0.5, 0.6])
+    # iou_thr_train([0.5, 0.6, 0.7])
+    # iou_thr_train([0.6, 0.7, 0.8])
+    # iou_thr_train([0.4, 0.5, 0.6])
 
     # trick 10: swa ensemble
-    SWA_train()
+    # SWA_train()
 
     # trick 11:
-    anchor_scales_cluster_train()
+    # anchor_scales_cluster_train()
 
     # trick 13: low score_thr
-    score_thr_train()
+    # score_thr_train()
 
     from analyze_data import phrase_json
-    phrase_json(DATA_NAME + '_test.json')
+    phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/' + DATA_NAME + '_test.json')
     pass
 
 
