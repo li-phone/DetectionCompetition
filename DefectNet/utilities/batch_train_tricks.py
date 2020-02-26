@@ -14,7 +14,7 @@ from infer import main as infer_main
 
 BASH_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASH_DIR)
-DATA_NAME = 'fabric'
+DATA_NAME = 'garbage'
 
 
 def hint(wav_file='./wav/qq.wav', n=5):
@@ -482,50 +482,76 @@ def score_thr_train(score_thr=0.02):
     batch_test(cfgs, save_path, 60 * 2, mode='test')
 
 
+def joint_train():
+    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
+    cfg_names = [DATA_NAME + '.py', ]
+
+    cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
+
+    cfg.data['imgs_per_gpu'] = 2
+    cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+    cfg.cfg_name = DATA_NAME + '_baseline'
+    cfg.uid = 'mode=baseline'
+    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+
+    cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+    if not os.path.exists(cfg.resume_from):
+        cfg.resume_from = None
+
+    cfgs = [cfg]
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    from batch_test import batch_test
+    save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    # from batch_train import batch_infer
+    # batch_infer(cfgs)
+
+
 def main():
     # trick 0: baseline
-    # baseline_train()
+    baseline_train()
 
     # trick 1: anchor cluster
-    # anchor_ratios_cluster_train()
+    anchor_ratios_cluster_train()
 
     # trick 2: larger lr
-    # larger_lr_train()
+    larger_lr_train()
 
     # trick 3: 2x epochs
     # twice_epochs_train()
 
     # trick 4: keep the same ratio with input image
-    # the_same_ratio_train()
+    the_same_ratio_train([1920, 1080])
 
     # trick 12: global context
-    # global_context_train()
+    global_context_train()
 
     # trick 5:
-    # OHEMSampler_train()
+    OHEMSampler_train()
 
     # trick 6: multiple scales train
-    # multi_scale_train()
+    multi_scale_train()
 
     # trick 7: load pretrained model train
-    # load_pretrain_train()
+    load_pretrain_train()
 
     # trick 8: backbone_dcn_train
-    # backbone_dcn_train()
+    backbone_dcn_train()
 
     # trick 9:
-    # iou_thr_train([0.5, 0.6, 0.7])
-    # iou_thr_train([0.6, 0.7, 0.8])
-    # iou_thr_train([0.4, 0.5, 0.6])
+    iou_thr_train([0.5, 0.6, 0.7])
+    iou_thr_train([0.6, 0.7, 0.8])
+    iou_thr_train([0.4, 0.5, 0.6])
 
     # trick 10: swa ensemble
-    # SWA_train()
+    SWA_train()
 
     # trick 11:
-    # anchor_scales_cluster_train()
+    anchor_scales_cluster_train()
 
     # trick 13: low score_thr
-    # score_thr_train()
+    score_thr_train()
 
     from analyze_data import phrase_json
     phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/' + DATA_NAME + '_test.json')
