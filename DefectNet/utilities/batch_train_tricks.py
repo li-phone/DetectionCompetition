@@ -364,7 +364,7 @@ def SWA_train():
                 model_ensemble = get_model(config, model_dir)
             else:
                 model_fusion = get_model(config, model_dir)
-                model_emsemble = model_average(model_ensemble, model_fusion, alpha)
+                model_ensemble = model_average(model_ensemble, model_fusion, alpha)
 
         checkpoint = torch.load(model_dir_list[-1])
         checkpoint['state_dict'] = model_ensemble.state_dict()
@@ -519,7 +519,7 @@ def main():
     # iou_thr_train([0.4, 0.5, 0.6])
 
     # trick 10: swa ensemble
-    # SWA_train()
+    SWA_train()
 
     # trick 11:
     # anchor_scales_cluster_train()
