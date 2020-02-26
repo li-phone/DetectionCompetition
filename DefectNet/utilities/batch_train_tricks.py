@@ -519,7 +519,7 @@ def main():
     # iou_thr_train([0.4, 0.5, 0.6])
 
     # trick 10: swa ensemble
-    SWA_train()
+    # SWA_train()
 
     # trick 11:
     # anchor_scales_cluster_train()
