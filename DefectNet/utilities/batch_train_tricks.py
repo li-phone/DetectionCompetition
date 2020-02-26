@@ -508,7 +508,14 @@ def joint_train():
     # batch_infer(cfgs)
 
 
+def other_cfg_train():
+    cfgs = [mmcv.Config.fromfile('../other_cfgs/cascade.py')]
+    batch_train(cfgs, sleep_time=0 * 60 * 2)
+
+
 def main():
+    other_cfg_train()
+
     # trick 0: baseline
     baseline_train()
 

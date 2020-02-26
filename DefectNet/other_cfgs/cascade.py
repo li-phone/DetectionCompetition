@@ -1,7 +1,7 @@
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    pretrained='/cache/common/resnet50-19c8e357.pth',
+    pretrained='torchvision://resnet50',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -11,7 +11,7 @@ model = dict(
         style='pytorch',
         dcn=dict(type='DCN', deformable_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True)
-        ),
+    ),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -22,7 +22,7 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        #anchor_ratios=[0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10, 20],
+        # anchor_ratios=[0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10, 20],
         anchor_ratios=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
@@ -161,13 +161,13 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='soft_nms', iou_thr=0.2, min_score=0.05), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+data_root = '/home/liphone/undone-work/data/detection/garbage'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=[(1920, 1080),(1920, 800)], multiscale_mode='range', keep_ratio=True),
+    dict(type='Resize', img_scale=[(1920, 1080), (1920, 800)], multiscale_mode='range', keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
     dict(type='Normalize', **img_norm_cfg),
@@ -196,22 +196,22 @@ data = dict(
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/train_washed.json',
-        img_prefix=data_root + 'train2017/',
+        ann_file=data_root + '/train/instance_train.json',
+        img_prefix=data_root + '/train/images/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/val_washed.json',
-        img_prefix=data_root + 'val2017/',
+        ann_file=data_root + '/train/instance_test_rate=0.75.json',
+        img_prefix=data_root + '/train/images/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/val_washed.json',
-        img_prefix=data_root + 'val2017/',
+        ann_file=data_root + '/val/val_open.json',
+        img_prefix=data_root + '/val/images/',
         pipeline=test_pipeline))
 # optimizer
 #  single  gpu  and  autoscale
-optimizer = dict(type='SGD', lr=0.00125 , momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -234,6 +234,6 @@ total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/cascade_rcnn_dconv_c3-c5_r50_fpn_1x'
-load_from = '/cache/common/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
+load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
 resume_from = None
 workflow = [('train', 1)]

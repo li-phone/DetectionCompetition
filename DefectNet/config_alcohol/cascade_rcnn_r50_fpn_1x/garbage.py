@@ -233,5 +233,5 @@ uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x/' + cfg_name
 resume_from = None
-load_from = work_dir + '/trained_coco_model/rpn_r50_fpn_1x_20181010-4a9c0712.pth'
+load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
 workflow = [('train', 1)]
