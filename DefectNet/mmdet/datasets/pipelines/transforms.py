@@ -294,7 +294,7 @@ class Pad(object):
             if padded_masks:
                 results[key] = np.stack(padded_masks, axis=0)
             else:
-                results[key] = np.empty((0, ) + pad_shape, dtype=np.uint8)
+                results[key] = np.empty((0,) + pad_shape, dtype=np.uint8)
 
     def _pad_seg(self, results):
         for key in results.get('seg_fields', []):
@@ -386,7 +386,7 @@ class RandomCrop(object):
         if 'gt_bboxes' in results:
             gt_bboxes = results['gt_bboxes']
             valid_inds = (gt_bboxes[:, 2] > gt_bboxes[:, 0]) & (
-                gt_bboxes[:, 3] > gt_bboxes[:, 1])
+                    gt_bboxes[:, 3] > gt_bboxes[:, 1])
             # if no gt bbox remains after cropping, just skip this image
             if not np.any(valid_inds):
                 return None
@@ -399,7 +399,7 @@ class RandomCrop(object):
                 valid_gt_masks = []
                 for i in np.where(valid_inds)[0]:
                     gt_mask = results['gt_masks'][i][crop_y1:crop_y2,
-                                                     crop_x1:crop_x2]
+                              crop_x1:crop_x2]
                     valid_gt_masks.append(gt_mask)
                 results['gt_masks'] = valid_gt_masks
 
@@ -517,8 +517,8 @@ class PhotoMetricDistortion(object):
         repr_str = self.__class__.__name__
         repr_str += ('(brightness_delta={}, contrast_range={}, '
                      'saturation_range={}, hue_delta={})').format(
-                         self.brightness_delta, self.contrast_range,
-                         self.saturation_range, self.hue_delta)
+            self.brightness_delta, self.contrast_range,
+            self.saturation_range, self.hue_delta)
         return repr_str
 
 
@@ -593,8 +593,8 @@ class Expand(object):
         repr_str = self.__class__.__name__
         repr_str += '(mean={}, to_rgb={}, ratio_range={}, ' \
                     'seg_ignore_label={})'.format(
-                        self.mean, self.to_rgb, self.ratio_range,
-                        self.seg_ignore_label)
+            self.mean, self.to_rgb, self.ratio_range,
+            self.seg_ignore_label)
         return repr_str
 
 
@@ -677,7 +677,7 @@ class MinIoURandomCrop(object):
                 # not tested
                 if 'gt_semantic_seg' in results:
                     results['gt_semantic_seg'] = results['gt_semantic_seg'][
-                        patch[1]:patch[3], patch[0]:patch[2]]
+                                                 patch[1]:patch[3], patch[0]:patch[2]]
                 return results
 
     def __repr__(self):
@@ -857,4 +857,54 @@ class Albu(object):
     def __repr__(self):
         repr_str = self.__class__.__name__
         repr_str += '(transformations={})'.format(self.transformations)
+        return repr_str
+
+
+@PIPELINES.register_module
+class Cutout(object):
+    """Randomly mask out one or more patches from an image.
+    Args:
+        n_holes (int): Number of patches to cut out of each image.
+        length (int): The length (in pixels) of each square patch.
+    """
+
+    def __init__(self, n_holes, length, flip_ratio=0.5):
+        self.flip_ratio = flip_ratio
+        self.n_holes = n_holes
+        self.length = length
+
+    def __call__(self, results):
+        if 'cutout' not in results:
+            flip = True if np.random.rand() < self.flip_ratio else False
+            results['cutout'] = flip
+
+        if results['cutout']:
+            img = results['img']
+            h = img.shape[0]
+            w = img.shape[1]
+
+            mask = np.ones((h, w, 3), np.float32)
+
+            for n in range(self.n_holes):
+                # (x,y)表示方形补丁的中心位置
+                y = np.random.randint(h)
+                x = np.random.randint(w)
+
+                y1 = np.clip(y - self.length // 2, 0, h)
+                y2 = np.clip(y + self.length // 2, 0, h)
+                x1 = np.clip(x - self.length // 2, 0, w)
+                x2 = np.clip(x + self.length // 2, 0, w)
+
+                mask[y1: y2, x1: x2, 0: 2] = 0.
+
+            # mask = torch.from_numpy(mask)
+            # mask = mask.expand_as(img)
+            img = img * mask
+            results['img'] = img
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += '(n_holes={}, length={})'.format(
+            self.n_holes, self.length)
         return repr_str
