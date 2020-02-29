@@ -79,6 +79,10 @@ def box_cluster(anns, n=3, sind=2, eind=4):
 
     boxes = [a['bbox'] for a in anns]
     boxes = np.array(boxes)
+    # import pandas as pd
+    # box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'w', 'h'])
+    # box_df.plot(kind="scatter", x="w", y="h", alpha=0.1)
+    # plt.show()
     boxes = boxes[:, sind:eind]
     centroids = kmeans(boxes, n, )
     centroids = np.sort(centroids, axis=0)

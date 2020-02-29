@@ -111,8 +111,17 @@ class SingleRoIExtractor(nn.Module):
                 rois_ = rois[inds, :]
                 roi_feats_t = self.roi_layers[i](feats[i], rois_)
                 if self.global_context:
-                    avg_out = self.global_avg_pool(feats[i])
-                    avg_out = avg_out.mean(dim=0)
-                    roi_feats_t += avg_out
+                    avg_outs = [self.global_avg_pool(feats[i][j]) for j in range(feats[i].shape[0])]
+                    start_ind = 0
+                    for j in range(1, rois_.shape[0]):
+                        index_ = int(rois_[j - 1][0])
+                        index_next = int(rois_[j][0])
+                        if index_ != index_next or j == (rois_.shape[0] - 1):
+                            if j == (rois_.shape[0] - 1):
+                                end_ind = j + 1
+                            else:
+                                end_ind = j
+                            roi_feats_t[start_ind:end_ind] += avg_outs[index_]
+                            start_ind = end_ind
                 roi_feats[inds] = roi_feats_t
         return roi_feats

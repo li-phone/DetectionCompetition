@@ -15,6 +15,7 @@ from infer import main as infer_main
 BASH_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASH_DIR)
 DATA_NAME = 'garbage'
+DATA_MODE = 'val'
 
 
 def hint(wav_file='./wav/qq.wav', n=5):
@@ -78,18 +79,18 @@ def baseline_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
     # from batch_train import batch_infer
     # batch_infer(cfgs)
 
 
 def anchor_ratios_cluster_train():
-    from tricks.data_cluster import anchor_cluster
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = [DATA_NAME + '.py', ]
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
     # new added
+    from tricks.data_cluster import anchor_cluster
     anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
     cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
 
@@ -108,7 +109,7 @@ def anchor_ratios_cluster_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
     # from batch_train import batch_infer
     # batch_infer(cfgs)
 
@@ -134,7 +135,7 @@ def larger_lr_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def twice_epochs_train():
@@ -159,7 +160,7 @@ def twice_epochs_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def the_same_ratio_train(img_scale=[1333, 545]):
@@ -185,7 +186,9 @@ def the_same_ratio_train(img_scale=[1333, 545]):
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    # batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    from batch_train import batch_infer
+    batch_infer(cfgs)
 
 
 def OHEMSampler_train():
@@ -216,7 +219,7 @@ def OHEMSampler_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def multi_scale_train(img_scale=[(1333, 800), (1333, 1200)]):
@@ -246,7 +249,7 @@ def multi_scale_train(img_scale=[(1333, 800), (1333, 1200)]):
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def load_pretrain_train():
@@ -271,7 +274,7 @@ def load_pretrain_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def backbone_dcn_train():
@@ -298,7 +301,7 @@ def backbone_dcn_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def iou_thr_train(iou_thrs=[0.5, 0.6, 0.7]):
@@ -326,7 +329,7 @@ def iou_thr_train(iou_thrs=[0.5, 0.6, 0.7]):
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def SWA_train():
@@ -394,7 +397,7 @@ def SWA_train():
     # batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def anchor_scales_cluster_train():
@@ -429,7 +432,7 @@ def anchor_scales_cluster_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def global_context_train():
@@ -454,7 +457,7 @@ def global_context_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def score_thr_train(score_thr=0.02):
@@ -479,7 +482,7 @@ def score_thr_train(score_thr=0.02):
     # batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
 def joint_train():
@@ -488,11 +491,35 @@ def joint_train():
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
 
+    # 0.810
+    img_scale = [1920, 1080]
+    cfg.train_pipeline[2]['img_scale'] = img_scale
+    cfg.test_pipeline[1]['img_scale'] = img_scale
+
+    # 0.819
+    cfg.model['backbone']['dcn'] = dict(  # 在最后三个block加入可变形卷积
+        modulated=False, deformable_groups=1, fallback_on_stride=False)
+    cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
+
+    # # 0.8??
+    # from tricks.data_cluster import anchor_cluster
+    # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=4)
+    # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
+
+    # focal loss for rcnn
+    # for head in cfg.model['bbox_head']:
+    #     head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
+
+    # global context
+    cfg.model['bbox_roi_extractor']['global_context'] = True
+
+    # cfg.model['rpn_head']['anchor_scales'] = list([6])
+
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'mode=baseline'
+    cfg.uid = 'mode=joint_train'
     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
@@ -503,66 +530,74 @@ def joint_train():
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode='test')
-    # from batch_train import batch_infer
-    # batch_infer(cfgs)
+    # batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    from batch_train import batch_infer
+    batch_infer(cfgs)
 
 
 def other_cfg_train():
+    cfg_dir = '../other_cfgs/'
     cfgs = [mmcv.Config.fromfile('../other_cfgs/cascade.py')]
-    batch_train(cfgs, sleep_time=0 * 60 * 2)
+    # batch_train(cfgs, sleep_time=0 * 60 * 2)
+    from batch_test import batch_test
+    cfgs[0].first_model_cfg = None
+    save_path = os.path.join(cfg_dir, 'garbage' + '_test.txt')
+    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    from batch_train import batch_infer
+    batch_infer(cfgs)
 
 
 def main():
-    other_cfg_train()
+    joint_train()
+    # other_cfg_train()
 
     # trick 0: baseline
-    baseline_train()
+    # baseline_train()
 
     # trick 1: anchor cluster
-    anchor_ratios_cluster_train()
+    # anchor_ratios_cluster_train()
 
     # trick 2: larger lr
-    larger_lr_train()
+    # larger_lr_train()
 
     # trick 3: 2x epochs
     # twice_epochs_train()
 
     # trick 4: keep the same ratio with input image
-    the_same_ratio_train([1920, 1080])
+    # the_same_ratio_train([1920, 1080])
 
     # trick 12: global context
-    global_context_train()
+    # global_context_train()
 
     # trick 5:
-    OHEMSampler_train()
+    # OHEMSampler_train()
 
     # trick 6: multiple scales train
-    multi_scale_train()
+    # multi_scale_train()
 
     # trick 7: load pretrained model train
-    load_pretrain_train()
+    # load_pretrain_train()
 
     # trick 8: backbone_dcn_train
-    backbone_dcn_train()
+    # backbone_dcn_train()
 
     # trick 9:
-    iou_thr_train([0.5, 0.6, 0.7])
-    iou_thr_train([0.6, 0.7, 0.8])
-    iou_thr_train([0.4, 0.5, 0.6])
+    # iou_thr_train([0.5, 0.6, 0.7])
+    # iou_thr_train([0.6, 0.7, 0.8])
+    # iou_thr_train([0.4, 0.5, 0.6])
 
     # trick 10: swa ensemble
-    SWA_train()
+    # SWA_train()
 
     # trick 11:
-    anchor_scales_cluster_train()
+    # anchor_scales_cluster_train()
 
     # trick 13: low score_thr
-    score_thr_train()
+    # score_thr_train()
 
-    from analyze_data import phrase_json
-    phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/' + DATA_NAME + '_test.json')
-    pass
+    # from analyze_data import phrase_json
+    # phrase_json('../config_alcohol/cascade_rcnn_r50_fpn_1x/' + DATA_NAME + '_test.json')
+    # pass
 
 
 if __name__ == '__main__':

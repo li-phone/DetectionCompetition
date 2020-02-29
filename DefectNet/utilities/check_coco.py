@@ -52,6 +52,11 @@ def check_image(img_dir):
         img = cv.imread(p)
         cv.imwrite(p, img)
 
+
+check_coco(
+    '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/garbage_data/train-debug.json',
+    '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/garbage_data/instance_train.json',
+)
 draw(
     '/home/liphone/undone-work/data/detection/garbage/val/images',
     '/home/liphone/undone-work/data/detection/garbage/val/',

@@ -133,7 +133,7 @@ def set_colors(types_len):
     return colors
 
 
-def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thresh=0.1, format='coco'):
+def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thresh=0.1, fontsize=16):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     with open(ann_file, "r") as fp:
@@ -163,5 +163,5 @@ def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thres
             scores = list(result['score'])
         img_pred = draw_bbox(
             image, list(result['bbox']), list(result['category_id']), label_list, colors,
-            scores=scores, box_mode='xywh', fontsize=16, )
+            scores=scores, box_mode='xywh', fontsize=fontsize, )
         save_img(img_pred, os.path.join(save_dir, file_name + '_draw.jpg'))

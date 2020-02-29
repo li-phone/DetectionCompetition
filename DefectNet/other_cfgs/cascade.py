@@ -1,3 +1,4 @@
+fp16 = dict(loss_scale=512.)
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
@@ -23,7 +24,8 @@ model = dict(
         feat_channels=256,
         anchor_scales=[8],
         # anchor_ratios=[0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10, 20],
-        anchor_ratios=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10],
+        # anchor_ratios=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10],
+        anchor_ratios=[0.5, 1.0, 2],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -105,21 +107,6 @@ train_cfg = dict(
         dict(
             assigner=dict(
                 type='MaxIoUAssigner',
-                pos_iou_thr=0.4,
-                neg_iou_thr=0.4,
-                min_pos_iou=0.4,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='OHEMSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
                 pos_iou_thr=0.5,
                 neg_iou_thr=0.5,
                 min_pos_iou=0.5,
@@ -146,6 +133,21 @@ train_cfg = dict(
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
             pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='OHEMSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
             debug=False)
     ],
     stage_loss_weights=[1, 0.5, 0.25])
@@ -158,7 +160,7 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05, nms=dict(type='soft_nms', iou_thr=0.2, min_score=0.05), max_per_img=100))
+        score_thr=0.05, nms=dict(type='soft_nms', iou_thr=0.3, min_score=0.05), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
 data_root = '/home/liphone/undone-work/data/detection/garbage'
@@ -201,7 +203,7 @@ data = dict(
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/train/instance_test_rate=0.75.json',
+        ann_file=data_root + '/train/instance_train.json',
         img_prefix=data_root + '/train/images/',
         pipeline=test_pipeline),
     test=dict(
