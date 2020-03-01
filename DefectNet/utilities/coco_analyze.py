@@ -82,10 +82,10 @@ def category_distribution(coco, legends=None, cn2eng=None):
         else:
             cat_dist = pd.DataFrame(data=cat_dist)
         cat_dists = pd.concat([cat_dists, cat_dist], axis=1, sort=True)
-    save_plt(save_img_dir + 'category_distribution.jpg')
     cat_dists = cat_dists.sort_values(by=legends[0], ascending=True)
     pplt = cat_dists.plot.barh(stacked=True)
     plt.xlabel('number of defect categories')
+    save_plt(save_img_dir + 'category_distribution.jpg')
     plt.show()
 
 
