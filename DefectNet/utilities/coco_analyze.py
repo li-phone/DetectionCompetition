@@ -85,7 +85,7 @@ def category_distribution(coco, legends=None, cn2eng=None):
     cat_dists = cat_dists.sort_values(by=legends[0], ascending=True)
     pplt = cat_dists.plot.barh(stacked=True)
     plt.xlabel('number of defect categories')
-    plt.subplots_adjust(left=0.27, right=0.97)
+    plt.subplots_adjust(left=0.27, right=0.97, top=0.96)
     save_plt(save_img_dir + 'category_distribution.jpg')
     plt.show()
 
