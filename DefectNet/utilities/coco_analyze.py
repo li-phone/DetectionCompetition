@@ -58,21 +58,34 @@ def save_plt(save_name, file_types=None):
         plt.savefig(save_name[:-4] + t)
 
 
-def category_distribution(coco, cn2eng=None):
-    coco = chg2coco(coco)
-    dataset = coco.dataset
-    if cn2eng is not None:
-        cat2label = {r['id']: cn2eng[r['name']] for r in dataset['categories']}
+def category_distribution(coco, legends=None, cn2eng=None):
+    if isinstance(coco, str):
+        cocos = [coco]
     else:
-        cat2label = {r['id']: r['name'] for r in dataset['categories']}
-    for ann in dataset['annotations']:
-        ann['category_id'] = cat2label[ann['category_id']]
+        cocos = coco
+    cat_dists = pd.DataFrame()
+    for i, coco in enumerate(cocos):
+        coco = chg2coco(coco)
+        dataset = coco.dataset
+        if cn2eng is not None:
+            cat2label = {r['id']: cn2eng[r['name']] for r in dataset['categories']}
+        else:
+            cat2label = {r['id']: r['name'] for r in dataset['categories']}
+        for ann in dataset['annotations']:
+            ann['category_id'] = cat2label[ann['category_id']]
 
-    ann_df = json_normalize(dataset['annotations'])
-    cat_dist = ann_df['category_id'].value_counts()
-    cat_dist = cat_dist.drop('background')
-    save_plt(save_img_dir + 'bbox_distribution.jpg')
-    cat_dist.plot.barh(stacked=True)
+        ann_df = json_normalize(dataset['annotations'])
+        cat_dist = ann_df['category_id'].value_counts()
+        cat_dist = cat_dist.drop('background')
+        if legends is not None:
+            cat_dist = pd.DataFrame(data={legends[i]: cat_dist})
+        else:
+            cat_dist = pd.DataFrame(data=cat_dist)
+        cat_dists = pd.concat([cat_dists, cat_dist], axis=1, sort=True)
+    save_plt(save_img_dir + 'category_distribution.jpg')
+    cat_dists = cat_dists.sort_values(by=legends[0], ascending=True)
+    pplt = cat_dists.plot.barh(stacked=True)
+    plt.xlabel('number of defect categories')
     plt.show()
 
 
@@ -89,11 +102,16 @@ def bbox_distribution(coco):
 
 
 def main():
-    image_count_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json')
-    image_count_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json')
-    image_count_summary('/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json')
+    ann_files = [
+        '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json',
+        '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json',
+        '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json',
+    ]
+    image_count_summary(ann_files[0])
+    image_count_summary(ann_files[1])
+    image_count_summary(ann_files[2])
 
-    bbox_distribution('/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json')
+    bbox_distribution(ann_files[1])
 
     cn2eng = {
         '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
@@ -106,9 +124,7 @@ def main():
         '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
         '纬纱不良': 'bad weft yarn',
     }
-    category_distribution(
-        '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json',
-        cn2eng)
+    category_distribution(ann_files, cn2eng=cn2eng, legends=['all', 'train', 'test'])
 
 
 if __name__ == '__main__':
