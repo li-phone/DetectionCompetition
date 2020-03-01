@@ -236,7 +236,7 @@ log_config = dict(
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/cascade_rcnn_dconv_c3-c5_r50_fpn_1x'
+work_dir = '../work_dirs/cascade_rcnn_dconv_c3-c5_r50_fpn_1x'
 load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
 resume_from = None
 workflow = [('train', 1)]

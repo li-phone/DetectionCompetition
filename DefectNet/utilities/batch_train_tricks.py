@@ -501,17 +501,19 @@ def joint_train():
         modulated=False, deformable_groups=1, fallback_on_stride=False)
     cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
 
-    # # 0.8??
+    # 0.822
+    # global context
+    cfg.model['bbox_roi_extractor']['global_context'] = True
+
+    # # 0.746
     # from tricks.data_cluster import anchor_cluster
-    # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=4)
+    # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
     # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
 
+    # 0.???
     # focal loss for rcnn
-    for head in cfg.model['bbox_head']:
-        head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
-
-    # global context
-    # cfg.model['bbox_roi_extractor']['global_context'] = True
+    # for head in cfg.model['bbox_head']:
+    #     head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
 
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
@@ -536,18 +538,20 @@ def joint_train():
 def other_cfg_train():
     cfg_dir = '../other_cfgs/'
     cfgs = [mmcv.Config.fromfile('../other_cfgs/cascade.py')]
+    cfgs[0].first_model_cfg = None
+    cfgs[0].uid = 'cutout'
+    cfgs[0].resume_from = cfgs[0].work_dir + '/latest.pth'
     batch_train(cfgs, sleep_time=0 * 60 * 2)
     from batch_test import batch_test
-    cfgs[0].first_model_cfg = None
     save_path = os.path.join(cfg_dir, 'garbage' + '_test.txt')
-    batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    # batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
     from batch_train import batch_infer
     batch_infer(cfgs)
 
 
 def main():
     joint_train()
-    other_cfg_train()
+    # other_cfg_train()
 
     # trick 0: baseline
     # baseline_train()
