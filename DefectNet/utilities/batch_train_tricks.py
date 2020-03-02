@@ -163,34 +163,6 @@ def twice_epochs_train():
     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
-def the_same_ratio_train(img_scale=[1333, 545]):
-    cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    cfg_names = [DATA_NAME + '.py', ]
-
-    cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    cfg.train_pipeline[2]['img_scale'] = img_scale
-    cfg.test_pipeline[1]['img_scale'] = img_scale
-
-    cfg.data['imgs_per_gpu'] = 2
-    cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-
-    cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'img_scale={}'.format(str(img_scale))
-    cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
-
-    cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-    if not os.path.exists(cfg.resume_from):
-        cfg.resume_from = None
-
-    cfgs = [cfg]
-    batch_train(cfgs, sleep_time=0 * 60 * 2)
-    from batch_test import batch_test
-    save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    # batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    from batch_train import batch_infer
-    batch_infer(cfgs)
-
-
 def OHEMSampler_train():
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = [DATA_NAME + '.py', ]
@@ -222,14 +194,14 @@ def OHEMSampler_train():
     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
 
 
-def multi_scale_train(img_scale=[(1333, 800), (1333, 1200)]):
+def multi_scale_train(img_scale=None, multiscale_mode='range', ratio_range=None, keep_ratio=True):
     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
     cfg_names = [DATA_NAME + '.py', ]
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
     cfg.train_pipeline[2] = dict(
-        type='Resize', img_scale=img_scale,
-        multiscale_mode='range', keep_ratio=True)
+        type='Resize', img_scale=img_scale, ratio_range=ratio_range,
+        multiscale_mode=multiscale_mode, keep_ratio=keep_ratio)
     sx = int(np.mean([v[0] for v in img_scale]))
     sy = int(np.mean([v[1] for v in img_scale]))
     cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
@@ -238,7 +210,8 @@ def multi_scale_train(img_scale=[(1333, 800), (1333, 1200)]):
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
     cfg.cfg_name = DATA_NAME + '_baseline'
-    cfg.uid = 'img_scale={}'.format(str(img_scale))
+    cfg.uid = 'img_scale={},multiscale_mode={},ratio_range={}' \
+        .format(str(img_scale), str(multiscale_mode), str(ratio_range))
     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
@@ -600,7 +573,12 @@ def joint_train_for_fabric():
 
 
 def main():
-    joint_train_for_fabric()
+    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)])
+    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)], ratio_range=[0.5, 1.5])
+    multi_scale_train(img_scale=[(2446, 1000)])
+    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)])
+
+    # joint_train_for_fabric()
     # other_cfg_train()
 
     # trick 0: baseline
@@ -614,9 +592,6 @@ def main():
 
     # trick 3: 2x epochs
     # twice_epochs_train()
-
-    # trick 4: keep the same ratio with input image
-    # the_same_ratio_train([1920, 1080])
 
     # trick 12: global context
     # global_context_train()

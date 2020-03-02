@@ -101,4 +101,6 @@ if __name__ == "__main__":
     cluster_number = 3
     filename = "train.txt"
     kmeans = YOLO_Kmeans(cluster_number, filename)
+    boxes = np.random.random((1000, 4))
+    ctr = kmeans.kmeans(boxes, 5)
     kmeans.txt2clusters()
