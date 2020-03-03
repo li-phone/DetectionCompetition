@@ -4,6 +4,13 @@ import numpy as np
 from tqdm import tqdm
 from pandas.io.json import json_normalize
 import glob
+from tqdm import tqdm
+import glob
+import xml.etree.ElementTree as ET
+import os
+import json
+import numpy as np
+import random
 
 
 def _get_box(points):
@@ -17,7 +24,46 @@ def _get_box(points):
     return [min_x, min_y, max_x - min_x, max_y - min_y]
 
 
-def transform2coco(anns, save_name, label2cat):
+def xml2list(xml_path, img_dir):
+    if isinstance(xml_path, str):
+        xml_path = glob.glob(os.path.join(xml_path, '*.xml'))
+    anns = []
+    for path in tqdm(xml_path):
+        img_id = os.path.basename(path)
+        img_id = img_id.split(".xml")[0]
+        img_path = glob.glob(os.path.join(img_dir, img_id + ".*"))
+        assert len(img_path) == 1
+        img_path = img_path[0]
+        if not os.path.exists(img_path):
+            print(img_path, "not exists")
+        tree = ET.parse(path)
+        root = tree.getroot()
+        size = root.find('size')
+        if size is not None:
+            img_w = int(size.find('width').text)
+            img_h = int(size.find('height').text)
+        for obj in root.iter('object'):
+            difficult = obj.find('difficult')
+            if difficult is not None:
+                iscrowd = int(difficult.text)
+            else:
+                iscrowd = 0
+            label_name = obj.find('name').text
+            xmlbox = obj.find('bndbox')
+            xmin, xmax, ymin, ymax = (float(xmlbox.find('xmin').text), float(xmlbox.find('xmax').text),
+                                      float(xmlbox.find('ymin').text), float(xmlbox.find('ymax').text))
+            bbox = [xmin, ymin, xmax, ymax]
+            ann = dict(
+                file_name=os.path.basename(img_path),
+                label=label_name,
+                bbox=bbox,
+                iscrowd=iscrowd,
+            )
+            anns.append(ann)
+    return anns
+
+
+def transform2coco(anns, save_name, label2cat=None, bgcat=None, supercategory=None, info=None, license=None):
     if isinstance(anns, str):
         with open(anns) as fp:
             anns = json.load(fp)
@@ -28,12 +74,27 @@ def transform2coco(anns, save_name, label2cat):
         if 'defect_name' in list(anns.columns):
             anns = anns.rename(columns={'defect_name': 'label'})
         anns['id'] = list(range(anns.shape[0]))
+    if label2cat is None:
+        label2cat = np.array(anns['label'].unique())
+        label2cat = np.sort(label2cat, )
+        label2cat = list(label2cat)
+        if bgcat is not None:
+            if isinstance(bgcat, dict):
+                label2cat.remove(bgcat['name'])
+                label2cat.insert(bgcat['id'], bgcat['name'])
+    if supercategory is None:
+        supercategory = [None] * len(label2cat)
 
-    coco = dict(info='fabric detect detection', license='null', categories=[], images=[], annotations=[])
+    coco = dict(info=info, license=license, categories=[], images=[], annotations=[])
     if isinstance(label2cat, list):
-        coco['categories'] = [dict(name=v, id=i + 1, supercategory='fabric_defect') for i, v in enumerate(label2cat)]
+        if bgcat is not None:
+            coco['categories'] = [dict(name=v, id=i, supercategory=supercategory[i]) for i, v in enumerate(label2cat)]
+        else:
+            coco['categories'] = [dict(name=v, id=i + 1, supercategory=supercategory[i]) for i, v in
+                                  enumerate(label2cat)]
+        label2cat = {v['name']: v['id'] for i, v in enumerate(coco['categories'])}
     elif isinstance(label2cat, dict):
-        coco['categories'] = [dict(name=k, id=i, supercategory='fabric_defect') for k, i in label2cat.items()]
+        coco['categories'] = [dict(name=k, id=i, supercategory=supercategory[i]) for k, i in label2cat.items()]
 
     images = list(anns['file_name'].unique())
     coco['images'] = [dict(file_name=v, id=i, width=2446, height=1000) for i, v in enumerate(images)]
@@ -57,7 +118,22 @@ def transform2coco(anns, save_name, label2cat):
         json.dump(coco, fp, indent=1, separators=(',', ': '))
 
 
-def main():
+def imgdir2coco(coco_sample, save_name, test_dir):
+    if isinstance(coco_sample, str):
+        from pycocotools.coco import COCO
+        coco_sample = COCO(coco_sample)
+    coco_sample = coco_sample.dataset
+    coco_test = dict(
+        info=coco_sample['info'], license=coco_sample['license'], categories=coco_sample['categories'],
+        images=[], annotations=[])
+    images = glob.glob(os.path.join(test_dir, '*'))
+    coco_test['images'] = [dict(file_name=os.path.basename(v), id=i, width=None, height=None) for i, v in
+                           enumerate(images)]
+    with open(save_name, 'w') as fp:
+        json.dump(coco_test, fp, indent=1, separators=(',', ': '))
+
+
+def fabric2coco():
     ann_file = '/home/liphone/undone-work/data/detection/fabric/annotations/anno_train_20190818-20190928.json'
     save_ann_name = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json'
     img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
@@ -102,6 +178,26 @@ def main():
     draw_coco(
         save_ann_name, img_dir, '/home/liphone/undone-work/data/detection/fabric/.instance_train,type=34,', label_list
     )
+
+
+def aquatic2coco():
+    data_root = '/home/liphone/undone-work/data/detection/aquatic'
+
+    save_name = data_root + '/annotations/aquatic_train.json'
+    if not os.path.exists(save_name):
+        xml_dir = data_root + '/train/box'
+        img_dir = data_root + '/train/image'
+        anns = xml2list(xml_dir, img_dir)
+        transform2coco(anns, save_name, bgcat={'id': 0, 'name': 'waterweeds'})
+
+    test_name = data_root + '/annotations/aquatic_test.json'
+    if not os.path.exists(test_name):
+        img_dir = data_root + '/test-A-image'
+        imgdir2coco(save_name, test_name, img_dir)
+
+
+def main():
+    aquatic2coco()
 
 
 if __name__ == '__main__':

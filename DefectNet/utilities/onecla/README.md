@@ -8,8 +8,25 @@
 
 #### Get Started
     
-    python split_data.py
+1. set your data set name, root, annotations, image directory
+    
+       
+    data_name = 'your_data_set_name'
+    
+    data_root = 'your_data_set_root'
+    
+    raw_train_path = 'your_data_annotations'
+    
+    ann_file = 'your_data_annotations'
+    
+    img_prefix = 'your_image_directory'
+        
+        
+2. start training
+
+    
     python train.py
+
 
 #### Test Result
 
