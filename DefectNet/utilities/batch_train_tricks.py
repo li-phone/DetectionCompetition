@@ -4,6 +4,7 @@ import os
 import time
 from mmdet.core import coco_eval
 import mmcv
+from mmcv import ConfigDict
 import copy
 import json
 import numpy as np
@@ -199,12 +200,16 @@ def multi_scale_train(img_scale=None, multiscale_mode='range', ratio_range=None,
     cfg_names = [DATA_NAME + '.py', ]
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    cfg.train_pipeline[2] = dict(
+    cfg.train_pipeline[2] = mmcv.ConfigDict(
         type='Resize', img_scale=img_scale, ratio_range=ratio_range,
         multiscale_mode=multiscale_mode, keep_ratio=keep_ratio)
     sx = int(np.mean([v[0] for v in img_scale]))
     sy = int(np.mean([v[1] for v in img_scale]))
     cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
+
+    cfg.data['train']['pipeline'] = cfg.train_pipeline
+    cfg.data['val']['pipeline'] = cfg.test_pipeline
+    cfg.data['test']['pipeline'] = cfg.test_pipeline
 
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
@@ -480,12 +485,16 @@ def joint_train():
 
     # 0.810 (img_scale = [1920, 1080]) ==> (img_scale = [(1920, 1080), (1333, 800)], multiscale_mode='range')
     img_scale = [(1920, 1080), (1333, 800)]
-    cfg.train_pipeline[2] = dict(
+    cfg.train_pipeline[2] = mmcv.ConfigDict(
         type='Resize', img_scale=img_scale, ratio_range=None,
         multiscale_mode='range', keep_ratio=True)
     sx = int(max([v[0] for v in img_scale]))
     sy = int(max([v[1] for v in img_scale]))
     cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
+
+    cfg.data['train'] = cfg.train_pipeline
+    cfg.data['val'] = cfg.test_pipeline
+    cfg.data['test'] = cfg.test_pipeline
 
     # 0.819
     cfg.model['backbone']['dcn'] = dict(  # 在最后三个block加入可变形卷积

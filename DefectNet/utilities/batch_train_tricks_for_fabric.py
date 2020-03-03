@@ -199,12 +199,16 @@ def multi_scale_train(img_scale=None, multiscale_mode='range', ratio_range=None,
     cfg_names = [DATA_NAME + '.py', ]
 
     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    cfg.train_pipeline[2] = dict(
+    cfg.train_pipeline[2] = mmcv.ConfigDict(
         type='Resize', img_scale=img_scale, ratio_range=ratio_range,
         multiscale_mode=multiscale_mode, keep_ratio=keep_ratio)
     sx = int(np.mean([v[0] for v in img_scale]))
     sy = int(np.mean([v[1] for v in img_scale]))
     cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
+
+    cfg.data['train']['pipeline'] = cfg.train_pipeline
+    cfg.data['val']['pipeline'] = cfg.test_pipeline
+    cfg.data['test']['pipeline'] = cfg.test_pipeline
 
     cfg.data['imgs_per_gpu'] = 2
     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
@@ -573,11 +577,11 @@ def joint_train_for_fabric():
 
 
 def main():
+    multi_scale_train(img_scale=[(2446, 1000)])
+    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)], ratio_range=[0.5, 1.5])
     multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)], multiscale_mode='value')
     multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)])
-    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)], ratio_range=[0.5, 1.5])
-    # multi_scale_train(img_scale=[(2446, 1000)])
-    # multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)])
+    multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)])
 
     # joint_train_for_fabric()
     # other_cfg_train()
