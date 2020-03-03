@@ -305,7 +305,7 @@ def main(**kwargs):
             eval_types = args.eval
             if eval_types:
                 print('Starting evaluate {}'.format(' and '.join(eval_types)))
-                rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=[0])
+                rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=cfg.data[args.mode]['ignore_ids'])
         else:
             for name in outputs[0]:
                 outputs_ = [out[name] for out in outputs]
