@@ -57,7 +57,7 @@ def batch_train(cfgs, sleep_time=0, detector=True):
 
 
 class BatchTrain(object):
-    def __init__(self, cfg_path, data_mode='val', train_sleep_time=0, test_sleep_time=60 * 2):
+    def __init__(self, cfg_path, data_mode='val', train_sleep_time=60, test_sleep_time=60 * 2):
         self.cfg_path = cfg_path
         self.cfg_dir = cfg_path[:cfg_path.rfind('/')]
         self.cfg_name = os.path.basename(cfg_path).split('.py')[0]
@@ -82,8 +82,8 @@ class BatchTrain(object):
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        batch_test(cfgs, save_path, 60 * 2, mode=self.data_mode)
-        # from batch_train import batch_infer
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+
         # batch_infer(cfgs)
 
     def multi_scale_train(self, img_scale=None, multiscale_mode='range', ratio_range=None, keep_ratio=True):
@@ -114,7 +114,7 @@ class BatchTrain(object):
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        batch_test(cfgs, save_path, 60 * 2, mode=self.data_mode)
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
     def backbone_dcn_train(self):
         cfg = mmcv.Config.fromfile(self.cfg_path)
@@ -136,7 +136,7 @@ class BatchTrain(object):
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        batch_test(cfgs, save_path, 60 * 2, mode=self.data_mode)
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
     def global_context_train(self):
         cfg = mmcv.Config.fromfile(self.cfg_path)
@@ -156,7 +156,23 @@ class BatchTrain(object):
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        batch_test(cfgs, save_path, 60 * 2, mode=self.data_mode)
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+
+    def other_cfg_train(self):
+        cfg = mmcv.Config.fromfile(self.cfg_path)
+
+        cfg.first_model_cfg = None
+        cfg.cfg_name = str(self.cfg_name) + '_baseline'
+        cfg.uid = str(self.cfg_name)
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+
+        cfgs = [cfg]
+        batch_train(cfgs, sleep_time=self.train_sleep_time)
+        save_path = os.path.join(self.cfg_name, 'garbage' + '_test.txt')
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        batch_infer(cfgs)
 
     # def iou_thr_train(iou_thrs=[0.5, 0.6, 0.7]):
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -183,7 +199,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def anchor_ratios_cluster_train():
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -210,8 +226,8 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    #     # from batch_train import batch_infer
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
+    #
     #     # batch_infer(cfgs)
     #
     # def larger_lr_train():
@@ -235,7 +251,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def twice_epochs_train():
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -259,7 +275,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def OHEMSampler_train():
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -289,7 +305,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def load_pretrain_train():
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -313,7 +329,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def SWA_train():
     #     import torch
@@ -380,7 +396,7 @@ class BatchTrain(object):
     #     # batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def anchor_scales_cluster_train():
     #     from tricks.data_cluster import box_cluster
@@ -414,7 +430,7 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def score_thr_train(score_thr=0.02):
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -438,20 +454,7 @@ class BatchTrain(object):
     #     # batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    #
-    # def other_cfg_train():
-    #     cfg_dir = '../other_cfgs/'
-    #     cfgs = [mmcv.Config.fromfile('../other_cfgs/cascade.py')]
-    #     cfgs[0].first_model_cfg = None
-    #     cfgs[0].uid = 'cutout'
-    #     cfgs[0].resume_from = cfgs[0].work_dir + '/latest.pth'
-    #     batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, 'garbage' + '_test.txt')
-    #     # batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    #     from batch_train import batch_infer
-    #     batch_infer(cfgs)
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
     # def joint_train(self):
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -498,8 +501,8 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    #     # from batch_train import batch_infer
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
+    #
     #     # batch_infer(cfgs)
     #
     # def joint_train_for_fabric():
@@ -547,8 +550,8 @@ class BatchTrain(object):
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, 60 * 2, mode=DATA_MODE)
-    #     # from batch_train import batch_infer
+    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
+    #
     #     # batch_infer(cfgs)
 
 
