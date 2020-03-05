@@ -158,6 +158,64 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
+    def joint_train(self, resize_cfg=None):
+        if resize_cfg is None:
+            resize_cfg = dict(
+                img_scale=[(1920, 1080), (1333, 800)],
+                ratio_range=None,
+                multiscale_mode='value',
+                keep_ratio=True,
+            )
+        cfg = mmcv.Config.fromfile(self.cfg_path)
+
+        # 0.810 () ==> 0.??? ()
+        cfg.train_pipeline[2] = mmcv.ConfigDict(
+            type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
+            multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
+        sx = int(np.max([v[0] for v in resize_cfg['img_scale']]))
+        sy = int(np.max([v[1] for v in resize_cfg['img_scale']]))
+        cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
+
+        cfg.data['train']['pipeline'] = cfg.train_pipeline
+        cfg.data['val']['pipeline'] = cfg.test_pipeline
+        cfg.data['test']['pipeline'] = cfg.test_pipeline
+
+        # 0.819
+        cfg.model['backbone']['dcn'] = dict(  # 在最后三个block加入可变形卷积
+            modulated=False, deformable_groups=1, fallback_on_stride=False)
+        cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
+
+        # 0.822
+        # global context
+        cfg.model['bbox_roi_extractor']['global_context'] = True
+
+        # # 0.746
+        # from tricks.data_cluster import anchor_cluster
+        # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
+        # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
+
+        # 0.???
+        # focal loss for rcnn
+        # for head in cfg.model['bbox_head']:
+        #     head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
+
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = str(self.cfg_name) + '_baseline'
+        cfg.uid = 'mode=joint_train'
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+
+        cfgs = [cfg]
+        batch_train(cfgs, sleep_time=self.train_sleep_time)
+        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        batch_infer(cfgs)
+
     def other_cfg_train(self):
         cfg = mmcv.Config.fromfile(self.cfg_path)
 
@@ -456,103 +514,6 @@ class BatchTrain(object):
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
     #
-    # def joint_train(self):
-    #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    #     cfg_names = [DATA_NAME + '.py', ]
-    #
-    #     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    #
-    #     # # 0.810
-    #     # img_scale = [1920, 1080]
-    #     # cfg.train_pipeline[2]['img_scale'] = img_scale
-    #     # cfg.test_pipeline[1]['img_scale'] = img_scale
-    #
-    #     # # 0.819
-    #     # cfg.model['backbone']['dcn'] = dict(  # 在最后三个block加入可变形卷积
-    #     #     modulated=False, deformable_groups=1, fallback_on_stride=False)
-    #     # cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
-    #
-    #     # # 0.822
-    #     # # global context
-    #     # cfg.model['bbox_roi_extractor']['global_context'] = True
-    #
-    #     # # 0.746
-    #     # from tricks.data_cluster import anchor_cluster
-    #     # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
-    #     # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
-    #
-    #     # 0.???
-    #     # focal loss for rcnn
-    #     # for head in cfg.model['bbox_head']:
-    #     #     head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
-    #
-    #     cfg.data['imgs_per_gpu'] = 2
-    #     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-    #
-    #     cfg.cfg_name = DATA_NAME + '_baseline'
-    #     cfg.uid = 'mode=joint_train+baseline'
-    #     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
-    #
-    #     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-    #     if not os.path.exists(cfg.resume_from):
-    #         cfg.resume_from = None
-    #
-    #     cfgs = [cfg]
-    #     batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    #     # batch_infer(cfgs)
-    #
-    # def joint_train_for_fabric():
-    #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    #     cfg_names = [DATA_NAME + '.py', ]
-    #
-    #     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    #
-    #     # # 0.810
-    #     # img_scale = [1920, 1080]
-    #     # cfg.train_pipeline[2]['img_scale'] = img_scale
-    #     # cfg.test_pipeline[1]['img_scale'] = img_scale
-    #
-    #     # # 0.819
-    #     # cfg.model['backbone']['dcn'] = dict(  # 在最后三个block加入可变形卷积
-    #     #     modulated=False, deformable_groups=1, fallback_on_stride=False)
-    #     # cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
-    #
-    #     # # 0.822
-    #     # # global context
-    #     # cfg.model['bbox_roi_extractor']['global_context'] = True
-    #
-    #     # # 0.746
-    #     # from tricks.data_cluster import anchor_cluster
-    #     # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
-    #     # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
-    #
-    #     # 0.???
-    #     # focal loss for rcnn
-    #     # for head in cfg.model['bbox_head']:
-    #     #     head['loss_cls'] = dict(type='FocalLoss', use_sigmoid=True, loss_weight=1.0)
-    #
-    #     cfg.data['imgs_per_gpu'] = 2
-    #     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-    #
-    #     cfg.cfg_name = DATA_NAME + '_baseline'
-    #     cfg.uid = 'mode=joint_train+baseline'
-    #     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
-    #
-    #     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-    #     if not os.path.exists(cfg.resume_from):
-    #         cfg.resume_from = None
-    #
-    #     cfgs = [cfg]
-    #     batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    #     # batch_infer(cfgs)
 
 
 def main():

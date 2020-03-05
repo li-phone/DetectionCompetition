@@ -63,7 +63,8 @@ def xml2list(xml_path, img_dir):
     return anns
 
 
-def transform2coco(anns, save_name, label2cat=None, bgcat=None, supercategory=None, info=None, license=None):
+def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, supercategory=None, info=None,
+                   license=None):
     if isinstance(anns, str):
         with open(anns) as fp:
             anns = json.load(fp)
@@ -97,7 +98,17 @@ def transform2coco(anns, save_name, label2cat=None, bgcat=None, supercategory=No
         coco['categories'] = [dict(name=k, id=i, supercategory=supercategory[i]) for k, i in label2cat.items()]
 
     images = list(anns['file_name'].unique())
-    coco['images'] = [dict(file_name=v, id=i, width=2446, height=1000) for i, v in enumerate(images)]
+    if img_dir is None:
+        coco['images'] = [dict(file_name=v, id=i, width=None, height=None) for i, v in enumerate(images)]
+    else:
+        import cv2 as cv
+        for i, v in tqdm(enumerate(images)):
+            if os.path.exists(os.path.join(img_dir, v)):
+                img_ = cv.imread(os.path.join(img_dir, v))
+                height_, width_, _ = img_.shape
+            else:
+                height_, width_, _ = None, None, None
+            coco['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
     image2id = {v: i for i, v in enumerate(images)}
 
     annotations = anns.to_dict('id')
@@ -114,11 +125,14 @@ def transform2coco(anns, save_name, label2cat=None, bgcat=None, supercategory=No
             area=area
         )
         coco['annotations'].append(ann)
+    save_dir = save_name[:save_name.rfind('/')]
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     with open(save_name, 'w') as fp:
         json.dump(coco, fp, indent=1, separators=(',', ': '))
 
 
-def imgdir2coco(coco_sample, save_name, test_dir):
+def imgdir2coco(coco_sample, save_name, test_dir=None):
     if isinstance(coco_sample, str):
         from pycocotools.coco import COCO
         coco_sample = COCO(coco_sample)
@@ -127,8 +141,21 @@ def imgdir2coco(coco_sample, save_name, test_dir):
         info=coco_sample['info'], license=coco_sample['license'], categories=coco_sample['categories'],
         images=[], annotations=[])
     images = glob.glob(os.path.join(test_dir, '*'))
-    coco_test['images'] = [dict(file_name=os.path.basename(v), id=i, width=None, height=None) for i, v in
-                           enumerate(images)]
+
+    if test_dir is None:
+        coco_test['images'] = [dict(file_name=os.path.basename(v), id=i, width=None, height=None) for i, v in
+                               enumerate(images)]
+    else:
+        import cv2 as cv
+        for i, v in tqdm(enumerate(images)):
+            v = os.path.basename(v)
+            if os.path.exists(os.path.join(test_dir, v)):
+                img_ = cv.imread(os.path.join(test_dir, v))
+                height_, width_, _ = img_.shape
+            else:
+                height_, width_, _ = None, None, None
+            coco_test['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
+
     with open(save_name, 'w') as fp:
         json.dump(coco_test, fp, indent=1, separators=(',', ': '))
 
@@ -184,16 +211,21 @@ def aquatic2coco():
     data_root = '/home/liphone/undone-work/data/detection/aquatic'
 
     save_name = data_root + '/annotations/aquatic_train.json'
+    img_dir = data_root + '/train/image'
     if not os.path.exists(save_name):
         xml_dir = data_root + '/train/box'
-        img_dir = data_root + '/train/image'
         anns = xml2list(xml_dir, img_dir)
-        transform2coco(anns, save_name, bgcat={'id': 0, 'name': 'waterweeds'})
+        transform2coco(anns, save_name, img_dir=img_dir, bgcat={'id': 0, 'name': 'waterweeds'})
 
     test_name = data_root + '/annotations/aquatic_test.json'
     if not os.path.exists(test_name):
-        img_dir = data_root + '/test-A-image'
-        imgdir2coco(save_name, test_name, img_dir)
+        test_img_dir = data_root + '/test-A-image'
+        imgdir2coco(save_name, test_name, test_img_dir)
+
+    # from draw_util import draw_coco
+    # draw_coco(
+    #     save_name, img_dir, data_root + '/train/.aquatic'
+    # )
 
 
 def main():
