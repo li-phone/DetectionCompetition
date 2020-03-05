@@ -39,6 +39,14 @@ def kmeans(x, n=3):
     inertia = estimator.inertia_  # 获取聚类准则的总和
     return centroids
 
+def con(args):
+    cons = []
+    for i, v in enumerate(args):
+        cons.append({'type': 'ineq', 'fun': lambda x: x[i] - v[0]})
+        cons.append({'type': 'ineq', 'fun': lambda x: -x[i] + v[1]})
+    cons = tuple(cons)
+    return cons
+
 
 # def get_cluster(x, n=3):
 #     centroids = kmeans(x, n)

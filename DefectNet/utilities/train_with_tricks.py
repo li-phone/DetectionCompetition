@@ -170,7 +170,7 @@ class BatchTrain(object):
 
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
-        save_path = os.path.join(self.cfg_name, 'garbage' + '_test.txt')
+        save_path = os.path.join(self.cfg_dir, 'garbage' + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 

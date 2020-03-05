@@ -17,6 +17,9 @@ os.chdir(BASH_DIR)
 
 
 def eval_report(rpt_txt, rpts, cfg, uid=None, mode='val'):
+    save_dir = rpt_txt[:rpt_txt.rfind('/')]
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     with open(rpt_txt, 'a+') as fp:
         head = '\n\n{} {}, uid: {}, mode: {} {}\n'.format('=' * 36, cfg, uid, mode, '=' * 36)
         fp.write(head)
