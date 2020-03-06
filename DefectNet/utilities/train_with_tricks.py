@@ -29,6 +29,10 @@ def batch_infer(cfgs):
     for cfg in tqdm(cfgs):
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
+        if cfg.data['test']['ignore_ids'] is None:
+            have_bg = False
+        else:
+            have_bg = True
         infer_params = dict(
             config=cfg,
             resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
@@ -36,7 +40,7 @@ def batch_infer(cfgs):
             img_dir=cfg.data['test']['img_prefix'],
             work_dir=cfg.work_dir,
             submit_out=osp.join(cfg.work_dir, '{}_submit,epoch_{}.json'.format(cfg_name, 12)),
-            have_bg=False,
+            have_bg=have_bg,
         )
         infer_main(**infer_params)
         print('{} infer successfully!'.format(cfg_name))
@@ -211,9 +215,9 @@ class BatchTrain(object):
             cfg.resume_from = None
 
         cfgs = [cfg]
-        batch_train(cfgs, sleep_time=self.train_sleep_time)
-        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        # batch_train(cfgs, sleep_time=self.train_sleep_time)
+        # save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+        # batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 
     def other_cfg_train(self):

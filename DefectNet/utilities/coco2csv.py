@@ -1,7 +1,33 @@
-from defect_test import have_defect
 from pycocotools.coco import COCO
 import pandas as pd
 import os
+from pandas.io.json import json_normalize
+from utilities.utils import load_dict
+
+
+def coco2csvsubmit(gt_result, dt_result, csv_name, file_type='.xml'):
+    if isinstance(gt_result, str):
+        gt_result = COCO(gt_result)
+    if isinstance(dt_result, str):
+        dt_result = load_dict(dt_result)
+    cat2label = {r['id']: r['name'] for r in gt_result.dataset['categories']}
+    imgid2filename = {r['id']: r['file_name'] for r in dt_result['images']}
+    results = []
+    for ann in dt_result['annotations']:
+        x, y, w, h = tuple(ann['bbox'])
+        xmin, ymin, xmax, ymax = int(x + 0.5), int(y + 0.5), int(x + w + 0.5), int(y + h + 0.5)
+        image_id = imgid2filename[ann['image_id']]
+        image_id = os.path.basename(image_id)
+        image_id = image_id[:image_id.rfind('.')] + file_type
+        row = dict(
+            name=cat2label[ann['category_id']],
+            image_id=image_id,
+            confidence=ann['score'],
+            xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax
+        )
+        results.append(row)
+    results = json_normalize(results)
+    results.to_csv(csv_name, index=False)
 
 
 def coco_defect2csv(ann_path, save_name):

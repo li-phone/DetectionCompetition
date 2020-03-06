@@ -11,13 +11,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# matplotlib.style.use('ggplot')  # 使用ggplot样式 %matplotlib inline
-sns.set(style="darkgrid")
-
-save_img_dir = '../results/fabric_defect_detection/'
-if not os.path.exists(save_img_dir):
-    os.makedirs(save_img_dir)
-
 
 def count_image(coco, ignore_id=0):
     defect_nums = np.empty(0, dtype=int)
@@ -42,15 +35,6 @@ def chg2coco(coco):
     return coco
 
 
-def image_count_summary(coco):
-    coco = chg2coco(coco)
-    img_cnts = count_image(coco)
-    print('total images: {}, normal images: {}, defect images: {}, normal : defective: {}'
-          .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / img_cnts[2]))
-    print('total defect number: {}\n'
-          .format(len(coco.dataset['annotations'])))
-
-
 def save_plt(save_name, file_types=None):
     if file_types is None:
         file_types = ['.svg', '.jpg', '.eps']
@@ -58,48 +42,63 @@ def save_plt(save_name, file_types=None):
         plt.savefig(save_name[:-4] + t)
 
 
-def category_distribution(coco, legends=None, cn2eng=None):
-    if isinstance(coco, str):
-        cocos = [coco]
-    else:
-        cocos = coco
-    cat_dists = pd.DataFrame()
-    for i, coco in enumerate(cocos):
+class COCOAnalysis(object):
+    # matplotlib.style.use('ggplot')  # 使用ggplot样式 %matplotlib inline
+    sns.set(style="darkgrid")
+
+    save_img_dir = '../results/fabric_defect_detection/'
+    if not os.path.exists(save_img_dir):
+        os.makedirs(save_img_dir)
+
+    def image_count_summary(coco):
+        coco = chg2coco(coco)
+        img_cnts = count_image(coco)
+        print('total images: {}, normal images: {}, defect images: {}, normal : defective: {}'
+              .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / img_cnts[2]))
+        print('total defect number: {}\n'
+              .format(len(coco.dataset['annotations'])))
+
+    def category_distribution(coco, legends=None, cn2eng=None):
+        if isinstance(coco, str):
+            cocos = [coco]
+        else:
+            cocos = coco
+        cat_dists = pd.DataFrame()
+        for i, coco in enumerate(cocos):
+            coco = chg2coco(coco)
+            dataset = coco.dataset
+            if cn2eng is not None:
+                cat2label = {r['id']: cn2eng[r['name']] for r in dataset['categories']}
+            else:
+                cat2label = {r['id']: r['name'] for r in dataset['categories']}
+            for ann in dataset['annotations']:
+                ann['category_id'] = cat2label[ann['category_id']]
+
+            ann_df = json_normalize(dataset['annotations'])
+            cat_dist = ann_df['category_id'].value_counts()
+            cat_dist = cat_dist.drop('background')
+            if legends is not None:
+                cat_dist = pd.DataFrame(data={legends[i]: cat_dist})
+            else:
+                cat_dist = pd.DataFrame(data=cat_dist)
+            cat_dists = pd.concat([cat_dists, cat_dist], axis=1, sort=True)
+        cat_dists = cat_dists.sort_values(by=legends[0], ascending=True)
+        pplt = cat_dists.plot.barh(stacked=True)
+        plt.xlabel('number of defect categories')
+        plt.subplots_adjust(left=0.27, right=0.97, top=0.96)
+        save_plt(save_img_dir + 'category_distribution.jpg')
+        plt.show()
+
+    def bbox_distribution(coco):
         coco = chg2coco(coco)
         dataset = coco.dataset
-        if cn2eng is not None:
-            cat2label = {r['id']: cn2eng[r['name']] for r in dataset['categories']}
-        else:
-            cat2label = {r['id']: r['name'] for r in dataset['categories']}
-        for ann in dataset['annotations']:
-            ann['category_id'] = cat2label[ann['category_id']]
-
-        ann_df = json_normalize(dataset['annotations'])
-        cat_dist = ann_df['category_id'].value_counts()
-        cat_dist = cat_dist.drop('background')
-        if legends is not None:
-            cat_dist = pd.DataFrame(data={legends[i]: cat_dist})
-        else:
-            cat_dist = pd.DataFrame(data=cat_dist)
-        cat_dists = pd.concat([cat_dists, cat_dist], axis=1, sort=True)
-    cat_dists = cat_dists.sort_values(by=legends[0], ascending=True)
-    pplt = cat_dists.plot.barh(stacked=True)
-    plt.xlabel('number of defect categories')
-    plt.subplots_adjust(left=0.27, right=0.97, top=0.96)
-    save_plt(save_img_dir + 'category_distribution.jpg')
-    plt.show()
-
-
-def bbox_distribution(coco):
-    coco = chg2coco(coco)
-    dataset = coco.dataset
-    boxes = [b['bbox'] for b in dataset['annotations']]
-    box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'bbox width', 'bbox height'])
-    box_df.plot(kind="scatter", x="bbox width", y="bbox height", alpha=0.2)
-    from tricks.data_cluster import box_cluster
-    boxes_ = box_cluster(dataset, n=10)
-    save_plt(save_img_dir + 'bbox_distribution.jpg')
-    plt.show()
+        boxes = [b['bbox'] for b in dataset['annotations']]
+        box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'bbox width', 'bbox height'])
+        box_df.plot(kind="scatter", x="bbox width", y="bbox height", alpha=0.2)
+        from tricks.data_cluster import box_cluster
+        boxes_ = box_cluster(dataset, n=10)
+        save_plt(save_img_dir + 'bbox_distribution.jpg')
+        plt.show()
 
 
 def main():

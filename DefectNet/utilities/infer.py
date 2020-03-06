@@ -111,6 +111,11 @@ def main(**kwargs):
     results = infer(model, args.infer_object, args.img_dir, args.have_bg)
     save_json(results['annotations'], args.submit_out[:-5] + '.submit.json')
     save_json(results, args.submit_out[:-5] + '.bbox.json')
+    from coco2csv import coco2csvsubmit
+    coco2csvsubmit(
+        gt_result=args.config.data['train']['ann_file'],
+        csv_name=args.submit_out[:-5] + '.submit.csv',
+        dt_result=args.submit_out[:-5] + '.bbox.json')
     draw(args.img_dir, args.work_dir, args.submit_out[:-5] + '.bbox.json', args.infer_object)
 
 

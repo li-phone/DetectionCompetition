@@ -1,0 +1,94 @@
+
+
+==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.568
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.646
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.537
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.206
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.595
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.445
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.631
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.696
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 30.471 | echinus  | 52.417 | holothurian | 55.008 |
+| scallop    | 59.458 | starfish | 60.182 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2540921519327321
+
+defect_fps:
+0.2540933389602507
+
+normal_fps:
+0.2531671183449881
+
+
+==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.568
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.646
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.537
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.206
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.595
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.445
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.631
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.696
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 30.471 | echinus  | 52.417 | holothurian | 55.008 |
+| scallop    | 59.458 | starfish | 60.182 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.25737616855205087
+
+defect_fps:
+0.25737440666946987
+
+normal_fps:
+0.258749178477696
