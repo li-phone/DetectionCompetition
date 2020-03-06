@@ -29,10 +29,13 @@ def batch_infer(cfgs):
     for cfg in tqdm(cfgs):
         cfg_name = os.path.basename(cfg.work_dir)
         print('\ncfg: {}'.format(cfg_name))
-        if cfg.data['test']['ignore_ids'] is None:
-            have_bg = False
+        if 'ignore_ids' in cfg.data['test']:
+            if cfg.data['test']['ignore_ids'] is None:
+                have_bg = False
+            else:
+                have_bg = True
         else:
-            have_bg = True
+            have_bg = False
         infer_params = dict(
             config=cfg,
             resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
