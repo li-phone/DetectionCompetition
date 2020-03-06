@@ -218,9 +218,9 @@ class BatchTrain(object):
             cfg.resume_from = None
 
         cfgs = [cfg]
-        # batch_train(cfgs, sleep_time=self.train_sleep_time)
-        # save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
-        # batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        batch_train(cfgs, sleep_time=self.train_sleep_time)
+        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 
     def other_cfg_train(self):
