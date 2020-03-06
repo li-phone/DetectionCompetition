@@ -175,7 +175,7 @@ class BatchTrain(object):
             )
         cfg = mmcv.Config.fromfile(self.cfg_path)
 
-        # 0.810 () ==> 0.??? ()
+        # 0.810 ([1333,800) ==> 0.828 ([(1920, 1080), (1333, 800)])
         cfg.train_pipeline[2] = mmcv.ConfigDict(
             type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
             multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
@@ -192,7 +192,7 @@ class BatchTrain(object):
             modulated=False, deformable_groups=1, fallback_on_stride=False)
         cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
 
-        # 0.822
+        # 0.822 (1333,800) ==> 0.828 ([(1920, 1080), (1333, 800)])
         # global context
         cfg.model['bbox_roi_extractor']['global_context'] = True
 
