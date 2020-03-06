@@ -1,6 +1,7 @@
 from train_with_tricks import BatchTrain
 import numpy as np
 
+
 def main():
     # ann_file = '/home/liphone/undone-work/data/detection/aquatic/annotations/aquatic_train.json'
     # from coco_analyze import chg2coco
@@ -13,11 +14,11 @@ def main():
         multiscale_mode='range',
         keep_ratio=True,
     )
-    # garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
-    # garbage_train.joint_train(resize_cfg)
+    garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
+    garbage_train.joint_train(resize_cfg)
 
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    aquatic_train.joint_train()
+    aquatic_train.joint_train(resize_cfg)
 
     # batrian = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # batrian.baseline_train()

@@ -43,22 +43,28 @@ def save_plt(save_name, file_types=None):
 
 
 class COCOAnalysis(object):
-    # matplotlib.style.use('ggplot')  # 使用ggplot样式 %matplotlib inline
-    sns.set(style="darkgrid")
+    def __init__(self, ann_files, save_img_dir, legends=None, cn2eng=None, style='darkgrid'):
+        # matplotlib.style.use('ggplot')  # 使用ggplot样式 %matplotlib inline
+        self.ann_files = ann_files
+        self.save_img_dir = save_img_dir
+        self.legends = legends
+        self.cn2eng = cn2eng
+        self.style = style
 
-    save_img_dir = '../results/fabric_defect_detection/'
-    if not os.path.exists(save_img_dir):
-        os.makedirs(save_img_dir)
+        sns.set(style=style)
+        if not os.path.exists(self.save_img_dir):
+            os.makedirs(self.save_img_dir)
 
-    def image_count_summary(coco):
+    def image_count_summary(self, coco, legend=None):
         coco = chg2coco(coco)
         img_cnts = count_image(coco)
+        print('{} {} {}'.format('-' * 32, legend, '-' * 32))
         print('total images: {}, normal images: {}, defect images: {}, normal : defective: {}'
-              .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / img_cnts[2]))
+              .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / max(img_cnts[2], 1)))
         print('total defect number: {}\n'
               .format(len(coco.dataset['annotations'])))
 
-    def category_distribution(coco, legends=None, cn2eng=None):
+    def category_distribution(self, coco, legends=None, cn2eng=None):
         if isinstance(coco, str):
             cocos = [coco]
         else:
@@ -76,7 +82,8 @@ class COCOAnalysis(object):
 
             ann_df = json_normalize(dataset['annotations'])
             cat_dist = ann_df['category_id'].value_counts()
-            cat_dist = cat_dist.drop('background')
+            if 'background' in cat_dist:
+                cat_dist = cat_dist.drop('background')
             if legends is not None:
                 cat_dist = pd.DataFrame(data={legends[i]: cat_dist})
             else:
@@ -86,19 +93,25 @@ class COCOAnalysis(object):
         pplt = cat_dists.plot.barh(stacked=True)
         plt.xlabel('number of defect categories')
         plt.subplots_adjust(left=0.27, right=0.97, top=0.96)
-        save_plt(save_img_dir + 'category_distribution.jpg')
+        save_plt(os.path.join(self.save_img_dir, 'category_distribution.jpg'))
         plt.show()
 
-    def bbox_distribution(coco):
+    def bbox_distribution(self, coco, legend=None):
+        if legend is None:
+            legend = ''
         coco = chg2coco(coco)
         dataset = coco.dataset
         boxes = [b['bbox'] for b in dataset['annotations']]
         box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'bbox width', 'bbox height'])
         box_df.plot(kind="scatter", x="bbox width", y="bbox height", alpha=0.2)
-        from tricks.data_cluster import box_cluster
-        boxes_ = box_cluster(dataset, n=10)
-        save_plt(save_img_dir + 'bbox_distribution.jpg')
+        save_plt(os.path.join(self.save_img_dir, 'bbox_distribution_{}.jpg'.format(str(legend))))
         plt.show()
+
+    def summary(self):
+        for i, ann_file in enumerate(self.ann_files):
+            self.image_count_summary(ann_file, self.legends[i])
+            self.bbox_distribution(ann_file, self.legends[i])
+        self.category_distribution(self.ann_files, cn2eng=self.cn2eng, legends=self.legends)
 
 
 def main():
@@ -107,12 +120,6 @@ def main():
         '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json',
         '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json',
     ]
-    image_count_summary(ann_files[0])
-    image_count_summary(ann_files[1])
-    image_count_summary(ann_files[2])
-
-    bbox_distribution(ann_files[1])
-
     cn2eng = {
         '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
         '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
@@ -124,7 +131,25 @@ def main():
         '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
         '纬纱不良': 'bad weft yarn',
     }
-    category_distribution(ann_files, cn2eng=cn2eng, legends=['all', 'train', 'test'])
+    legends = ['all', 'train', 'test']
+    fabric_analysis = COCOAnalysis(
+        ann_files=ann_files,
+        save_img_dir='../results/fabric/fabric_defect_detection',
+        legends=legends,
+        cn2eng=cn2eng)
+    fabric_analysis.summary()
+
+    aquatic_ana = COCOAnalysis(
+        ann_files=['/home/liphone/undone-work/data/detection/aquatic/annotations/aquatic_train.json'],
+        save_img_dir='../results/aquatic',
+        legends=['train'])
+    aquatic_ana.summary()
+
+    garbage_ana = COCOAnalysis(
+        ann_files=['/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'],
+        save_img_dir='../results/garbage',
+        legends=['train'])
+    garbage_ana.summary()
 
 
 if __name__ == '__main__':
