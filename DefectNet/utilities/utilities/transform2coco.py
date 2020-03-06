@@ -115,16 +115,17 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
     for k, v in annotations.items():
         bbox = v['bbox']
         area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
-        points = [[bbox[0], bbox[1]], [bbox[2], bbox[1]], [bbox[2], bbox[3]], [bbox[0], bbox[3]]]
-        ann = dict(
-            id=v['id'],
-            image_id=image2id[v['file_name']],
-            category_id=label2cat[v['label']],
-            bbox=_get_box(points),
-            iscrowd=0,
-            area=area
-        )
-        coco['annotations'].append(ann)
+        if area > 0:
+            points = [[bbox[0], bbox[1]], [bbox[2], bbox[1]], [bbox[2], bbox[3]], [bbox[0], bbox[3]]]
+            ann = dict(
+                id=v['id'],
+                image_id=image2id[v['file_name']],
+                category_id=label2cat[v['label']],
+                bbox=_get_box(points),
+                iscrowd=0,
+                area=area
+            )
+            coco['annotations'].append(ann)
     save_dir = save_name[:save_name.rfind('/')]
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)

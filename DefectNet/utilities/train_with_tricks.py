@@ -165,6 +165,28 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
+    def anchor_cluster_train(self, anchor_ratios=[0.5, 1.0, 2.0], anchor_scales=[8], k=5):
+        cfg = mmcv.Config.fromfile(self.cfg_path)
+
+        cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
+        cfg.model['rpn_head']['anchor_scales'] = list([anchor_scales])
+
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = str(self.cfg_name) + '_baseline'
+        cfg.uid = 'anchor_cluster={}'.format(k)
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+
+        cfgs = [cfg]
+        batch_train(cfgs, sleep_time=self.train_sleep_time)
+        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+
     def joint_train(self, resize_cfg=None):
         if resize_cfg is None:
             resize_cfg = dict(
@@ -196,9 +218,9 @@ class BatchTrain(object):
         # global context
         cfg.model['bbox_roi_extractor']['global_context'] = True
 
-        # # 0.746
-        # from tricks.data_cluster import anchor_cluster
-        # anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
+        # 0.???
+        # from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
+        # anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], n=7)
         # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
 
         # 0.???
@@ -265,35 +287,6 @@ class BatchTrain(object):
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    # def anchor_ratios_cluster_train():
-    #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    #     cfg_names = [DATA_NAME + '.py', ]
-    #
-    #     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    #     # new added
-    #     from tricks.data_cluster import anchor_cluster
-    #     anchor_ratios = anchor_cluster(cfg.data['train']['ann_file'], n=6)
-    #     cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
-    #
-    #     cfg.data['imgs_per_gpu'] = 2
-    #     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-    #
-    #     cfg.cfg_name = DATA_NAME + '_baseline'
-    #     cfg.uid = 'anchor_cluster=6'
-    #     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
-    #
-    #     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-    #     if not os.path.exists(cfg.resume_from):
-    #         cfg.resume_from = None
-    #
-    #     cfgs = [cfg]
-    #     batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    #     # batch_infer(cfgs)
     #
     # def larger_lr_train():
     #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
@@ -459,40 +452,6 @@ class BatchTrain(object):
     #
     #     cfgs = [cfg]
     #     # batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    # def anchor_scales_cluster_train():
-    #     from tricks.data_cluster import box_cluster
-    #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    #     cfg_names = [DATA_NAME + '.py', ]
-    #
-    #     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    #     # new added
-    #     boxes = box_cluster(cfg.data['train']['ann_file'], n=5)
-    #     anchor_scales = np.sqrt(boxes[0][0] * boxes[0][1])
-    #     anchor_scales = min(anchor_scales * 1333 / 2446, anchor_scales * 800 / 1000) / 4
-    #     anchor_scales = int(anchor_scales)
-    #     cfg.model['rpn_head']['anchor_scales'] = list([anchor_scales])
-    #
-    #     cfg.data['imgs_per_gpu'] = 2
-    #     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-    #
-    #     cfg.cfg_name = DATA_NAME + '_baseline'
-    #     if anchor_scales == 8:
-    #         cfg.uid = 'mode=baseline'
-    #         print('This trick is the same with baseline model.')
-    #     else:
-    #         cfg.uid = 'anchor_scales_cluster=6'
-    #     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
-    #
-    #     cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-    #     if not os.path.exists(cfg.resume_from):
-    #         cfg.resume_from = None
-    #
-    #     cfgs = [cfg]
-    #     batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
