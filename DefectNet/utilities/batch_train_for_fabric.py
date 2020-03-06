@@ -8,18 +8,18 @@ def main():
     # coco = chg2coco(ann_file)
     # img_sizes = [(r['width'], r['height']) for r in coco.dataset['images']]
     # img_sizes = set(img_sizes)
-    resize_cfg = dict(
-        img_scale=[(1920 * 2 / 3, 1080 * 2 / 3)],
-        ratio_range=[0.5, 1.5],
-        multiscale_mode='range',
-        keep_ratio=True,
-    )
+    # resize_cfg = dict(
+    #     img_scale=[(1920 * 2 / 3, 1080 * 2 / 3)],
+    #     ratio_range=[0.5, 1.5],
+    #     multiscale_mode='range',
+    #     keep_ratio=True,
+    # )
     # resize_cfg = None
     garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
-    garbage_train.joint_train(resize_cfg)
+    garbage_train.joint_train(name='anchor_cluster')
 
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    aquatic_train.joint_train(resize_cfg)
+    aquatic_train.joint_train(name='anchor_cluster')
 
     # batrian = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # batrian.baseline_train()

@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 
 import numpy as np
 
-from kmeans import kmeans, avg_iou
+from .kmeans import kmeans, avg_iou
 
 ANNOTATIONS_PATH = "Annotations"
 CLUSTERS = 5

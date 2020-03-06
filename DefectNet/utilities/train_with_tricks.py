@@ -187,7 +187,7 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
-    def joint_train(self, resize_cfg=None):
+    def joint_train(self, resize_cfg=None, name=''):
         if resize_cfg is None:
             resize_cfg = dict(
                 img_scale=[(1920, 1080), (1333, 800)],
@@ -219,9 +219,9 @@ class BatchTrain(object):
         cfg.model['bbox_roi_extractor']['global_context'] = True
 
         # 0.???
-        # from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
-        # anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], n=7)
-        # cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
+        from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
+        anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=7)
+        cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
 
         # 0.???
         # focal loss for rcnn
@@ -232,7 +232,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'mode=joint_train'
+        cfg.uid = '+'.join(['mode=joint_train', name])
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
