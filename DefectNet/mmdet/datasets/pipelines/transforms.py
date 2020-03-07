@@ -11,6 +11,18 @@ from mmdet.core.evaluation.bbox_overlaps import bbox_overlaps
 from ..registry import PIPELINES
 
 
+def cv_showimg(img, gt_bboxes, gt_labels, **kwargs):
+    import cv2 as cv
+    img = np.asarray(img)
+    for b, l in zip(gt_bboxes, gt_labels):
+        cv.rectangle(img, (b[0], b[1]), (b[2], b[3]), color=(0, 0, 255))
+        cv.putText(img, str(l), (b[0], b[1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+    img = np.array(img.astype(np.uint8))
+    cv.imshow('showimg', img)
+    cv.waitKey(0)
+    cv.destroyWindow('showimg')
+
+
 @PIPELINES.register_module
 class Resize(object):
     """Resize images & bbox & mask.
@@ -220,11 +232,16 @@ class RandomFlip(object):
         return flipped
 
     def __call__(self, results):
-        if 'flip' not in results:
+        if 'flip_direction' in results and results['flip_direction'] != self.direction:
             flip = True if np.random.rand() < self.flip_ratio else False
             results['flip'] = flip
-        if 'flip_direction' not in results:
             results['flip_direction'] = self.direction
+        else:
+            if 'flip' not in results:
+                flip = True if np.random.rand() < self.flip_ratio else False
+                results['flip'] = flip
+            if 'flip_direction' not in results:
+                results['flip_direction'] = self.direction
         if results['flip']:
             # flip image
             results['img'] = mmcv.imflip(
@@ -245,6 +262,7 @@ class RandomFlip(object):
             for key in results.get('seg_fields', []):
                 results[key] = mmcv.imflip(
                     results[key], direction=results['flip_direction'])
+        # cv_showimg(**results)
         return results
 
     def __repr__(self):
@@ -471,7 +489,8 @@ class PhotoMetricDistortion(object):
         if random.randint(2):
             delta = random.uniform(-self.brightness_delta,
                                    self.brightness_delta)
-            img += delta
+            # img += delta
+            img = np.add(img, delta)
 
         # mode == 0 --> do random contrast first
         # mode == 1 --> do random contrast last
@@ -480,19 +499,24 @@ class PhotoMetricDistortion(object):
             if random.randint(2):
                 alpha = random.uniform(self.contrast_lower,
                                        self.contrast_upper)
-                img *= alpha
+                # img *= alpha
+                img = np.multiply(img, alpha)
 
         # convert color from BGR to HSV
+        img = img.astype(np.uint8)
         img = mmcv.bgr2hsv(img)
 
         # random saturation
         if random.randint(2):
-            img[..., 1] *= random.uniform(self.saturation_lower,
-                                          self.saturation_upper)
+            # img[..., 1] *= random.uniform(self.saturation_lower,
+            #                               self.saturation_upper)
+            img[..., 1] = np.multiply(img[..., 1], random.uniform(self.saturation_lower,
+                                                                  self.saturation_upper))
 
-        # random hue
+            # random hue
         if random.randint(2):
-            img[..., 0] += random.uniform(-self.hue_delta, self.hue_delta)
+            # img[..., 0] += random.uniform(-self.hue_delta, self.hue_delta)
+            img[..., 0] = np.add(img[..., 0], random.uniform(-self.hue_delta, self.hue_delta))
             img[..., 0][img[..., 0] > 360] -= 360
             img[..., 0][img[..., 0] < 0] += 360
 
@@ -504,13 +528,15 @@ class PhotoMetricDistortion(object):
             if random.randint(2):
                 alpha = random.uniform(self.contrast_lower,
                                        self.contrast_upper)
-                img *= alpha
+                # img *= alpha
+                img = np.multiply(img, alpha)
 
         # randomly swap channels
         if random.randint(2):
             img = img[..., random.permutation(3)]
 
         results['img'] = img
+        # cv_showimg(**results)
         return results
 
     def __repr__(self):
@@ -699,6 +725,7 @@ class Corrupt(object):
             results['img'].astype(np.uint8),
             corruption_name=self.corruption,
             severity=self.severity)
+        # cv_showimg(**results)
         return results
 
     def __repr__(self):
