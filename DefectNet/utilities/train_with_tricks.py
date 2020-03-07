@@ -208,8 +208,9 @@ class BatchTrain(object):
             anchor_cluster = dict(enable=False, k=7)
         if data_augment is None:
             data_augment = dict(
-                enable=[False, False, False, True],
+                enable=[False, False, False, False, True],
                 cfg=[
+                    dict(type='Mixup'),
                     dict(type='Corrupt', corruption='contrast'),
                     dict(type='MinIoURandomCrop'),
                     dict(type='PhotoMetricDistortion'),

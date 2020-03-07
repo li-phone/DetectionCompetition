@@ -15,6 +15,7 @@ def cv_showimg(img, gt_bboxes, gt_labels, **kwargs):
     import cv2 as cv
     img = np.asarray(img)
     for b, l in zip(gt_bboxes, gt_labels):
+        b = [int(_) for _ in b]
         cv.rectangle(img, (b[0], b[1]), (b[2], b[3]), color=(0, 0, 255))
         cv.putText(img, str(l), (b[0], b[1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
     img = np.array(img.astype(np.uint8))
@@ -935,3 +936,75 @@ class Cutout(object):
         repr_str += '(n_holes={}, length={})'.format(
             self.n_holes, self.length)
         return repr_str
+
+
+@PIPELINES.register_module
+class Mixup(object):
+
+    def __init__(self, flip_ratio=0.5, mixup_ratio=0.5, img_mixup=False, shift=True):
+        self.flip_ratio = flip_ratio
+        self.mixup_ratio = mixup_ratio
+        self.img_mixup = img_mixup
+        self.shift = shift
+
+    def __call__(self, results):
+        if 'mixup' not in results:
+            flip = True if np.random.rand() < self.flip_ratio else False
+            results['mixup'] = flip
+
+        if results['mixup']:
+            img = results['img']
+            new_img, box_dst, label_dst = self._matte(results['img'], results['gt_bboxes'], results['gt_labels'],
+                                                      results['img'], results['gt_bboxes'], results['gt_labels'])
+            assert box_dst.shape[0] == label_dst.shape[0]
+            results['img'] = new_img
+            results['gt_bboxes'] = box_dst
+            results['gt_labels'] = label_dst
+        cv_showimg(**results)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += '(mixup_ratio={}, img_mixup={},shift={})'.format(
+            self.mixup_ratio, self.img_mixup, self.shift)
+        return repr_str
+
+    def _matte(self, img_src, box_src, label_src, img_dst, box_dst, label_dst, mixup_ratio=0.5, img_mixup=False,
+               shift=True):
+        img_src = img_src.astype(np.float) / 255.0
+        img_dst = img_dst.astype(np.float) / 255.0
+        box_dst = np.array(box_dst)
+        new_h, new_w = max(img_src.shape[0], img_dst.shape[0]), max(img_src.shape[1], img_dst.shape[1])
+        new_img = np.zeros((new_h, new_w, 3))
+        img_dst_h, img_dst_w, img_dst_c = img_dst.shape
+        img_src_h, img_src_w, img_src_c = img_src.shape
+        if img_mixup:
+            new_img[:img_src_h, :img_src_w, :] = mixup_ratio * img_src + 0.0 * new_img[:img_src_h, :img_src_w, :]
+            new_img[:img_dst_h, :img_dst_w, :] = (1.0 - mixup_ratio) * img_dst + 1.0 * new_img[:img_dst_h, :img_dst_w,
+                                                                                       :]
+        else:
+            new_img[:img_dst_h, :img_dst_w, :] = img_dst
+        for i, sbox in enumerate(box_src):
+            bi = [int(x + 0.5) for x in sbox]
+            wmin, hmin, wmax, hmax = bi
+            simg_h, simg_w, simg_c = img_src.shape
+            wmin, hmin, wmax, hmax = max(0, wmin), max(0, hmin), min(wmax, simg_w), min(hmax, simg_h)
+            bbox_img = img_src[hmin:hmax, wmin:wmax, :].copy()
+            if mixup_ratio > 0:
+                if shift:
+                    box_w, box_h = (wmax - wmin), (hmax - hmin)
+                    hmin = np.random.randint(0, new_h - box_h)
+                    wmin = np.random.randint(0, new_w - box_w)
+                    hmax, wmax = hmin + box_h, wmin + box_w
+                new_img[hmin:hmax, wmin:wmax, :] = mixup_ratio * bbox_img + (1.0 - mixup_ratio) * new_img[hmin:hmax,
+                                                                                                  wmin:wmax, :]
+            else:
+                new_img[hmin:hmax, wmin:wmax, :] = bbox_img
+            new_box = [wmin, hmin, wmax, hmax]
+            new_box = [float(_) for _ in new_box]
+            new_box = np.array(new_box).reshape((-1, 4)).astype(np.float32)
+            box_dst = np.append(box_dst, new_box, axis=0)
+            new_label = np.array(label_src[i]).reshape((-1)).astype(np.int64)
+            label_dst = np.append(label_dst, new_label, axis=0)
+        new_img = np.array(new_img * 255).astype(np.uint8)
+        return new_img, box_dst, label_dst
