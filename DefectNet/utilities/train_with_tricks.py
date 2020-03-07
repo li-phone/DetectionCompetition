@@ -218,7 +218,7 @@ class BatchTrain(object):
         # global context
         cfg.model['bbox_roi_extractor']['global_context'] = True
 
-        # 0.???
+        # 0.830
         from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
         anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=7)
         cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
