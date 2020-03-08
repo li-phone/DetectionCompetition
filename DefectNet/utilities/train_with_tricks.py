@@ -194,9 +194,9 @@ class BatchTrain(object):
             multiscale = dict(
                 enable=True,
                 resize_cfg=dict(
-                    img_scale=[(1920, 1080), (1333, 800)],
+                    img_scale=[(1920, 864), (1920, 1296)],
                     ratio_range=None,
-                    multiscale_mode='value',
+                    multiscale_mode='range',
                     keep_ratio=True,
                 )
             )
@@ -224,8 +224,8 @@ class BatchTrain(object):
             cfg.train_pipeline[2] = mmcv.ConfigDict(
                 type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
                 multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
-            sx = int(np.max([v[0] for v in resize_cfg['img_scale']]))
-            sy = int(np.max([v[1] for v in resize_cfg['img_scale']]))
+            sx = int(np.mean([v[0] for v in resize_cfg['img_scale']]))
+            sy = int(np.mean([v[1] for v in resize_cfg['img_scale']]))
             cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
 
             cfg.data['train']['pipeline'] = cfg.train_pipeline
