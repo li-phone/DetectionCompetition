@@ -6,7 +6,10 @@ multiscale(img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')+dcn+g
 aquatic_baseline+mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True: 0.45151362()[+vertical_flip+soft_nms]
 
 
-(img_scale=[(1920, 864), (1920, 1296)],multiscale_mode='range')+dcn+global_context+soft_nms:
+===================================================================report===================================================================
+(img_scale=[(1920, 1080), (1333, 800)],multiscale_mode='value')+test_scale=(img_scale=(1920, 1080))+dcn+global_context: 0.45206264
+
+(img_scale=[(1920, 864), (1920, 1296)],multiscale_mode='range')+test_scale=(img_scale=(1920, 1080))+dcn+global_context:
 
 
 
