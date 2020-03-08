@@ -3,12 +3,11 @@ import numpy as np
 
 
 def main():
-    garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
-    garbage_train.joint_train()
-
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    aquatic_train.joint_train()
+    aquatic_train.compete_train()
 
+    # garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
+    # garbage_train.joint_train()
     # batrian = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # batrian.baseline_train()
     # batrian.multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)], ratio_range=[0.5, 1.5])
