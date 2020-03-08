@@ -250,7 +250,7 @@ class BatchTrain(object):
                 if data_augment['enable'][i]:
                     aug_ = mmcv.ConfigDict(**v)
                     cfg.train_pipeline.insert(4, aug_)
-                    cfg.test_pipeline[1]['transforms'].insert(2, aug_)
+                    # cfg.test_pipeline[1]['transforms'].insert(2, aug_)
             cfg.data['train']['pipeline'] = cfg.train_pipeline
             cfg.data['val']['pipeline'] = cfg.test_pipeline
             cfg.data['test']['pipeline'] = cfg.test_pipeline
