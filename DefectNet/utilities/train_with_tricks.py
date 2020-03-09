@@ -165,7 +165,7 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
-    def anchor_cluster_train(self, anchor_ratios=[0.5, 1.0, 2.0], anchor_scales=[8], k=5):
+    def anchor_cluster_train(self, anchor_ratios=[0.5, 1.0, 2.0], anchor_scales=[8]):
         cfg = mmcv.Config.fromfile(self.cfg_path)
 
         cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
@@ -175,7 +175,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'anchor_cluster={}'.format(k)
+        cfg.uid = 'anchor_cluster={}+k={}'.format(str(anchor_ratios), len(anchor_ratios))
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
@@ -194,9 +194,9 @@ class BatchTrain(object):
             multiscale = dict(
                 enable=True,
                 resize_cfg=dict(
-                    img_scale=[(1920, 864), (1920, 1296)],
+                    img_scale=[(1920, 1080), (1333, 800)],
                     ratio_range=None,
-                    multiscale_mode='range',
+                    multiscale_mode='value',
                     keep_ratio=True,
                 )
             )
@@ -218,6 +218,11 @@ class BatchTrain(object):
                     dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
                 ])
         cfg = mmcv.Config.fromfile(self.cfg_path)
+        # add balanced l1 loss
+        cfg.model['rpn_head']['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
+        for rcnn in cfg.model['bbox_head']:
+            rcnn['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
+
         if multiscale['enable'] and multiscale['resize_cfg'] is not None:
             # 0.745 ==> 0.810(+0.065) | (1333x800) ==> (1920x1080)
             # 0.822 ==> 0.828(+0.006) | (1920x1080) ==> (img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')
@@ -225,8 +230,8 @@ class BatchTrain(object):
             cfg.train_pipeline[2] = mmcv.ConfigDict(
                 type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
                 multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
-            sx = int(np.mean([v[0] for v in resize_cfg['img_scale']]))
-            sy = int(np.mean([v[1] for v in resize_cfg['img_scale']]))
+            sx = int(np.max([v[0] for v in resize_cfg['img_scale']]))
+            sy = int(np.max([v[1] for v in resize_cfg['img_scale']]))
             cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
 
             cfg.data['train']['pipeline'] = cfg.train_pipeline
@@ -267,7 +272,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'multiscale+dcn+global_context'
+        cfg.uid = 'multiscale+dcn+global_context+BalancedL1Loss'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')

@@ -1,5 +1,5 @@
 # fp16 settings
-fp16 = dict(loss_scale=512.)
+# fp16 = dict(loss_scale=512.)
 # model settings
 model = dict(
     type='CascadeRCNN',
