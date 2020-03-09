@@ -38,8 +38,12 @@ def chg2coco(coco):
 def save_plt(save_name, file_types=None):
     if file_types is None:
         file_types = ['.svg', '.jpg', '.eps']
+    save_dir = save_name[:save_name.rfind('/')]
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
     for t in file_types:
         plt.savefig(save_name[:-4] + t)
+
 
 
 class COCOAnalysis(object):

@@ -1,7 +1,9 @@
 import glob
 import xml.etree.ElementTree as ET
-
+import matplotlib.pyplot as plt
 import numpy as np
+import os
+import seaborn as sns
 
 from .kmeans import kmeans, avg_iou
 
@@ -47,7 +49,8 @@ def coco_kmeans(coco, k=7):
     data = np.asarray(data)
     data = data[:, 2:]
     out = kmeans(data, k=k)
-    print("Accuracy: {:.2f}%".format(avg_iou(data, out) * 100))
+    acc = avg_iou(data, out) * 100
+    print("Accuracy: {:.2f}%".format(acc))
     print("Boxes:\n {}".format(out))
     ratios = np.around(out[:, 0] / out[:, 1], decimals=2).tolist()
     print("Ratios:\n {}".format(sorted(ratios)))
@@ -70,9 +73,32 @@ def coco_kmeans(coco, k=7):
     #  [0.51, 0.62, 0.91, 1.01, 1.01, 1.08, 1.17, 1.17, 1.94]
 
 
+def save_plt(save_name, file_types=None):
+    if file_types is None:
+        file_types = ['.svg', '.jpg', '.eps']
+    save_dir = save_name[:save_name.rfind('/')]
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    for t in file_types:
+        plt.savefig(save_name[:-4] + t)
+
+
 def main():
-    coco_kmeans('/home/liphone/undone-work/data/detection/aquatic/annotations/aquatic_train.json')
-    coco_kmeans('/home/liphone/undone-work/data/detection/garbage/train/instance_train.json')
+    import pandas as pd
+    from tqdm import tqdm
+    ks, accs = [], []
+    for i in tqdm(range(1, 11)):
+        ratios, acc, out = coco_kmeans(
+            '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json', k=i)
+        ks.append(i)
+        accs.append(acc)
+    acc_df = pd.DataFrame(data={'k': ks, 'avg_iou': accs})
+    ax = acc_df.plot.line(
+        x='k', y='avg_iou', marker='^',
+        grid=True, xlim=(1, 10), ylim=(0., 100.))
+    plt.ylabel('avg_iou')
+    save_plt('../../../results/fabric/fabric_defect_detection/k-means_cluster/k-means_cluster.jpg')
+    plt.show()
 
 
 if __name__ == "__main__":
