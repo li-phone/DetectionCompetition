@@ -293,3 +293,50 @@ defect_fps:
 
 normal_fps:
 0.26222688811165945
+
+
+==================================== aquatic_baseline+multiscale+dcn+global_context, uid: multiscale+dcn+global_context, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.586
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.919
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.677
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.325
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.556
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.211
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.609
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.662
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.465
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.643
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.710
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 28.493 | echinus  | 53.517 | holothurian | 57.761 |
+| scallop    | 61.512 | starfish | 61.760 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.50      0.14      0.22         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.75      0.57      0.61      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2565215307904093
+
+defect_fps:
+0.2565221049171539
+
+normal_fps:
+0.2560741220201765

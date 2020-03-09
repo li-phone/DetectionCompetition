@@ -201,13 +201,13 @@ data = dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/aquatic_train.json',
         img_prefix=data_root + '/train/image/',
-        # ignore_ids=[1],
+        ignore_ids=[1],
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/aquatic_test.json',
         img_prefix=data_root + '/test-A-image/',
-        # ignore_ids=[1],
+        ignore_ids=[1],
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
