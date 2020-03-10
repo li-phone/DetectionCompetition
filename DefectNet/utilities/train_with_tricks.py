@@ -262,7 +262,7 @@ class BatchTrain(object):
             cfg.data['test']['pipeline'] = cfg.test_pipeline
         if soft_nms:
             # 0.830 ==> 0.833(+0.003)
-            cfg.test_cfg['rcnn']['nms'] = dict(type='soft_nms', iou_thr=0.3, min_score=0.05)
+            cfg.test_cfg['rcnn']['nms'] = dict(type='soft_nms', iou_thr=0.5, method='gaussian')
         # 0.???
         # focal loss for rcnn
         # for head in cfg.model['bbox_head']:
