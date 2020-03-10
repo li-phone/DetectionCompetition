@@ -112,3 +112,117 @@ defect_fps:
 
 normal_fps:
 0.08185479487445445
+
+
+==================================== fabric_baseline,anchor_cluster=[0.12, 1.0, 4.43]+k=3, uid: anchor_cluster=[0.12, 1.0, 4.43]+k=3, mode: test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.231
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.441
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.216
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.166
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.184
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.238
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.282
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.347
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.353
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.284
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.275
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.347
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 破洞     | 39.251 | 水渍     | 17.471 |
+| 油渍     | 35.000 | 污渍     | 19.185 | 三丝     | 37.392 |
+| 结头     | 21.333 | 花板跳   | 52.565 | 百脚     | 36.204 |
+| 毛粒     | 9.592  | 粗经     | 34.651 | 松经     | 30.076 |
+| 断经     | 15.702 | 吊经     | 14.934 | 粗维     | 20.828 |
+| 纬缩     | 5.596  | 浆斑     | 41.749 | 整经结   | 17.682 |
+| 星跳     | 27.280 | 跳花     | 31.407 | 断氨纶   | 18.825 |
+| 稀密档   | 8.280  | 浪纹档   | 0.000  | 色差档   | 0.792  |
+| 磨痕     | 2.192  | 轧痕     | 23.078 | 修痕     | 27.257 |
+| 烧毛痕   | 60.627 | 死皱     | 1.900  | 云织     | 0.000  |
+| 双纬     | 54.290 | 双经     | 0.000  | 跳纱     | 32.517 |
+| 筘路     | 17.728 | 纬纱不良 | 29.738 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.95      0.65      0.77       761
+           1       0.81      0.98      0.88      1155
+
+    accuracy                           0.85      1916
+   macro avg       0.88      0.81      0.83      1916
+weighted avg       0.86      0.85      0.84      1916
+
+
+fps:
+0.07978523150864125
+
+defect_fps:
+0.08023162156472474
+
+normal_fps:
+0.07910772754704279
+
+
+==================================== fabric_baseline,anchor_cluster=[0.04, 0.28, 1.0, 4.43, 8.77]+k=5, uid: anchor_cluster=[0.04, 0.28, 1.0, 4.43, 8.77]+k=5, mode: test ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.242
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.453
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.215
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.146
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.182
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.257
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.290
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.354
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.358
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.253
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.255
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.360
+
+classwise:
++----------+--------+----------+--------+----------+--------+
+| category | AP     | category | AP     | category | AP     |
++----------+--------+----------+--------+----------+--------+
+| 背景     | 0.000  | 破洞     | 40.770 | 水渍     | 13.168 |
+| 油渍     | 32.329 | 污渍     | 17.755 | 三丝     | 35.345 |
+| 结头     | 21.631 | 花板跳   | 52.912 | 百脚     | 40.102 |
+| 毛粒     | 7.471  | 粗经     | 43.367 | 松经     | 30.855 |
+| 断经     | 16.274 | 吊经     | 18.218 | 粗维     | 22.173 |
+| 纬缩     | 7.665  | 浆斑     | 41.194 | 整经结   | 17.896 |
+| 星跳     | 30.660 | 跳花     | 33.890 | 断氨纶   | 17.995 |
+| 稀密档   | 10.033 | 浪纹档   | 2.723  | 色差档   | 6.684  |
+| 磨痕     | 9.464  | 轧痕     | 23.599 | 修痕     | 32.394 |
+| 烧毛痕   | 66.934 | 死皱     | 2.866  | 云织     | 0.000  |
+| 双纬     | 28.708 | 双经     | 0.000  | 跳纱     | 32.308 |
+| 筘路     | 25.428 | 纬纱不良 | 40.957 | None     | None   |
++----------+--------+----------+--------+----------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.96      0.57      0.71       761
+           1       0.77      0.98      0.87      1155
+
+    accuracy                           0.82      1916
+   macro avg       0.86      0.77      0.79      1916
+weighted avg       0.85      0.82      0.80      1916
+
+
+fps:
+0.07920695919084648
+
+defect_fps:
+0.07954286951007265
+
+normal_fps:
+0.07869713472474107

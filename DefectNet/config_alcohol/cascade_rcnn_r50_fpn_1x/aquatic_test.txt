@@ -342,3 +342,50 @@ defect_fps:
 
 normal_fps:
 0.2560741220201765
+
+
+==================================== aquatic_baseline+multiscale+dcn+global_context+BalancedL1Loss, uid: multiscale+dcn+global_context+BalancedL1Loss, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.573
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.902
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.655
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.295
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.540
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.208
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.603
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.657
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.454
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.638
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.706
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 27.812 | echinus  | 52.869 | holothurian | 55.920 |
+| scallop    | 59.754 | starfish | 60.541 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       1.00      0.14      0.25         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       1.00      0.57      0.62      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.25743721230743305
+
+defect_fps:
+0.25743629388258504
+
+normal_fps:
+0.25815292767116
