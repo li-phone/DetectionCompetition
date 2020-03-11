@@ -11,7 +11,7 @@ aquatic_baseline+mode=joint_train+multiscale=True+dcn=True+global_context=True+a
 
 (img_scale=[(1920, 864), (1920, 1296)],multiscale_mode='range')+test_scale=(img_scale=(1920, 1080))+dcn+global_context: 0.45197501
 
-(img_scale=[(1920, 1080), (1333, 800)],multiscale_mode='value')+test_scale=(img_scale=(1920, 1080))+dcn+global_context: 0.45206264
+(img_scale=[(1920, 1080), (1333, 800)],multiscale_mode='value')+test_scale=(img_scale=(1920, 1080))+dcn+global_context+BalancedL1Loss: 0.45015873
 
 
 

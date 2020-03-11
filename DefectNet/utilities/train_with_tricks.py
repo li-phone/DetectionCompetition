@@ -176,7 +176,7 @@ class BatchTrain(object):
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
         cfg.uid = 'anchor_cluster={}+k={}'.format(str(anchor_ratios), len(anchor_ratios))
-        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
@@ -189,21 +189,21 @@ class BatchTrain(object):
 
     def compete_train(
             self, multiscale=None, dcn=None, global_context=None,
-            anchor_cluster=None, data_augment=None, soft_nms=False):
+            anchor_cluster=None, data_augment=None, soft_nms=True):
         if multiscale is None:
             multiscale = dict(
                 enable=True,
                 resize_cfg=dict(
-                    img_scale=[(1920, 1080), (1333, 800)],
+                    img_scale=[(4096, 800), (4096, 1200)],
                     ratio_range=None,
-                    multiscale_mode='value',
+                    multiscale_mode='range',
                     keep_ratio=True,
                 )
             )
         if dcn is None:
-            dcn = dict(enable=True)
+            dcn = dict(enable=False)
         if global_context is None:
-            global_context = dict(enable=True)
+            global_context = dict(enable=False)
         if anchor_cluster is None:
             anchor_cluster = dict(enable=False, k=7)
         if data_augment is None:
@@ -218,10 +218,10 @@ class BatchTrain(object):
                     dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
                 ])
         cfg = mmcv.Config.fromfile(self.cfg_path)
-        # add balanced l1 loss
-        cfg.model['rpn_head']['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
-        for rcnn in cfg.model['bbox_head']:
-            rcnn['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
+        # # add balanced l1 loss, not effective
+        # cfg.model['rpn_head']['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
+        # for rcnn in cfg.model['bbox_head']:
+        #     rcnn['loss_bbox'] = dict(type='BalancedL1Loss', loss_weight=1.0)
 
         if multiscale['enable'] and multiscale['resize_cfg'] is not None:
             # 0.745 ==> 0.810(+0.065) | (1333x800) ==> (1920x1080)
@@ -230,8 +230,8 @@ class BatchTrain(object):
             cfg.train_pipeline[2] = mmcv.ConfigDict(
                 type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
                 multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
-            sx = int(np.max([v[0] for v in resize_cfg['img_scale']]))
-            sy = int(np.max([v[1] for v in resize_cfg['img_scale']]))
+            sx = int(np.mean([v[0] for v in resize_cfg['img_scale']]))
+            sy = int(np.mean([v[1] for v in resize_cfg['img_scale']]))
             cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
 
             cfg.data['train']['pipeline'] = cfg.train_pipeline
@@ -262,7 +262,8 @@ class BatchTrain(object):
             cfg.data['test']['pipeline'] = cfg.test_pipeline
         if soft_nms:
             # 0.830 ==> 0.833(+0.003)
-            cfg.test_cfg['rcnn']['nms'] = dict(type='soft_nms', iou_thr=0.5, method='gaussian')
+            cfg.test_cfg['rcnn'] = mmcv.ConfigDict(
+                score_thr=0.001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.001), max_per_img=100)
         # 0.???
         # focal loss for rcnn
         # for head in cfg.model['bbox_head']:
@@ -271,8 +272,8 @@ class BatchTrain(object):
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
-        cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'multiscale+dcn+global_context+BalancedL1Loss'
+        cfg.cfg_name = str(self.cfg_name) + '_strong_baseline'
+        cfg.uid = 'multiscale+soft-nms'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')

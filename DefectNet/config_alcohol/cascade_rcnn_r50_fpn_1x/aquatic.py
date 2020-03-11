@@ -178,7 +178,7 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         img_scale=(1333, 800),
-        flip=False,
+        flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -238,5 +238,5 @@ uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x/' + cfg_name
 resume_from = None
-load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
+load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_20e_20181123-db483a09.pth'
 workflow = [('train', 1)]
