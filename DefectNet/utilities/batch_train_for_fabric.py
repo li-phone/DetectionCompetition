@@ -20,7 +20,7 @@ def draw_soft_nms():
         # ylim=(0., 1.),
     )
     plt.ylabel('mAP')
-    save_plt('../../../results/fabric/fabric_defect_detection/soft-nms/soft-nms.jpg')
+    save_plt('../results/fabric/fabric_defect_detection/soft-nms/soft-nms.jpg')
     plt.show()
 
 
