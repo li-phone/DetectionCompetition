@@ -106,13 +106,17 @@ class BatchTrain(object):
         cfg.data['val']['pipeline'] = cfg.test_pipeline
         cfg.data['test']['pipeline'] = cfg.test_pipeline
 
+        cfg.model['rpn_head']['anchor_ratios'] = list([0.04, 0.28, 1.0, 4.43, 8.77])
+        cfg.model['rpn_head']['anchor_scales'] = list([8])
+
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'img_scale={},multiscale_mode={},ratio_range={},keep_ratio={}' \
-            .format(str(img_scale), str(multiscale_mode), str(ratio_range), str(keep_ratio))
-        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + cfg.uid)
+        # cfg.uid = 'img_scale={},multiscale_mode={},ratio_range={},keep_ratio={}' \
+        #     .format(str(img_scale), str(multiscale_mode), str(ratio_range), str(keep_ratio))
+        cfg.uid = 'baseline+multi-scale+anchor_clusters'
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
