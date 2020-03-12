@@ -187,6 +187,28 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
+    def soft_nms_test(self, iou_thr=0.5, model_name='mode=baseline'):
+        cfg = mmcv.Config.fromfile(self.cfg_path)
+
+        cfg.test_cfg['rcnn'] = mmcv.ConfigDict(
+            score_thr=0.05, nms=dict(type='soft_nms', iou_thr=iou_thr), max_per_img=100)
+
+        cfg.data['imgs_per_gpu'] = 2
+        cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
+
+        cfg.cfg_name = str(self.cfg_name) + '_baseline'
+
+        cfg.uid = 'soft_nms_iou_thr={}'.format(iou_thr)
+        cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + model_name)
+
+        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+
+        cfgs = [cfg]
+        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+
     def compete_train(
             self, multiscale=None, dcn=None, global_context=None,
             anchor_cluster=None, data_augment=None, soft_nms=True):
@@ -205,7 +227,7 @@ class BatchTrain(object):
         if global_context is None:
             global_context = dict(enable=False)
         if anchor_cluster is None:
-            anchor_cluster = dict(enable=False, k=7)
+            anchor_cluster = dict(enable=True, k=5)
         if data_augment is None:
             data_augment = dict(
                 enable=False,
@@ -273,7 +295,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_strong_baseline'
-        cfg.uid = 'multiscale+soft-nms'
+        cfg.uid = 'multiscale+soft-nms+anchor_clusters'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')

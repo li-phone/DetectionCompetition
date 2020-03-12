@@ -106,7 +106,7 @@ def defect_eval(det_result, gt_result, result_times, threshold=0.05):
     y_true = [0 if x == 0 else 1 for x in true_nums]
     assert len(y_pred) == len(y_true)
 
-    find_ability_rpt = classification_report(y_true, y_pred, output_dict=False)
+    find_ability_rpt = classification_report(y_true, y_pred, output_dict=False, digits=3)
     find_ability = classification_report(y_true, y_pred, output_dict=True)
     defect_fps = [result_times[i] for i, x in enumerate(y_true) if x != 0]
     normal_fps = [result_times[i] for i, x in enumerate(y_true) if x == 0]

@@ -1,12 +1,37 @@
 from train_with_tricks import BatchTrain
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def draw_soft_nms():
+    from coco_analyze import save_plt
+    iou_thr = np.linspace(0.1, 0.9, 9)
+    acc = [0.877, 0.877, 0.877, 0.877, 0.877, 0.877, 0.877, 0.877, 0.877]
+    mAP = [0.163, 0.163, 0.163, 0.163, 0.163, 0.163, 0.160, 0.155, 0.135, ]
+    AP50 = [0.314, 0.314, 0.314, 0.315, 0.314, 0.311, 0.302, 0.283, 0.241]
+    data = pd.DataFrame(data={
+        'acc': acc, 'iou_thr': iou_thr, 'mAP': mAP, 'AP@0.50': AP50})
+
+    ax = data.plot.line(
+        x='iou_thr', y='mAP', marker='^',
+        grid=True,
+        xlim=(0.1, 0.9),
+        # ylim=(0., 1.),
+    )
+    plt.ylabel('mAP')
+    save_plt('../../../results/fabric/fabric_defect_detection/soft-nms/soft-nms.jpg')
+    plt.show()
 
 
 def main():
+    draw_soft_nms()
     # garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
     # garbage_train.joint_train()
 
     fabric_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
+    for i in np.linspace(0.1, 0.9, 9):
+        fabric_train.soft_nms_test(iou_thr=i)
     # fabric_train.anchor_cluster_train(anchor_ratios=[0.12, 1.0, 4.43])
     # fabric_train.anchor_cluster_train(anchor_ratios=[0.04, 0.28, 1.0, 4.43, 8.77])
     # fabric_train.anchor_cluster_train(anchor_ratios=[0.04, 0.14, 0.32, 0.69, 1.0, 4.77, 8.84])
@@ -19,7 +44,7 @@ def main():
     # batrian.multi_scale_train(img_scale=[(2446, 1000)])
 
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    aquatic_train.compete_train()
+    # aquatic_train.compete_train()
 
 
 if __name__ == '__main__':
