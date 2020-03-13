@@ -109,6 +109,9 @@ class BatchTrain(object):
         cfg.model['rpn_head']['anchor_ratios'] = list([0.04, 0.28, 1.0, 4.43, 8.77])
         cfg.model['rpn_head']['anchor_scales'] = list([8])
 
+        cfg.test_cfg['rcnn'] = mmcv.ConfigDict(
+            score_thr=0.05, nms=dict(type='soft_nms', iou_thr=0.5), max_per_img=100)
+
         cfg.data['imgs_per_gpu'] = 2
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
@@ -118,6 +121,7 @@ class BatchTrain(object):
         cfg.uid = 'baseline+multi-scale+anchor_clusters'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
+        cfg.uid = 'baseline+multi-scale+anchor_clusters+soft-nms'
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
             cfg.resume_from = None
