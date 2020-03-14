@@ -279,7 +279,9 @@ class BatchTrain(object):
         if anchor_cluster['enable']:
             # 0.828 ==> 0.830(+0.002)
             from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
-            anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=anchor_cluster['k'])
+            # anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=anchor_cluster['k'])
+            anchor_ratios = [1.1, 1.11, 1.13, 1.21, 1.24]
+            print('anchor_ratios', anchor_ratios)
             cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
         if data_augment['enable']:
             for i, v in enumerate(data_augment['cfg']):
