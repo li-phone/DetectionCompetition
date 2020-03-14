@@ -955,12 +955,15 @@ class Mixup(object):
         if results['mixup']:
             img = results['img']
             new_img, box_dst, label_dst = self._matte(results['img'], results['gt_bboxes'], results['gt_labels'],
-                                                      results['img'], results['gt_bboxes'], results['gt_labels'])
+                                                      results['img'], results['gt_bboxes'], results['gt_labels'],
+                                                      mixup_ratio=self.mixup_ratio,
+                                                      img_mixup=self.img_mixup,
+                                                      shift=self.shift)
             assert box_dst.shape[0] == label_dst.shape[0]
             results['img'] = new_img
             results['gt_bboxes'] = box_dst
             results['gt_labels'] = label_dst
-        cv_showimg(**results)
+        # cv_showimg(**results)
         return results
 
     def __repr__(self):

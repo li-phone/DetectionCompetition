@@ -238,10 +238,10 @@ class BatchTrain(object):
             anchor_cluster = dict(enable=True, k=5)
         if data_augment is None:
             data_augment = dict(
-                enable=False,
-                cfg_enable=[False, False, False, False, False],
+                enable=True,
+                cfg_enable=[True, False, False, False, False],
                 cfg=[
-                    dict(type='Mixup'),
+                    dict(type='Mixup', mixup_ratio=0.8),
                     dict(type='Corrupt', corruption='contrast'),
                     dict(type='MinIoURandomCrop'),
                     dict(type='PhotoMetricDistortion'),
@@ -303,7 +303,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_strong_baseline'
-        cfg.uid = 'multiscale+soft-nms+anchor_clusters+dcn'
+        cfg.uid = 'multiscale+soft-nms+anchor_clusters+dcn+flipmixup'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')

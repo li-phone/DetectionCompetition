@@ -17,7 +17,7 @@ aquatic_strong_baseline+multiscale+soft-nms: 0.45993518
 
 aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters: 0.46000774
 
-aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn: 0.46000774
+aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn: 0.46218754
 
 ==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
 bbox:
