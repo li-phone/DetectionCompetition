@@ -231,7 +231,7 @@ class BatchTrain(object):
                 )
             )
         if dcn is None:
-            dcn = dict(enable=False)
+            dcn = dict(enable=True)
         if global_context is None:
             global_context = dict(enable=False)
         if anchor_cluster is None:
@@ -303,7 +303,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_strong_baseline'
-        cfg.uid = 'multiscale+soft-nms+anchor_clusters'
+        cfg.uid = 'multiscale+soft-nms+anchor_clusters+dcn'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
