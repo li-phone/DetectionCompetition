@@ -19,6 +19,9 @@ aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters: 0.46000774
 
 aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn: 0.46218754
 
+aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn+flipmixup: 0.46252733
+
+
 ==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
 bbox:
 log:
@@ -534,3 +537,50 @@ defect_fps:
 
 normal_fps:
 0.17164860452924455
+
+
+==================================== aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn+flipmixup, uid: multiscale+soft-nms+anchor_clusters+dcn+flipmixup, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.562
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.898
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.640
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.288
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.527
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.626
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.605
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.688
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.544
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.671
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.722
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 38.011 | echinus  | 53.425 | holothurian | 54.544 |
+| scallop    | 57.603 | starfish | 59.409 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0      0.000     0.000     0.000         7
+           1      0.999     1.000     0.999      5455
+
+    accuracy                          0.999      5462
+   macro avg      0.499     0.500     0.500      5462
+weighted avg      0.997     0.999     0.998      5462
+
+
+fps:
+0.15875520674748458
+
+defect_fps:
+0.1587310575542922
+
+normal_fps:
+0.17757432801382883

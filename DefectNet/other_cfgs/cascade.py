@@ -1,9 +1,9 @@
-fp16 = dict(loss_scale=512.)
+# fp16 = dict(loss_scale=512.)
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    # pretrained='torchvision://resnet50',
-    pretrained='/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/epoch_000004_state_dict.pth',
+    pretrained='torchvision://resnet50',
+    # pretrained='/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/epoch_000004_state_dict.pth',
     backbone=dict(
         type='ResNet',
         depth=50,

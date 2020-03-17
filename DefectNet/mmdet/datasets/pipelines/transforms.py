@@ -996,8 +996,8 @@ class Mixup(object):
             if mixup_ratio > 0:
                 if shift:
                     box_w, box_h = (wmax - wmin), (hmax - hmin)
-                    hmin = np.random.randint(0, new_h - box_h)
-                    wmin = np.random.randint(0, new_w - box_w)
+                    hmin = np.random.randint(0, max(new_h - box_h, 1))
+                    wmin = np.random.randint(0, max(new_w - box_w, 1))
                     hmax, wmax = hmin + box_h, wmin + box_w
                 new_img[hmin:hmax, wmin:wmax, :] = mixup_ratio * bbox_img + (1.0 - mixup_ratio) * new_img[hmin:hmax,
                                                                                                   wmin:wmax, :]

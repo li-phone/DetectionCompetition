@@ -25,8 +25,6 @@ def draw_soft_nms():
 
 
 def main():
-    # garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
-    # garbage_train.joint_train()
 
     # fabric_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # fabric_train.multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)], multiscale_mode='value')
@@ -43,6 +41,9 @@ def main():
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
     aquatic_train.compete_train()
 
+    # garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
+    garbage_train = BatchTrain(cfg_path='../other_cfgs/cascade.py', data_mode='val')
+    garbage_train.joint_train()
 
 if __name__ == '__main__':
     main()
