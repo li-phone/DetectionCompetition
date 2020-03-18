@@ -38,11 +38,11 @@ def batch_infer(cfgs):
             have_bg = False
         infer_params = dict(
             config=cfg,
-            resume_from=osp.join(cfg.work_dir, 'epoch_12.pth'),
+            resume_from=osp.join(cfg.work_dir, 'latest.pth'),
             infer_object=cfg.data['test']['ann_file'],
             img_dir=cfg.data['test']['img_prefix'],
             work_dir=cfg.work_dir,
-            submit_out=osp.join(cfg.work_dir, '{}_submit+epoch_{}.json'.format(cfg_name, 12)),
+            submit_out=osp.join(cfg.work_dir, '{}_submit+epoch_{}.json'.format(cfg_name, 'latest')),
             have_bg=have_bg,
         )
         infer_main(**infer_params)
@@ -375,7 +375,9 @@ class BatchTrain(object):
         if anchor_cluster['enable']:
             # 0.828 ==> 0.830(+0.002)
             from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
-            anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=anchor_cluster['k'])
+            # anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=anchor_cluster['k'])
+            # print('anchor ratios:', anchor_ratios)
+            anchor_ratios = [0.9, 1.01, 1.07, 0.97, 1.11, 0.6, 1.37]
             cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
         if data_augment['enable']:
             for i, v in enumerate(data_augment['cfg']):
@@ -398,10 +400,7 @@ class BatchTrain(object):
         cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
 
         cfg.cfg_name = str(self.cfg_name) + '_baseline'
-        cfg.uid = 'mode=joint_train+multiscale={}+dcn={}+global_context={}+anchor_cluster={}+data_augment={}+soft_nms={}'.format(
-            multiscale['enable'], dcn['enable'], global_context['enable'], anchor_cluster['enable'],
-            data_augment['enable'] != None, soft_nms
-        )
+        cfg.uid = 'joint_train+multiscale+dcn+global_context+anchor_cluster+RandomVerticalFlip+flipmixup+soft_nms'
         cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + '+' + cfg.uid)
 
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
