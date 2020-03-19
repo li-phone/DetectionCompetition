@@ -10,11 +10,11 @@ def main():
     parser = ArgumentParser(description='COCO Evaluation')
     parser.add_argument(
         '--result',
-        default='/home/liphone/undone-work/uselessNet/code/mmdetection/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/baseline/latest_epoch_12_out.pkl.bbox.json',
+        default='/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline/fabric_baseline+baseline+multi-scale+anchor_clusters/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json',
         help='result file path')
     parser.add_argument(
         '--ann',
-        default='/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_34.json',
+        default='/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json',
         help='annotation file path')
     parser.add_argument(
         '--types',
