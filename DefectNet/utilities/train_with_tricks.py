@@ -241,7 +241,7 @@ class BatchTrain(object):
                 enable=True,
                 cfg_enable=[True, False, True, False, False],
                 cfg=[
-                    dict(type='Mixup', mixup_ratio=0.8),
+                    dict(type='BoxMixup', mixup_ratio=0.8),
                     dict(type='Corrupt', corruption='contrast'),
                     dict(type='MinIoURandomCrop'),
                     dict(type='PhotoMetricDistortion'),

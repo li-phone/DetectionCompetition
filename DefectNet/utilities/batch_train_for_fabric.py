@@ -38,7 +38,7 @@ def main():
     # batrian.multi_scale_train(img_scale=[(2446, 1000)])
 
     aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    # aquatic_train.compete_train()
+    aquatic_train.compete_train()
 
     garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
     garbage_train.joint_train()

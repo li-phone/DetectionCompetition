@@ -11,13 +11,17 @@ from mmdet.core.evaluation.bbox_overlaps import bbox_overlaps
 from ..registry import PIPELINES
 
 
-def cv_showimg(img, gt_bboxes, gt_labels, **kwargs):
+def cv_showimg(img, gt_bboxes, gt_labels, old_flag=1e10, **kwargs):
     import cv2 as cv
     img = np.asarray(img)
-    for b, l in zip(gt_bboxes, gt_labels):
+    for i, b, l in zip(range(len(gt_labels)), gt_bboxes, gt_labels):
         b = [int(_) for _ in b]
         cv.rectangle(img, (b[0], b[1]), (b[2], b[3]), color=(0, 0, 255))
-        cv.putText(img, str(l), (b[0], b[1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+        if i < old_flag:
+            cv.putText(img, str(l), (b[0], b[1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+        else:
+            cv.putText(img, str('**,') + str(l), (b[0], b[1]), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2)
+
     img = np.array(img.astype(np.uint8))
     cv.imshow('showimg', img)
     cv.waitKey(0)
@@ -939,31 +943,31 @@ class Cutout(object):
 
 
 @PIPELINES.register_module
-class Mixup(object):
+class BoxMixup(object):
 
-    def __init__(self, flip_ratio=0.5, mixup_ratio=0.5, img_mixup=False, shift=True):
+    def __init__(self, flip_ratio=0.5, mixup_ratio=0.5, ratio_range=[0.5, 1.0], keep_ratio=True, img_mixup=False,
+                 shift=True):
         self.flip_ratio = flip_ratio
         self.mixup_ratio = mixup_ratio
+        self.ratio_range = ratio_range
+        self.keep_ratio = keep_ratio
         self.img_mixup = img_mixup
         self.shift = shift
 
     def __call__(self, results):
-        if 'mixup' not in results:
+        if 'boxmixup' not in results:
             flip = True if np.random.rand() < self.flip_ratio else False
-            results['mixup'] = flip
+            results['boxmixup'] = flip
 
-        if results['mixup']:
+        if results['boxmixup']:
             img = results['img']
             new_img, box_dst, label_dst = self._matte(results['img'], results['gt_bboxes'], results['gt_labels'],
-                                                      results['img'], results['gt_bboxes'], results['gt_labels'],
-                                                      mixup_ratio=self.mixup_ratio,
-                                                      img_mixup=self.img_mixup,
-                                                      shift=self.shift)
+                                                      results['img'], results['gt_bboxes'], results['gt_labels'])
             assert box_dst.shape[0] == label_dst.shape[0]
             results['img'] = new_img
             results['gt_bboxes'] = box_dst
             results['gt_labels'] = label_dst
-        # cv_showimg(**results)
+        # cv_showimg(**results, old_flag=old_len)
         return results
 
     def __repr__(self):
@@ -972,8 +976,31 @@ class Mixup(object):
             self.mixup_ratio, self.img_mixup, self.shift)
         return repr_str
 
-    def _matte(self, img_src, box_src, label_src, img_dst, box_dst, label_dst, mixup_ratio=0.5, img_mixup=False,
-               shift=True):
+    @staticmethod
+    def random_sample_ratio(img_scale, ratio_range):
+        assert isinstance(img_scale, tuple) and len(img_scale) == 2
+        min_ratio, max_ratio = ratio_range
+        assert min_ratio <= max_ratio
+        ratio = np.random.random_sample() * (max_ratio - min_ratio) + min_ratio
+        scale = int(img_scale[0] * ratio), int(img_scale[1] * ratio)
+        return scale, None
+
+    def _resize_img(self, results):
+        if self.keep_ratio:
+            img, scale_factor = mmcv.imrescale(
+                results['img'], results['scale'], return_scale=True)
+        else:
+            img, w_scale, h_scale = mmcv.imresize(
+                results['img'], results['scale'], return_scale=True)
+            scale_factor = np.array([w_scale, h_scale, w_scale, h_scale],
+                                    dtype=np.float32)
+        results['img'] = img
+        results['img_shape'] = img.shape
+        results['pad_shape'] = img.shape  # in case that there is no padding
+        results['scale_factor'] = scale_factor
+        results['keep_ratio'] = self.keep_ratio
+
+    def _matte(self, img_src, box_src, label_src, img_dst, box_dst, label_dst):
         img_src = img_src.astype(np.float) / 255.0
         img_dst = img_dst.astype(np.float) / 255.0
         box_dst = np.array(box_dst)
@@ -981,10 +1008,11 @@ class Mixup(object):
         new_img = np.zeros((new_h, new_w, 3))
         img_dst_h, img_dst_w, img_dst_c = img_dst.shape
         img_src_h, img_src_w, img_src_c = img_src.shape
-        if img_mixup:
-            new_img[:img_src_h, :img_src_w, :] = mixup_ratio * img_src + 0.0 * new_img[:img_src_h, :img_src_w, :]
-            new_img[:img_dst_h, :img_dst_w, :] = (1.0 - mixup_ratio) * img_dst + 1.0 * new_img[:img_dst_h, :img_dst_w,
-                                                                                       :]
+        if self.img_mixup:
+            new_img[:img_src_h, :img_src_w, :] = self.mixup_ratio * img_src + 0.0 * new_img[:img_src_h, :img_src_w, :]
+            new_img[:img_dst_h, :img_dst_w, :] = (1.0 - self.mixup_ratio) * img_dst + 1.0 * new_img[:img_dst_h,
+                                                                                            :img_dst_w,
+                                                                                            :]
         else:
             new_img[:img_dst_h, :img_dst_w, :] = img_dst
         for i, sbox in enumerate(box_src):
@@ -993,14 +1021,24 @@ class Mixup(object):
             simg_h, simg_w, simg_c = img_src.shape
             wmin, hmin, wmax, hmax = max(0, wmin), max(0, hmin), min(wmax, simg_w), min(hmax, simg_h)
             bbox_img = img_src[hmin:hmax, wmin:wmax, :].copy()
-            if mixup_ratio > 0:
-                if shift:
-                    box_w, box_h = (wmax - wmin), (hmax - hmin)
+
+            if self.ratio_range:
+                img_scale = bbox_img.shape[:2]
+                scale, scale_idx = self.random_sample_ratio(
+                    img_scale, self.ratio_range)
+                results = {'img': bbox_img, 'scale': scale}
+                self._resize_img(results)
+                bbox_img = results['img']
+            if self.mixup_ratio > 0:
+                if self.shift:
+                    box_w, box_h = bbox_img.shape[1], bbox_img.shape[0]
                     hmin = np.random.randint(0, max(new_h - box_h, 1))
                     wmin = np.random.randint(0, max(new_w - box_w, 1))
                     hmax, wmax = hmin + box_h, wmin + box_w
-                new_img[hmin:hmax, wmin:wmax, :] = mixup_ratio * bbox_img + (1.0 - mixup_ratio) * new_img[hmin:hmax,
-                                                                                                  wmin:wmax, :]
+                new_img[hmin:hmax, wmin:wmax, :] = self.mixup_ratio * bbox_img + (1.0 - self.mixup_ratio) * new_img[
+                                                                                                            hmin:hmax,
+                                                                                                            wmin:wmax,
+                                                                                                            :]
             else:
                 new_img[hmin:hmax, wmin:wmax, :] = bbox_img
             new_box = [wmin, hmin, wmax, hmax]
