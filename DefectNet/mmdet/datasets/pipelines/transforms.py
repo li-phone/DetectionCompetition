@@ -958,7 +958,7 @@ class BoxMixup(object):
         if 'boxmixup' not in results:
             flip = True if np.random.rand() < self.flip_ratio else False
             results['boxmixup'] = flip
-
+        old_flag=len(results['gt_labels'])
         if results['boxmixup']:
             img = results['img']
             new_img, box_dst, label_dst = self._matte(results['img'], results['gt_bboxes'], results['gt_labels'],
@@ -967,7 +967,7 @@ class BoxMixup(object):
             results['img'] = new_img
             results['gt_bboxes'] = box_dst
             results['gt_labels'] = label_dst
-        # cv_showimg(**results, old_flag=old_len)
+        cv_showimg(**results, old_flag=old_flag)
         return results
 
     def __repr__(self):
@@ -1023,7 +1023,7 @@ class BoxMixup(object):
             bbox_img = img_src[hmin:hmax, wmin:wmax, :].copy()
 
             if self.ratio_range:
-                img_scale = bbox_img.shape[:2]
+                img_scale = bbox_img.shape[:2][::-1]
                 scale, scale_idx = self.random_sample_ratio(
                     img_scale, self.ratio_range)
                 results = {'img': bbox_img, 'scale': scale}
