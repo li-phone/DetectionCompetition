@@ -13,6 +13,11 @@ import numpy as np
 import random
 
 
+def get_segmentation(points):
+    return [points[0], points[1], points[2] + points[0], points[1],
+            points[2] + points[0], points[3] + points[1], points[0], points[3] + points[1]]
+
+
 def _get_box(points):
     min_x = min_y = np.inf
     max_x = max_y = 0
@@ -122,7 +127,9 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
                 image_id=image2id[v['file_name']],
                 category_id=label2cat[v['label']],
                 bbox=_get_box(points),
+                segmentation=[points],
                 iscrowd=0,
+                ignore=0,
                 area=area
             )
             coco['annotations'].append(ann)
@@ -208,17 +215,17 @@ def fabric2coco():
     )
 
 
-def aquatic2coco():
-    data_root = '/home/liphone/undone-work/data/detection/aquatic'
+def underwater2coco():
+    data_root = '/home/liphone/undone-work/data/detection/underwater'
 
-    save_name = data_root + '/annotations/aquatic_train.json'
+    save_name = data_root + '/annotations/underwater_train.json'
     img_dir = data_root + '/train/image'
     if not os.path.exists(save_name):
         xml_dir = data_root + '/train/box'
         anns = xml2list(xml_dir, img_dir)
         transform2coco(anns, save_name, img_dir=img_dir, bgcat={'id': 0, 'name': 'waterweeds'})
 
-    test_name = data_root + '/annotations/aquatic_test.json'
+    test_name = data_root + '/annotations/underwater_test.json'
     if not os.path.exists(test_name):
         test_img_dir = data_root + '/test-A-image'
         imgdir2coco(save_name, test_name, test_img_dir)
@@ -230,7 +237,7 @@ def aquatic2coco():
 
 
 def main():
-    # aquatic2coco()
+    underwater2coco()
 
     img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
     cn2eng = {
@@ -260,7 +267,7 @@ def main():
     draw_coco(
         baseline_results,
         img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
-        thresh = 0.05, fontsize = 16*4
+        thresh=0.05, fontsize=16 * 4
     )
 
     trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
@@ -272,7 +279,7 @@ def main():
     draw_coco(
         trick_results,
         img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
-        thresh = 0.05, fontsize = 16*4
+        thresh=0.05, fontsize=16 * 4
     )
 
 
