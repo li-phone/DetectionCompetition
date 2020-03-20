@@ -121,13 +121,13 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                     self.mask_roi_extractor[i].init_weights()
                 self.mask_head[i].init_weights()
 
-    def old_extract_feat(self, img):
+    def extract_feat(self, img):
         x1 = self.backbone(img, detector=True)
         if self.with_neck:
             x1 = self.neck(x1)
         return x1
 
-    def extract_feat(self, img, targets=None):
+    def extract_defect_feat(self, img, targets=None):
         if targets is None:
             x1, x2 = self.backbone(img, detector=True)
             score = x2.softmax(dim=1)
@@ -146,7 +146,16 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
     def forward_dummy(self, img):
         outs = ()
         # backbone
-        x, x2 = self.extract_feat(img)
+        if self.dfn_weight is None:
+            x = self.extract_feat(img)
+        elif self.dfn_weight == 0:
+            x, x2 = self.extract_defect_feat(img)
+            if self.with_neck:
+                x = self.neck(x)
+        else:
+            x, x2 = self.extract_defect_feat(img)
+            if x2 == 0:
+                return x2
         # rpn
         if self.with_rpn:
             rpn_outs = self.rpn_head(x)
@@ -214,7 +223,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         losses = dict()
 
         if self.dfn_weight is None:
-            x = self.old_extract_feat(img)
+            x = self.extract_feat(img)
         else:
             # split the images into defect(1) image and normal(0) image
             defect_nums = []
@@ -229,7 +238,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             dfn_labels = [0 if i == 0 else 1 for i in defect_nums]
             dfn_labels = torch.Tensor(dfn_labels).long().cuda()
 
-            x, dfn_loss = self.extract_feat(img, targets=dfn_labels)
+            x, dfn_loss = self.extract_defect_feat(img, targets=dfn_labels)
             loss_dfn = dfn_loss['loss']
             loss_dfn = loss_dfn * self.dfn_weight
             losses.update(loss_dfn=loss_dfn)
@@ -395,13 +404,13 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             dict: results
         """
         if self.dfn_weight is None:
-            x = self.old_extract_feat(img)
+            x = self.extract_feat(img)
         elif self.dfn_weight == 0:
-            x, x2 = self.extract_feat(img)
+            x, x2 = self.extract_defect_feat(img)
             if self.with_neck:
                 x = self.neck(x)
         else:
-            x, x2 = self.extract_feat(img)
+            x, x2 = self.extract_defect_feat(img)
             if x2 == 0:
                 return x2
 
@@ -498,7 +507,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         # recompute feats to save memory
         if self.dfn_weight is None:
             proposal_list = self.aug_test_rpn(
-                self.old_extract_feat(imgs), img_metas, self.test_cfg.rpn)
+                self.extract_feat(imgs), img_metas, self.test_cfg.rpn)
         else:
             proposal_list = self.aug_test_rpn(
                 self.extract_feats(imgs), img_metas, self.test_cfg.rpn)

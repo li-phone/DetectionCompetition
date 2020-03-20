@@ -8,59 +8,10 @@ import copy
 import json
 import numpy as np
 import os.path as osp
-from train import main as train_main
-from batch_test import batch_test
-from infer import main as infer_main
+from batch_process import batch_train, batch_test, batch_infer
 
 BASH_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASH_DIR)
-
-
-def hint(wav_file='./wav/qq.wav', n=5):
-    import pygame
-    for i in range(n):
-        pygame.mixer.init()
-        pygame.mixer.music.load(wav_file)
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play()
-
-
-def batch_infer(cfgs):
-    for cfg in tqdm(cfgs):
-        cfg_name = os.path.basename(cfg.work_dir)
-        print('\ncfg: {}'.format(cfg_name))
-        if 'ignore_ids' in cfg.data['test']:
-            if cfg.data['test']['ignore_ids'] is None:
-                have_bg = False
-            else:
-                have_bg = True
-        else:
-            have_bg = False
-        infer_params = dict(
-            config=cfg,
-            resume_from=osp.join(cfg.work_dir, 'latest.pth'),
-            infer_object=cfg.data['test']['ann_file'],
-            img_dir=cfg.data['test']['img_prefix'],
-            work_dir=cfg.work_dir,
-            submit_out=osp.join(cfg.work_dir, '{}_submit+epoch_{}.json'.format(cfg_name, 'latest')),
-            have_bg=have_bg,
-        )
-        infer_main(**infer_params)
-        print('{} infer successfully!'.format(cfg_name))
-        hint()
-
-
-def batch_train(cfgs, sleep_time=0, detector=True):
-    for cfg in tqdm(cfgs):
-        cfg_name = os.path.basename(cfg.work_dir)
-        print('\ncfg: {}'.format(cfg_name))
-
-        # train
-        train_params = dict(config=cfg, detector=detector)
-        train_main(**train_params)
-        print('{} train successfully!'.format(cfg_name))
-        hint()
-        time.sleep(sleep_time)
 
 
 class BatchTrain(object):
@@ -413,75 +364,10 @@ class BatchTrain(object):
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 
-    def other_cfg_train(self):
+    def no_trick_train(self):
         cfg = mmcv.Config.fromfile(self.cfg_path)
-        multiscale = dict(
-            enable=True,
-            resize_cfg=dict(
-                img_scale=[(1920, 864), (1920, 1296)],
-                ratio_range=None,
-                multiscale_mode='range',
-                keep_ratio=True,
-            )
-        )
-        dcn = dict(enable=True)
-        global_context = dict(enable=True)
-        anchor_cluster = dict(enable=True, k=5)
-        data_augment = dict(
-            enable=True,
-            cfg_enable=[False, False, False, False, True],
-            cfg=[
-                dict(type='Mixup', mixup_ratio=0.8),
-                dict(type='Corrupt', corruption='contrast'),
-                dict(type='MinIoURandomCrop'),
-                dict(type='PhotoMetricDistortion'),
-                dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
-            ])
-        if multiscale['enable'] and multiscale['resize_cfg'] is not None:
-            # 0.745 ==> 0.810(+0.065) | (1333x800) ==> (1920x1080)
-            # 0.822 ==> 0.828(+0.006) | (1920x1080) ==> (img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')
-            resize_cfg = multiscale['resize_cfg']
-            cfg.train_pipeline[2] = mmcv.ConfigDict(
-                type='Resize', img_scale=resize_cfg['img_scale'], ratio_range=resize_cfg['ratio_range'],
-                multiscale_mode=resize_cfg['multiscale_mode'], keep_ratio=resize_cfg['keep_ratio'])
-            sx = int(np.mean([v[0] for v in resize_cfg['img_scale']]))
-            sy = int(np.mean([v[1] for v in resize_cfg['img_scale']]))
-            cfg.test_pipeline[1]['img_scale'] = [(sx, sy)]
-
-            cfg.data['train']['pipeline'] = cfg.train_pipeline
-            cfg.data['val']['pipeline'] = cfg.test_pipeline
-            cfg.data['test']['pipeline'] = cfg.test_pipeline
-        if dcn['enable']:
-            # 0.810 ==> 0.819(+0.009)
-            cfg.model['backbone']['dcn'] = dict(
-                modulated=False, deformable_groups=1, fallback_on_stride=False)
-            cfg.model['backbone']['stage_with_dcn'] = (False, True, True, True)
-        if global_context['enable']:
-            # 0.819 ==> 0.822(+0.003)
-            # global context
-            cfg.model['bbox_roi_extractor']['global_context'] = True
-        if anchor_cluster['enable']:
-            # 0.828 ==> 0.830(+0.002)
-            from tricks.kmeans_anchor_boxes.yolo_kmeans import coco_kmeans
-            # anchor_ratios = coco_kmeans(cfg.data['train']['ann_file'], k=anchor_cluster['k'])
-            anchor_ratios = [0.92, 0.98, 0.99, 1.07, 1.11]
-            print('anchor_ratios', anchor_ratios)
-            cfg.model['rpn_head']['anchor_ratios'] = list(anchor_ratios)
-        if data_augment['enable']:
-            for i, v in enumerate(data_augment['cfg']):
-                if data_augment['cfg_enable'][i]:
-                    aug_ = mmcv.ConfigDict(**v)
-                    cfg.train_pipeline.insert(4, aug_)
-                    # cfg.test_pipeline[1]['transforms'].insert(2, aug_)
-            cfg.data['train']['pipeline'] = cfg.train_pipeline
-            cfg.data['val']['pipeline'] = cfg.test_pipeline
-            cfg.data['test']['pipeline'] = cfg.test_pipeline
-        # 0.830 ==> 0.833(+0.003)
-        cfg.test_cfg['rcnn'] = mmcv.ConfigDict(
-            score_thr=0.05, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.001), max_per_img=100)
-
         cfg.first_model_cfg = None
-        cfg.cfg_name = str(self.cfg_name) + '_baseline'
+        cfg.cfg_name = str(self.cfg_name)
         cfg.uid = str(self.cfg_name)
         cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
         if not os.path.exists(cfg.resume_from):
@@ -489,7 +375,7 @@ class BatchTrain(object):
 
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
-        save_path = os.path.join(self.cfg_dir, 'garbage' + '_test.txt')
+        save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_{}.txt'.format(self.data_mode))
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 

@@ -1,4 +1,3 @@
-from train_with_tricks import BatchTrain
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,6 +24,18 @@ def draw_soft_nms():
 
 
 def main():
+    from batch_train import BatchTrain
+
+    # garbage_train = BatchTrain(cfg_path='../configs/garbage/garbage_cas_rcnn_x101_32x4d_fpn_1x.py', data_mode='val')
+    # garbage_train.no_trick_train()
+
+    # garbage_train = BatchTrain(cfg_path='../configs/garbage/garbage_cas_rcnn_x101_64x4d_fpn_1x.py', data_mode='val')
+    # garbage_train.no_trick_train()
+
+    garbage_train = BatchTrain(cfg_path='../configs/underwater/underwater_htc_without_semantic_x101_64x4d_fpn_1x.py',
+                               data_mode='val')
+    garbage_train.no_trick_train()
+
     # fabric_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # fabric_train.multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)], multiscale_mode='value')
     # fabric_train.anchor_cluster_train(anchor_ratios=[0.12, 1.0, 4.43])
@@ -37,11 +48,8 @@ def main():
     # batrian.multi_scale_train(img_scale=[(2446 / 2, 1000 / 2)])
     # batrian.multi_scale_train(img_scale=[(2446, 1000)])
 
-    aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
-    aquatic_train.compete_train()
-
-    garbage_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/garbage.py', data_mode='val')
-    garbage_train.joint_train()
+    # aquatic_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/aquatic.py', data_mode='val')
+    # aquatic_train.compete_train()
 
 
 if __name__ == '__main__':
