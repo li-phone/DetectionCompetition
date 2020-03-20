@@ -1,11 +1,28 @@
-from utilities.utils import save_dict, load_dict
-
 from pandas.io.json import json_normalize
 import os
+import json
 
 
-def check_coco(src, dst):
-    if os.path.exists(dst):
+def load_dict(fname):
+    with open(fname, "r") as fp:
+        o = json.load(fp, )
+        return o
+
+
+def save_dict(fname, d, mode='w', **kwargs):
+    # 持久化写入
+    with open(fname, mode) as fp:
+        # json.dump(d, fp, cls=NpEncoder, indent=1, separators=(',', ': '))
+        json.dump(d, fp, **kwargs)
+
+
+def get_segmentation(points):
+    return [points[0], points[1], points[2] + points[0], points[1],
+            points[2] + points[0], points[3] + points[1], points[0], points[3] + points[1]]
+
+
+def check_coco(src, dst, replace=True):
+    if not replace:
         print('There is an existed {}.'.format(dst))
         return
     coco = load_dict(src)
@@ -25,9 +42,14 @@ def check_coco(src, dst):
     anns = json_normalize(coco['annotations'])
     anns['id'] = list(range(anns.shape[0]))
     anns = anns.to_dict('id')
+    for k, v in anns.items():
+        if 'segmentation' not in v:
+            seg = get_segmentation(v['bbox'])
+            v['segmentation'] = [[float(_) for _ in seg]]
     coco['annotations'] = list(anns.values())
 
     save_dict(dst, coco)
+    print('Done!')
 
 
 def draw(img_dir, work_dir, ann_file):
@@ -53,22 +75,31 @@ def check_image(img_dir):
         cv.imwrite(p, img)
 
 
-check_coco(
-    '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/garbage_data/train-debug.json',
-    '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/garbage_data/instance_train.json',
-)
-draw(
-    '/home/liphone/undone-work/data/detection/garbage/val/images',
-    '/home/liphone/undone-work/data/detection/garbage/val/',
-    '/home/liphone/undone-work/data/detection/garbage/val_sample.json',
-)
-check_image('/home/liphone/undone-work/data/detection/garbage/val/images', )
-check_coco(
-    '/home/liphone/undone-work/data/detection/garbage/train/train.json',
-    '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
-)
-# draw(
-#     '/home/liphone/undone-work/data/detection/garbage/train/images',
-#     '/home/liphone/undone-work/data/detection/garbage/train/',
-#     '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json',
-# )
+def main():
+    check_coco(
+        '/home/liphone/undone-work/data/detection/garbage/train/new_train.json',
+        '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json',
+    )
+    check_coco(
+        '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
+        '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
+    )
+    # draw(
+    #     '/home/liphone/undone-work/data/detection/garbage/val/images',
+    #     '/home/liphone/undone-work/data/detection/garbage/val/',
+    #     '/home/liphone/undone-work/data/detection/garbage/val_sample.json',
+    # )
+    # check_image('/home/liphone/undone-work/data/detection/garbage/val/images', )
+    # check_coco(
+    #     '/home/liphone/undone-work/data/detection/garbage/train/train.json',
+    #     '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'
+    # )
+    # draw(
+    #     '/home/liphone/undone-work/data/detection/garbage/train/images',
+    #     '/home/liphone/undone-work/data/detection/garbage/train/',
+    #     '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json',
+    # )
+
+
+if __name__ == '__main__':
+    main()

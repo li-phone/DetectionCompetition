@@ -13,11 +13,6 @@ import numpy as np
 import random
 
 
-def get_segmentation(points):
-    return [points[0], points[1], points[2] + points[0], points[1],
-            points[2] + points[0], points[3] + points[1], points[0], points[3] + points[1]]
-
-
 def _get_box(points):
     min_x = min_y = np.inf
     max_x = max_y = 0
@@ -127,7 +122,6 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
                 image_id=image2id[v['file_name']],
                 category_id=label2cat[v['label']],
                 bbox=_get_box(points),
-                segmentation=[points],
                 iscrowd=0,
                 ignore=0,
                 area=area
@@ -239,48 +233,48 @@ def underwater2coco():
 def main():
     underwater2coco()
 
-    img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
-    cn2eng = {
-        '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
-        '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
-        '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
-        '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
-        '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
-        '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
-        '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
-        '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
-        '纬纱不良': 'bad weft yarn',
-    }
-    label_list = [v for k, v in cn2eng.items()]
-
-    import copy
-    from draw_util import draw_coco
-    from utils import load_dict
-    gt_files = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json'
-    gt_results = load_dict(gt_files)
-
-    baseline_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-                    '/fabric_baseline+mode=baseline/mode=test,.bbox.json'
-    baseline_boxes = load_dict(baseline_path)
-    baseline_results = copy.deepcopy(gt_results)
-    baseline_results['annotations'] = baseline_boxes
-    draw_coco(
-        baseline_results,
-        img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
-        thresh=0.05, fontsize=16 * 4
-    )
-
-    trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-                 '/fabric_baseline+baseline+multi-scale+anchor_clusters' + \
-                 '/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json'
-    trick_boxes = load_dict(trick_path)
-    trick_results = copy.deepcopy(gt_results)
-    trick_results['annotations'] = trick_boxes
-    draw_coco(
-        trick_results,
-        img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
-        thresh=0.05, fontsize=16 * 4
-    )
+    # img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
+    # cn2eng = {
+    #     '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
+    #     '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
+    #     '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
+    #     '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
+    #     '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
+    #     '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
+    #     '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
+    #     '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
+    #     '纬纱不良': 'bad weft yarn',
+    # }
+    # label_list = [v for k, v in cn2eng.items()]
+    #
+    # import copy
+    # from draw_util import draw_coco
+    # from utils import load_dict
+    # gt_files = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json'
+    # gt_results = load_dict(gt_files)
+    #
+    # baseline_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
+    #                 '/fabric_baseline+mode=baseline/mode=test,.bbox.json'
+    # baseline_boxes = load_dict(baseline_path)
+    # baseline_results = copy.deepcopy(gt_results)
+    # baseline_results['annotations'] = baseline_boxes
+    # draw_coco(
+    #     baseline_results,
+    #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
+    #     thresh=0.05, fontsize=16 * 4
+    # )
+    #
+    # trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
+    #              '/fabric_baseline+baseline+multi-scale+anchor_clusters' + \
+    #              '/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json'
+    # trick_boxes = load_dict(trick_path)
+    # trick_results = copy.deepcopy(gt_results)
+    # trick_results['annotations'] = trick_boxes
+    # draw_coco(
+    #     trick_results,
+    #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
+    #     thresh=0.05, fontsize=16 * 4
+    # )
 
 
 if __name__ == '__main__':
