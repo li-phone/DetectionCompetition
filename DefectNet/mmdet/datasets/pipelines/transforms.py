@@ -945,10 +945,12 @@ class Cutout(object):
 @PIPELINES.register_module
 class BoxMixup(object):
 
-    def __init__(self, flip_ratio=0.5, mixup_ratio=0.5, ratio_range=[0.5, 1.0], keep_ratio=True, img_mixup=False,
+    def __init__(self, flip_ratio=0.5, mixup_ratio=0.5, max_mixup=None, ratio_range=[0.5, 1.0], keep_ratio=True,
+                 img_mixup=False,
                  shift=True):
         self.flip_ratio = flip_ratio
         self.mixup_ratio = mixup_ratio
+        self.max_mixup = max_mixup
         self.ratio_range = ratio_range
         self.keep_ratio = keep_ratio
         self.img_mixup = img_mixup
@@ -958,7 +960,7 @@ class BoxMixup(object):
         if 'boxmixup' not in results:
             flip = True if np.random.rand() < self.flip_ratio else False
             results['boxmixup'] = flip
-        old_flag=len(results['gt_labels'])
+        old_flag = len(results['gt_labels'])
         if results['boxmixup']:
             img = results['img']
             new_img, box_dst, label_dst = self._matte(results['img'], results['gt_bboxes'], results['gt_labels'],
@@ -1016,6 +1018,8 @@ class BoxMixup(object):
         else:
             new_img[:img_dst_h, :img_dst_w, :] = img_dst
         for i, sbox in enumerate(box_src):
+            if self.max_mixup is not None and i > self.max_mixup:
+                break
             bi = [int(x + 0.5) for x in sbox]
             wmin, hmin, wmax, hmax = bi
             simg_h, simg_w, simg_c = img_src.shape
