@@ -21,6 +21,16 @@ def get_segmentation(points):
             points[2] + points[0], points[3] + points[1], points[0], points[3] + points[1]]
 
 
+def check_w_h(anns):
+    for i in range(len(anns) - 1, -1, -1):
+        v = anns[i]
+        if 'bbox' in v:
+            b = v['bbox']
+            if b[2] == 0 or b[3] == 0:
+                anns.pop(i)
+    return anns
+
+
 def check_coco(src, dst, replace=True):
     if not replace:
         print('There is an existed {}.'.format(dst))
@@ -47,6 +57,7 @@ def check_coco(src, dst, replace=True):
             seg = get_segmentation(v['bbox'])
             v['segmentation'] = [[float(_) for _ in seg]]
     coco['annotations'] = list(anns.values())
+    coco['annotations'] = check_w_h(coco['annotations'])
 
     save_dict(dst, coco)
     print('Done!')

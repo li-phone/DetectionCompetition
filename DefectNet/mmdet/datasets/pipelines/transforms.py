@@ -1017,10 +1017,13 @@ class BoxMixup(object):
                                                                                             :]
         else:
             new_img[:img_dst_h, :img_dst_w, :] = img_dst
+        np.random.shuffle(box_src)
         for i, sbox in enumerate(box_src):
             if self.max_mixup is not None and i > self.max_mixup:
                 break
             bi = [int(x + 0.5) for x in sbox]
+            if bi[2] - bi[0] == 0 or bi[3] - bi[1] == 0:
+                continue
             wmin, hmin, wmax, hmax = bi
             simg_h, simg_w, simg_c = img_src.shape
             wmin, hmin, wmax, hmax = max(0, wmin), max(0, hmin), min(wmax, simg_w), min(hmax, simg_h)
