@@ -20,7 +20,7 @@ def infer(model, infer_object, img_dir=None, have_bg=False):
         images = infer_object
     elif isinstance(infer_object, str):
         if infer_object[-5:] == '.json':
-            from batch_test import load_json
+            from batch_util import load_json
             coco = load_json(infer_object)
             images = coco['images']
         else:

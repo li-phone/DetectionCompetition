@@ -376,7 +376,8 @@ class BatchTrain(object):
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_{}.txt'.format(self.data_mode))
-        batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        if self.test_sleep_time >= 0:
+            batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
         batch_infer(cfgs)
 
     # def iou_thr_train(iou_thrs=[0.5, 0.6, 0.7]):
