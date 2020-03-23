@@ -29,12 +29,13 @@ def main():
     # garbage_train = BatchTrain(cfg_path='../configs/garbage/garbage_cas_rcnn_x101_32x4d_fpn_1x.py', data_mode='val')
     # garbage_train.no_trick_train()
 
-    # garbage_train = BatchTrain(cfg_path='../configs/garbage/garbage_cas_rcnn_x101_64x4d_fpn_1x.py', data_mode='val')
-    # garbage_train.no_trick_train()
-
-    underwater = BatchTrain(cfg_path='../configs/underwater/underwater_htc_without_semantic_x101_64x4d_fpn_1x.py',
-                               data_mode='val')
-    underwater.no_trick_train()
+    garbage_train = BatchTrain(cfg_path='../configs/garbage/garbage_cas_rcnn_x101_64x4d_fpn_1x.py', data_mode='val',
+                               train_sleep_time=0)
+    garbage_train.no_trick_train()
+    #
+    # underwater = BatchTrain(cfg_path='../configs/underwater/underwater_htc_without_semantic_x101_64x4d_fpn_1x.py',
+    #                            data_mode='val')
+    # underwater.no_trick_train()
 
     # fabric_train = BatchTrain(cfg_path='../config_alcohol/cascade_rcnn_r50_fpn_1x/fabric.py', data_mode='test')
     # fabric_train.multi_scale_train(img_scale=[(2446 / 2, 1000 / 2), (1333, 800)], multiscale_mode='value')
