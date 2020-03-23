@@ -403,7 +403,10 @@ def main(**kwargs):
             eval_types = args.eval
             if eval_types:
                 print('Starting evaluate {}'.format(' and '.join(eval_types)))
-                rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=[0])
+                if 'ignore_ids' not in cfg.data[args.mode]:
+                    cfg.data[args.mode]['ignore_ids'] = None
+                rpts = coco_eval(result_files, eval_types, dataset.coco, classwise=True,
+                                 ignore_ids=cfg.data[args.mode]['ignore_ids'])
                 defect_rpt = defect_eval(result_files['bbox'], dataset.coco.dataset, result_times,
                                          threshold=cfg.test_cfg['rcnn']['score_thr'])
                 rpts['bbox']['log']['defect_eval'] = defect_rpt['log']
