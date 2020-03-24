@@ -168,7 +168,7 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
-    def SWA_train(self):
+    def swa_test(self):
         import torch
         import os
         import mmcv
