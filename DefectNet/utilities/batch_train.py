@@ -168,6 +168,64 @@ class BatchTrain(object):
         save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
         batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
+    def SWA_train(self):
+        import torch
+        import os
+        import mmcv
+        from mmdet.models import build_detector
+
+        def get_model(config, model_dir):
+            model = build_detector(config.model, test_cfg=config.test_cfg)
+            checkpoint = torch.load(model_dir)
+            state_dict = checkpoint['state_dict']
+            model.load_state_dict(state_dict, strict=True)
+            return model
+
+        def model_average(modelA, modelB, alpha):
+            # modelB占比 alpha
+            for A_param, B_param in zip(modelA.parameters(), modelB.parameters()):
+                A_param.data = A_param.data * (1 - alpha) + alpha * B_param.data
+            return modelA
+
+        def swa(cfg, epoch_inds, alpha=0.7):
+            ###########################注意，此py文件没有更新batchnorm层，所以只有在mmdetection默认冻住BN情况下使用，如果训练时BN层被解冻，不应该使用此py　＃＃＃＃＃
+            #########逻辑上会　score　会高一点不会太多，需要指定的参数是　[config_dir , epoch_indices ,  alpha]　　######################
+            if isinstance(cfg, str):
+                config = mmcv.Config.fromfile(cfg)
+            else:
+                config = cfg
+            work_dir = config.work_dir
+            model_dir_list = [os.path.join(work_dir, 'epoch_{}.pth'.format(epoch)) for epoch in epoch_inds]
+
+            model_ensemble = None
+            for model_dir in model_dir_list:
+                if model_ensemble is None:
+                    model_ensemble = get_model(config, model_dir)
+                else:
+                    model_fusion = get_model(config, model_dir)
+                    model_ensemble = model_average(model_ensemble, model_fusion, alpha)
+
+            checkpoint = torch.load(model_dir_list[-1])
+            checkpoint['state_dict'] = model_ensemble.state_dict()
+            ensemble_path = os.path.join(work_dir, 'epoch_ensemble.pth')
+            torch.save(checkpoint, ensemble_path)
+            return ensemble_path
+
+        cfg = mmcv.Config.fromfile(self.cfg_path)
+
+        epo_inds = [10, 11, 12]
+        ensemble_path = swa(cfg, epo_inds)
+        cfg.resume_from = ensemble_path
+        if not os.path.exists(cfg.resume_from):
+            cfg.resume_from = None
+
+        cfgs = [cfg]
+        if self.test_sleep_time >= 0:
+            cfg.uid = 'SWA={}'.format(str(epo_inds))
+            save_path = os.path.join(self.cfg_dir, str(self.cfg_name) + '_test.txt')
+            batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
+        batch_infer(cfgs)
+
     def compete_train(
             self, multiscale=None, dcn=None, global_context=None,
             anchor_cluster=None, data_augment=None, soft_nms=True):
@@ -504,73 +562,6 @@ class BatchTrain(object):
     #
     #     cfgs = [cfg]
     #     batch_train(cfgs, sleep_time=self.train_sleep_time)
-    #     from batch_test import batch_test
-    #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
-    #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
-    #
-    # def SWA_train():
-    #     import torch
-    #     import os
-    #     import mmcv
-    #     from mmdet.models import build_detector
-    #
-    #     def get_model(config, model_dir):
-    #         model = build_detector(config.model, test_cfg=config.test_cfg)
-    #         checkpoint = torch.load(model_dir)
-    #         state_dict = checkpoint['state_dict']
-    #         model.load_state_dict(state_dict, strict=True)
-    #         return model
-    #
-    #     def model_average(modelA, modelB, alpha):
-    #         # modelB占比 alpha
-    #         for A_param, B_param in zip(modelA.parameters(), modelB.parameters()):
-    #             A_param.data = A_param.data * (1 - alpha) + alpha * B_param.data
-    #         return modelA
-    #
-    #     def swa(cfg, epoch_inds, alpha=0.7):
-    #         ###########################注意，此py文件没有更新batchnorm层，所以只有在mmdetection默认冻住BN情况下使用，如果训练时BN层被解冻，不应该使用此py　＃＃＃＃＃
-    #         #########逻辑上会　score　会高一点不会太多，需要指定的参数是　[config_dir , epoch_indices ,  alpha]　　######################
-    #         if isinstance(cfg, str):
-    #             config = mmcv.Config.fromfile(cfg)
-    #         else:
-    #             config = cfg
-    #         work_dir = config.work_dir
-    #         model_dir_list = [os.path.join(work_dir, 'epoch_{}.pth'.format(epoch)) for epoch in epoch_inds]
-    #
-    #         model_ensemble = None
-    #         for model_dir in model_dir_list:
-    #             if model_ensemble is None:
-    #                 model_ensemble = get_model(config, model_dir)
-    #             else:
-    #                 model_fusion = get_model(config, model_dir)
-    #                 model_ensemble = model_average(model_ensemble, model_fusion, alpha)
-    #
-    #         checkpoint = torch.load(model_dir_list[-1])
-    #         checkpoint['state_dict'] = model_ensemble.state_dict()
-    #         ensemble_path = os.path.join(work_dir, 'epoch_ensemble.pth')
-    #         torch.save(checkpoint, ensemble_path)
-    #         return ensemble_path
-    #
-    #     cfg_dir = '../config_alcohol/cascade_rcnn_r50_fpn_1x'
-    #     cfg_names = [DATA_NAME + '.py', ]
-    #
-    #     cfg = mmcv.Config.fromfile(os.path.join(cfg_dir, cfg_names[0]))
-    #
-    #     cfg.data['imgs_per_gpu'] = 2
-    #     cfg.optimizer['lr'] = cfg.optimizer['lr'] / 8 * (cfg.data['imgs_per_gpu'] / 2)
-    #
-    #     cfg.cfg_name = DATA_NAME + '_baseline'
-    #     cfg.uid = 'SWA=[10,11,12]'
-    #
-    #     cfg.work_dir = os.path.join(cfg.work_dir, cfg.cfg_name, cfg.cfg_name + ',' + 'mode=baseline')
-    #
-    #     ensemble_path = swa(cfg, [10, 11, 12])
-    #     cfg.resume_from = ensemble_path
-    #     if not os.path.exists(cfg.resume_from):
-    #         cfg.resume_from = None
-    #
-    #     cfgs = [cfg]
-    #     # batch_train(cfgs, sleep_time=self.train_sleep_time)
     #     from batch_test import batch_test
     #     save_path = os.path.join(cfg_dir, DATA_NAME + '_test.txt')
     #     batch_test(cfgs, save_path, self.test_sleep_time, mode=DATA_MODE)
