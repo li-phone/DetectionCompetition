@@ -170,6 +170,7 @@ train_pipeline = [
     dict(type='Resize', img_scale=[(4096, 600), (4096, 1000)],
          multiscale_mode='range', keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
@@ -185,6 +186,7 @@ test_pipeline = [
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
+            dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='Pad', size_divisor=32),
             dict(type='ImageToTensor', keys=['img']),
@@ -236,7 +238,7 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 uid = None
 cfg_name = ''
-work_dir = '../work_dirs/' + dataset_name + '/garbage_cas_rcnn_x101_64x4d_fpn_1x+multiscale+softnms'
+work_dir = '../work_dirs/' + dataset_name + '/garbage_cas_rcnn_x101_64x4d_fpn_1x+multiscale+softnms+flip'
 load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
 resume_from = None
 workflow = [('train', 1)]
