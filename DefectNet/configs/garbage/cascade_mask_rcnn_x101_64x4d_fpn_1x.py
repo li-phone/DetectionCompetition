@@ -230,7 +230,7 @@ data = dict(
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/val/val_open.json',
+        ann_file=data_root + '/val/val_open_fake.json',
         img_prefix=data_root + '/val/images/',
         pipeline=test_pipeline))
 # optimizer

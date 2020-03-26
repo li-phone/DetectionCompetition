@@ -14,7 +14,7 @@ def save_json(results, submit_filename):
         json.dump(results, fp)
 
 
-def infer(model, infer_object, img_dir=None, have_bg=False):
+def infer(model, infer_object, img_dir=None, have_bg=False, mask=False):
     images = None
     if isinstance(infer_object, list):
         images = infer_object
@@ -41,6 +41,8 @@ def infer(model, infer_object, img_dir=None, have_bg=False):
         results['images'].append(dict(file_name=os.path.basename(image['file_name']), id=img_id))
         img_path = os.path.join(img_dir, os.path.basename(image['file_name']))
         result = inference_detector(model, img_path)
+        if not mask:
+            result = result[0]
         for idx, pred in enumerate(result):
             if have_bg:
                 category_id = idx

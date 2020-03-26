@@ -49,7 +49,14 @@ def check_coco(src, dst, replace=True):
     imgs = imgs.to_dict('id')
     coco['images'] = list(imgs.values())
 
-    anns = json_normalize(coco['annotations'])
+    if 'annotations' in coco:
+        anns = json_normalize(coco['annotations'])
+    else:
+        ann_fakes = [
+            {"area": 100, "iscrowd": 0, "image_id": image['id'], "bbox": [0, 0, 10, 10], "category_id": 1, "id": 1}
+            for image in coco['images']
+        ]
+        anns = json_normalize(ann_fakes)
     anns['id'] = list(range(anns.shape[0]))
     anns = anns.to_dict('id')
     for k, v in anns.items():
@@ -88,13 +95,17 @@ def check_image(img_dir):
 
 def main():
     check_coco(
-        '/home/liphone/undone-work/data/detection/garbage/train/new_train.json',
-        '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json',
+        '/home/liphone/undone-work/data/detection/garbage/val/val_open.json',
+        '/home/liphone/undone-work/data/detection/garbage/val/val_open_fake.json',
     )
-    check_coco(
-        '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
-        '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
-    )
+    # check_coco(
+    #     '/home/liphone/undone-work/data/detection/garbage/train/new_train.json',
+    #     '/home/liphone/undone-work/data/detection/garbage/train/instance_train.json',
+    # )
+    # check_coco(
+    #     '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
+    #     '/home/liphone/undone-work/data/detection/underwater/annotations/underwater_train.json',
+    # )
     # draw(
     #     '/home/liphone/undone-work/data/detection/garbage/val/images',
     #     '/home/liphone/undone-work/data/detection/garbage/val/',
