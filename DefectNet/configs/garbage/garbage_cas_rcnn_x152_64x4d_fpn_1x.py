@@ -5,7 +5,7 @@ model = dict(
     pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
         type='ResNeXt',
-        depth=101,
+        depth=152,
         groups=64,
         base_width=4,
         num_stages=4,
@@ -41,7 +41,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=6,
+            num_classes=205,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
@@ -54,7 +54,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=6,
+            num_classes=205,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
@@ -67,7 +67,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=6,
+            num_classes=205,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
@@ -160,7 +160,7 @@ test_cfg = dict(
         score_thr=0.0001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001), max_per_img=200))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = '/home/liphone/undone-work/data/detection/underwater'
+data_root = '/home/liphone/undone-work/data/detection/garbage'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -170,6 +170,7 @@ train_pipeline = [
     dict(type='Resize', img_scale=[(4096, 600), (4096, 1000)],
          multiscale_mode='range', keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
@@ -179,7 +180,8 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
+        # img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
+        img_scale=[(4096, 600), (4096, 700), (4096, 800), (4096, 900), (4096, 1000)],
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -195,21 +197,18 @@ data = dict(
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/underwater_train.json',
-        img_prefix=data_root + '/train/image/',
-        ignore_ids=[1],
+        ann_file=data_root + '/train/instance_train.json',
+        img_prefix=data_root + '/train/images/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/underwater_train.json',
-        img_prefix=data_root + '/train/image/',
-        ignore_ids=[1],
+        ann_file=data_root + '/train/instance_train.json',
+        img_prefix=data_root + '/train/images/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/underwater_test.json',
-        img_prefix=data_root + '/test-A-image/',
-        ignore_ids=[1],
+        ann_file=data_root + '/val/val_open.json',
+        img_prefix=data_root + '/val/images/',
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02 / 16, momentum=0.9, weight_decay=0.0001)
@@ -231,14 +230,14 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-dataset_name = 'underwater'
+dataset_name = 'garbage'
 first_model_cfg = None
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 uid = None
 cfg_name = ''
-work_dir = '../work_dirs/' + dataset_name + '/underwater_cas_rcnn_x101_64x4d_fpn_1x+multiscale+softnms'
+work_dir = '../work_dirs/' + dataset_name + '/garbage_cas_rcnn_x152_64x4d_fpn_1x+multiscale+softnms+flip'
 load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
 resume_from = None
 workflow = [('train', 1)]
