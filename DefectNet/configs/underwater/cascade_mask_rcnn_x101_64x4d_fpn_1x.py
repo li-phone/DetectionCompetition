@@ -74,7 +74,20 @@ model = dict(
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
-    ])
+    ],
+    mask_roi_extractor=dict(
+        type='SingleRoIExtractor',
+        roi_layer=dict(type='RoIAlign', out_size=14, sample_num=2),
+        out_channels=256,
+        featmap_strides=[4, 8, 16, 32]),
+    mask_head=dict(
+        type='FCNMaskHead',
+        num_convs=4,
+        in_channels=256,
+        conv_out_channels=256,
+        num_classes=6,
+        loss_mask=dict(
+            type='CrossEntropyLoss', use_mask=True, loss_weight=1.0)))
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(
@@ -114,6 +127,7 @@ train_cfg = dict(
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
+            mask_size=28,
             pos_weight=-1,
             debug=False),
         dict(
@@ -129,6 +143,7 @@ train_cfg = dict(
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
+            mask_size=28,
             pos_weight=-1,
             debug=False),
         dict(
@@ -144,6 +159,7 @@ train_cfg = dict(
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
+            mask_size=28,
             pos_weight=-1,
             debug=False)
     ],
@@ -157,7 +173,13 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.0001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001), max_per_img=200))
+        # score_thr=0.05,
+        # nms=dict(type='nms', iou_thr=0.5),
+        # max_per_img=100,
+        score_thr=0.0001,
+        nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001),
+        max_per_img=200,
+        mask_thr_binary=0.5))
 # dataset settings
 dataset_type = 'CocoDataset'
 data_root = '/home/liphone/undone-work/data/detection/underwater'
@@ -165,7 +187,7 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     # dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='Resize', img_scale=[(4096, 600), (4096, 1000)],
          multiscale_mode='range', keep_ratio=True),
@@ -174,13 +196,15 @@ train_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks']),
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
+        # img_scale=(1333, 800),
+        # flip=False,
+        img_scale=[(4096, 600), (4096, 700), (4096, 800), (4096, 900), (4096, 1000)],
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -233,14 +257,12 @@ log_config = dict(
 # yapf:enable
 # runtime settings
 dataset_name = 'underwater'
-first_model_cfg = None
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 uid = None
 cfg_name = ''
-work_dir = '../work_dirs/' + dataset_name + '/underwater_cas_rcnn_x101_64x4d_fpn_1x+multiscale+softnms+flipv'
-load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
-# load_from = '../work_dirs/pretrained/htc_x101_64x4d_fpn_20e_20190408-497f2561.pth'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_mask_rcnn_x101_64x4d_fpn_1x+multiscale+softnms+fliphv'
+load_from = '../work_dirs/pretrained/cascade_mask_rcnn_x101_64x4d_fpn_1x_20190501-827e0a70.pth'
 resume_from = None
 workflow = [('train', 1)]

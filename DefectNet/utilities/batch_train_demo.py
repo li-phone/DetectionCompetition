@@ -26,9 +26,9 @@ def draw_soft_nms():
 def main():
     from batch_train import BatchTrain
 
-    garbage_train = BatchTrain(cfg_path='../configs/garbage/cascade_mask_rcnn_x101_64x4d_fpn_1x.py', data_mode='val',
+    underwater = BatchTrain(cfg_path='../configs/underwater/cascade_mask_rcnn_x101_64x4d_fpn_1x.py', data_mode='val',
                                train_sleep_time=0, test_sleep_time=-1)
-    garbage_train.no_trick_train()
+    underwater.no_trick_train()
 
     # underwater = BatchTrain(cfg_path='../configs/underwater/underwater_cas_rcnn_x101_64x4d_fpn_1x.py', data_mode='val',
     #                            train_sleep_time=60, test_sleep_time=-60)
