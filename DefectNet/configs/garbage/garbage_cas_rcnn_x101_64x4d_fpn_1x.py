@@ -46,7 +46,7 @@ model = dict(
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0, label_smooth=0.1),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
         dict(
             type='SharedFCBBoxHead',
@@ -59,7 +59,7 @@ model = dict(
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0, label_smooth=0.1),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0)),
         dict(
             type='SharedFCBBoxHead',
@@ -72,7 +72,7 @@ model = dict(
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
             loss_cls=dict(
-                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0, label_smooth=0.1),
             loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
     ])
 # model training and testing settings
@@ -160,7 +160,7 @@ test_cfg = dict(
         score_thr=0.0001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001), max_per_img=200))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = '/home/liphone/undone-work/data/detection/garbage'
+data_root = 'E:/liphone/data/images/detections/garbage'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -238,6 +238,7 @@ log_level = 'INFO'
 uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/garbage_cas_rcnn_x101_64x4d_fpn_1x+multiscale+softnms+flip'
-load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
+# load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
+load_from = None
 resume_from = None
 workflow = [('train', 1)]
