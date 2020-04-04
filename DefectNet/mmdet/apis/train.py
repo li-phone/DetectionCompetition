@@ -73,9 +73,9 @@ def parse_losses(losses):
     log_vars['loss'] = loss
     for loss_name, loss_value in log_vars.items():
         # reduce loss when distributed training
-        if dist.is_initialized():
-            loss_value = loss_value.data.clone()
-            dist.all_reduce(loss_value.div_(dist.get_world_size()))
+        # if dist.is_initialized():
+        #     loss_value = loss_value.data.clone()
+        #     dist.all_reduce(loss_value.div_(dist.get_world_size()))
         log_vars[loss_name] = loss_value.item()
 
     return loss, log_vars

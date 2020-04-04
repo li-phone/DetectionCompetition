@@ -17,7 +17,7 @@ def label_smooth_loss(x, labels, label_smooth=0.1):
     epsilon = torch.ones(targets.shape).cuda() * label_smooth
     label_smooth_weight = torch.where(torch.eq(targets, 1.), 1 - epsilon, epsilon / (k - 1))
 
-    bce = -(targets * torch.log(classification) + (1.0 - targets) * torch.log(1.0 - classification))
+    bce = -(targets * torch.log(classification + 1e-37) + (1.0 - targets) * torch.log(1.0 - classification + 1e-37))
     cls_loss = label_smooth_weight * bce
     cls_loss = torch.where(torch.ne(targets, -1.0), cls_loss, torch.zeros(cls_loss.shape).cuda())
     return cls_loss.sum(dim=1)
