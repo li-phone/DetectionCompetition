@@ -2,6 +2,7 @@ import inspect
 
 import albumentations
 import mmcv
+import copy
 import numpy as np
 from albumentations import Compose
 from imagecorruptions import corrupt
@@ -1056,3 +1057,87 @@ class BoxMixup(object):
             label_dst = np.append(label_dst, new_label, axis=0)
         new_img = np.array(new_img * 255).astype(np.uint8)
         return new_img, box_dst, label_dst
+
+
+# RoIMix: Proposal-Fusion among Multiple Images for Underwater Object Detection, Lin et al..
+# arXiv: https://arxiv.org/abs/1911.03029
+@PIPELINES.register_module
+class RoIMix(object):
+
+    def __init__(self, switch_prob=1., alpha=0.1, level='ground_truth', type='single', repeated=False,
+                 distribution='beta', use_max=True, min_iou=None):
+        self.switch_prob = switch_prob
+        self.alpha = alpha
+        self.level = level
+        # To do
+        # Proposal level RoI Mix
+        self.type = type
+        self.repeated = repeated
+        self.distribution = distribution
+        self.use_max = use_max
+        self.min_iou = min_iou
+
+    def _roimix(self, b1, b2, img):
+        b1 = [int(_) for _ in b1]
+        b2 = [int(_) for _ in b2]
+        roi2 = img[b2[1]:b2[3], b2[0]:b2[2], :].copy()
+        b1w, b1h = (b1[2] - b1[0]), (b1[3] - b1[1])
+        if self.min_iou is not None:
+            min_area = b1w * b1h * self.min_iou
+            min_w, min_h = np.sqrt(min_area), np.sqrt(min_area)
+            scale = [max(0., b1h - min_h), max(0., b1w - min_w)]
+            scale[0] = b1h if scale[0] == 0 else scale[0]
+            scale[1] = b1w if scale[1] == 0 else scale[1]
+        else:
+            scale = (b1h, b1w)
+        roi2, scale_factor = mmcv.imrescale(roi2, tuple(scale), return_scale=True)
+        lamb = np.random.beta(self.alpha, self.alpha)
+        if self.use_max:
+            new_lamb = max(lamb, 1 - lamb)
+        else:
+            new_lamb = lamb
+        new_lamb = 0.5
+        roi2h, roi2w = roi2.shape[0], roi2.shape[1]
+        l, t = np.random.randint(max(b1w - roi2w, 1)), np.random.randint(max(b1h - roi2h, 1))
+        t += b1[1]
+        l += b1[0]
+        img[t:t + roi2h, l:l + roi2w, :] = new_lamb * img[t:t + roi2h, l:l + roi2w, :] + (1 - new_lamb) * roi2
+        return img
+
+    def roimix(self, img, _gt_boxes):
+        gt_boxes = copy.deepcopy(_gt_boxes)
+        img = img.astype(np.float) / 255.0
+        if self.type == 'single':
+            if self.repeated:
+                for i, b1 in enumerate(gt_boxes):
+                    idx = np.random.randint(gt_boxes.shape[0])
+                    b2 = gt_boxes[idx]
+                    img = self._roimix(b1, b2, img)
+            else:
+                while gt_boxes.shape[0] > 1:
+                    idx = np.random.randint(gt_boxes.shape[0])
+                    b1 = gt_boxes[idx]
+                    gt_boxes = np.delete(gt_boxes, idx, axis=0)
+                    idx = np.random.randint(gt_boxes.shape[0])
+                    b2 = gt_boxes[idx]
+                    gt_boxes = np.delete(gt_boxes, idx, axis=0)
+                    img = self._roimix(b1, b2, img)
+        else:
+            raise Exception('Only support single type in ground_truth level in current.')
+
+        new_img = np.array(img * 255).astype(np.uint8)
+        return new_img
+
+    def __call__(self, results):
+        if 'roimix' not in results:
+            use_roimix = True if np.random.rand() < self.switch_prob else False
+            results['roimix'] = use_roimix
+        if results['roimix']:
+            results['img'] = self.roimix(results['img'], results['gt_bboxes'])
+        cv_showimg(**results)
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += '(level={}, type={})'.format(self.level, self.type)
+        return repr_str

@@ -35,7 +35,10 @@ def overlap_iou(coco, min_iou=0.2, min_num=10):
                 if _iou <= min_iou:
                     continue
                 row_j = keep_ann.iloc[j]
-                key = (row_i['category_id'], row_j['category_id'])
+                if row_i['category_id'] <= row_j['category_id']:
+                    key = (row_i['category_id'], row_j['category_id'])
+                else:
+                    key = (row_j['category_id'], row_i['category_id'])
                 if key not in results:
                     results[key] = []
                 results[key].append(_iou)
@@ -49,14 +52,15 @@ def overlap_iou(coco, min_iou=0.2, min_num=10):
     table = table[table['num'] > min_num]
     table = table.sort_values(by='num', ascending=False)
     print(table)
-    print('total overlap iou:', np.mean(total_iou))
+    print('total overlap iou@{}: {:.3f}'.format(min_iou, np.mean(total_iou)))
 
 
-def main(anns):
+def main(anns, min_iou=0.2):
     from pycocotools.coco import COCO
     coco = COCO(anns)
-    overlap_iou(coco.dataset)
+    overlap_iou(coco.dataset, min_iou=min_iou)
 
 
 if __name__ == '__main__':
-    main('E:/liphone/data/images/detections/garbage/annotations/instances_train2017.json')
+    main('E:/liphone/data/images/detections/underwater/annotations/underwater_train.json', min_iou=0.15)
+    main('E:/liphone/data/images/detections/garbage/annotations/instances_train2017.json', min_iou=0.2)
