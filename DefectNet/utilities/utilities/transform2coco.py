@@ -210,7 +210,7 @@ def fabric2coco():
 
 
 def underwater2coco():
-    data_root = '/home/liphone/undone-work/data/detection/underwater'
+    data_root = 'E:/liphone/data/images/detections/underwater'
 
     save_name = data_root + '/annotations/underwater_train.json'
     img_dir = data_root + '/train/image'
