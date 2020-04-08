@@ -1093,6 +1093,8 @@ class RoIMix(object):
         else:
             scale = (b1h, b1w)
         scale = (scale[1], scale[0])
+        if min(scale) <= 1:
+            return img
         roi2 = cv2.resize(img, scale, interpolation=cv2.INTER_LINEAR)
         # roi2, _rescale = mmcv.imrescale(roi2, tuple(scale), return_scale=True)
         roi2 = np.asarray(roi2)
