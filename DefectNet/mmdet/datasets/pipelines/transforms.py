@@ -2,6 +2,7 @@ import inspect
 
 import albumentations
 import mmcv
+import cv2
 import copy
 import numpy as np
 from albumentations import Compose
@@ -1081,6 +1082,7 @@ class RoIMix(object):
         b1 = [int(_) for _ in b1]
         b2 = [int(_) for _ in b2]
         roi2 = img[b2[1]:b2[3], b2[0]:b2[2], :].copy()
+        roi2 = np.asarray(roi2)
         b1w, b1h = (b1[2] - b1[0]), (b1[3] - b1[1])
         if self.min_iou is not None:
             min_area = b1w * b1h * self.min_iou
@@ -1090,13 +1092,15 @@ class RoIMix(object):
             scale[1] = b1w if scale[1] == 0 else scale[1]
         else:
             scale = (b1h, b1w)
-        roi2, scale_factor = mmcv.imrescale(roi2, tuple(scale), return_scale=True)
+        scale = (scale[1], scale[0])
+        roi2 = cv2.resize(img, scale, interpolation=cv2.INTER_LINEAR)
+        # roi2, _rescale = mmcv.imrescale(roi2, tuple(scale), return_scale=True)
+        roi2 = np.asarray(roi2)
         lamb = np.random.beta(self.alpha, self.alpha)
         if self.use_max:
             new_lamb = max(lamb, 1 - lamb)
         else:
             new_lamb = lamb
-        new_lamb = 0.5
         roi2h, roi2w = roi2.shape[0], roi2.shape[1]
         l, t = np.random.randint(max(b1w - roi2w, 1)), np.random.randint(max(b1h - roi2h, 1))
         t += b1[1]
@@ -1134,7 +1138,7 @@ class RoIMix(object):
             results['roimix'] = use_roimix
         if results['roimix']:
             results['img'] = self.roimix(results['img'], results['gt_bboxes'])
-        cv_showimg(**results)
+        # cv_showimg(**results)
         return results
 
     def __repr__(self):

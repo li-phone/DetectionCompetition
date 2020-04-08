@@ -160,12 +160,13 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = '/home/liphone/undone-work/data/detection/garbage'
+data_root = 'E:/liphone/data/images/detections/garbage'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
+    dict(type='RoIMix'),
     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
@@ -219,7 +220,7 @@ lr_config = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=50,
+    interval=1,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
@@ -235,5 +236,6 @@ uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x/' + cfg_name
 resume_from = None
-load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
+# load_from = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/trained_coco_model/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
+load_from=None
 workflow = [('train', 1)]
