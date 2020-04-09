@@ -41,7 +41,7 @@ def infer(model, infer_object, img_dir=None, have_bg=False, mask=False):
         results['images'].append(dict(file_name=os.path.basename(image['file_name']), id=img_id))
         img_path = os.path.join(img_dir, os.path.basename(image['file_name']))
         result = inference_detector(model, img_path)
-        if not mask:
+        if mask:
             result = result[0]
         for idx, pred in enumerate(result):
             if have_bg:
@@ -85,6 +85,7 @@ def parse_args():
         default='../work_dirs/alcohol/cascade_rcnn_r50_fpn_1x/dig_augment_n4_id3/',
         help='train config file path')
     parser.add_argument('--have_bg', default=False)
+    parser.add_argument('--mask', default=False)
     args = parser.parse_args()
 
     return args
@@ -110,7 +111,7 @@ def main(**kwargs):
 
     model = init_detector(args.config, args.resume_from, device='cuda:0')
 
-    results = infer(model, args.infer_object, args.img_dir, args.have_bg)
+    results = infer(model, args.infer_object, args.img_dir, args.have_bg, args.mask)
     save_json(results['annotations'], args.submit_out[:-5] + '.submit.json')
     save_json(results, args.submit_out[:-5] + '.bbox.json')
     from coco2csv import coco2csvsubmit
