@@ -219,9 +219,9 @@ def underwater2coco():
         anns = xml2list(xml_dir, img_dir)
         transform2coco(anns, save_name, img_dir=img_dir, bgcat={'id': 0, 'name': 'waterweeds'})
 
-    test_name = data_root + '/annotations/underwater_test.json'
+    test_name = data_root + '/annotations/underwater_testB.json'
     if not os.path.exists(test_name):
-        test_img_dir = data_root + '/test-A-image'
+        test_img_dir = data_root + '/test-B-image'
         imgdir2coco(save_name, test_name, test_img_dir)
 
     # from draw_util import draw_coco

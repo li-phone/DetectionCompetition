@@ -95,8 +95,8 @@ def check_image(img_dir):
 
 def main():
     check_coco(
-        '/home/liphone/undone-work/data/detection/garbage/val/val_open.json',
-        '/home/liphone/undone-work/data/detection/garbage/val/val_open_fake.json',
+        r'E:\liphone\data\images\detections\underwater\annotations\underwater_testB.json',
+        r'E:\liphone\data\images\detections\underwater\annotations\underwater_testB.json',
     )
     # check_coco(
     #     '/home/liphone/undone-work/data/detection/garbage/train/new_train.json',

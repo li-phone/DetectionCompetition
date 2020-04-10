@@ -48,7 +48,6 @@ def infer(model, infer_object, img_dir=None, have_bg=False, mask=False):
                 category_id = idx
             else:
                 category_id = idx + 1
-
             if 0 == category_id:
                 continue
 

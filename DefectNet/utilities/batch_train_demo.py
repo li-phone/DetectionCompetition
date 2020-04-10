@@ -28,8 +28,9 @@ def main():
     # garbage = BatchTrain(cfg_path='../configs/garbage/garbage_cas_r50_1x.py', data_mode='val',
     #                      train_sleep_time=0, test_sleep_time=-60)
     # garbage.no_trick_train()
-
-    underwater = BatchTrain(cfg_path='../configs/underwater/cascade_rcnn_r50_fpn_1x.py', data_mode='val',
+    import os
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    underwater = BatchTrain(cfg_path='../configs/underwater/cas_rcnn_x101_64x4d_fpn_1x.py', data_mode='val',
                             train_sleep_time=0, test_sleep_time=-1)
     underwater.no_trick_train()
 

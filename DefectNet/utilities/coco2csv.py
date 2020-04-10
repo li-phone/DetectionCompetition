@@ -1,7 +1,7 @@
 from pycocotools.coco import COCO
 import pandas as pd
 import os
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from utilities.utils import load_dict
 
 

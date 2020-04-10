@@ -4,7 +4,7 @@ from PIL import Image
 from PIL import ImageFile
 import numpy as np
 import os
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 import pandas as pd
 import json
 from tqdm import tqdm
