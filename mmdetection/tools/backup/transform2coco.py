@@ -1,18 +1,16 @@
+import os
+import json
+import numpy as np
+from tqdm import tqdm
+from pandas.io.json import json_normalize
 import glob
 from tqdm import tqdm
 import glob
 import xml.etree.ElementTree as ET
 import os
 import json
-import pandas as pd
 import numpy as np
-import argparse
 import random
-
-try:
-    from pandas import json_normalize
-except:
-    from pandas.io.json import json_normalize
 
 
 def _get_box(points):
@@ -68,19 +66,14 @@ def xml2list(xml_path, img_dir):
 def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, supercategory=None, info=None,
                    license=None):
     if isinstance(anns, str):
-        if anns[-5:] == '.json':
-            with open(anns) as fp:
-                anns = json.load(fp)
-        elif anns[-4:] == '.csv':
-            anns = pd.read_csv(anns)
+        with open(anns) as fp:
+            anns = json.load(fp)
     if isinstance(anns, list):
         anns = json_normalize(anns)
-    assert isinstance(anns, pd.DataFrame)
-    if 'name' in list(anns.columns):
-        anns = anns.rename(columns={'name': 'file_name'})
-    if 'defect_name' in list(anns.columns):
-        anns = anns.rename(columns={'defect_name': 'label'})
-    if 'id' not in list(anns.columns):
+        if 'name' in list(anns.columns):
+            anns = anns.rename(columns={'name': 'file_name'})
+        if 'defect_name' in list(anns.columns):
+            anns = anns.rename(columns={'defect_name': 'label'})
         anns['id'] = list(range(anns.shape[0]))
     if label2cat is None:
         label2cat = np.array(anns['label'].unique())
@@ -237,108 +230,51 @@ def underwater2coco():
     # )
 
 
-# def main():
-#     underwater2coco()
-#
-#     # img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
-#     # cn2eng = {
-#     #     '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
-#     #     '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
-#     #     '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
-#     #     '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
-#     #     '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
-#     #     '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
-#     #     '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
-#     #     '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
-#     #     '纬纱不良': 'bad weft yarn',
-#     # }
-#     # label_list = [v for k, v in cn2eng.items()]
-#     #
-#     # import copy
-#     # from draw_util import draw_coco
-#     # from utils import load_dict
-#     # gt_files = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json'
-#     # gt_results = load_dict(gt_files)
-#     #
-#     # baseline_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-#     #                 '/fabric_baseline+mode=baseline/mode=test,.bbox.json'
-#     # baseline_boxes = load_dict(baseline_path)
-#     # baseline_results = copy.deepcopy(gt_results)
-#     # baseline_results['annotations'] = baseline_boxes
-#     # draw_coco(
-#     #     baseline_results,
-#     #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
-#     #     thresh=0.05, fontsize=16 * 4
-#     # )
-#     #
-#     # trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-#     #              '/fabric_baseline+baseline+multi-scale+anchor_clusters' + \
-#     #              '/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json'
-#     # trick_boxes = load_dict(trick_path)
-#     # trick_results = copy.deepcopy(gt_results)
-#     # trick_results['annotations'] = trick_boxes
-#     # draw_coco(
-#     #     trick_results,
-#     #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
-#     #     thresh=0.05, fontsize=16 * 4
-#     # )
-
-class MultipleKVAction(argparse.Action):
-    """
-    argparse action to split an argument into KEY=VALUE form
-    on the first = and append to a dictionary. List options should
-    be passed as comma separated values, i.e KEY=V1,V2,V3
-    """
-
-    def _parse_int_float_bool(self, val):
-        try:
-            return int(val)
-        except ValueError:
-            pass
-        try:
-            return float(val)
-        except ValueError:
-            pass
-        if val.lower() in ['true', 'false']:
-            return True if val.lower() == 'true' else False
-        return val
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        options = {}
-        for kv in values:
-            key, val = kv.split('=', maxsplit=1)
-            val = [self._parse_int_float_bool(v) for v in val.split(',')]
-            if len(val) == 1:
-                val = val[0]
-            options[key] = val
-        setattr(namespace, self.dest, options)
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
-    parser.add_argument('ann_or_test_dir', help='annotation file or test image directory')
-    parser.add_argument('save_name', help='save_name')
-    parser.add_argument(
-        '--options',
-        nargs='+', action=MultipleKVAction, help='custom options')
-    parser.add_argument(
-        '--fmt',
-        choices=['xml', 'test_dir', 'csv'],
-        default='xml', help='format type')
-    args = parser.parse_args()
-    return args
-
-
 def main():
-    args = parse_args()
-    kwargs = {} if args.options is None else args.options
-    if args.fmt == 'xml':
-        anns = xml2list(args.ann_or_test_dir, **kwargs)
-        transform2coco(anns, args.save_name, **kwargs)
-    elif args.fmt == 'test_dir':
-        imgdir2coco(args.ann_or_test_dir, args.save_name, **kwargs)
-    elif args.fmt == 'csv':
-        transform2coco(args.ann_or_test_dir, args.save_name, **kwargs)
+    underwater2coco()
+
+    # img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
+    # cn2eng = {
+    #     '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
+    #     '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
+    #     '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
+    #     '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
+    #     '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
+    #     '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
+    #     '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
+    #     '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
+    #     '纬纱不良': 'bad weft yarn',
+    # }
+    # label_list = [v for k, v in cn2eng.items()]
+    #
+    # import copy
+    # from draw_util import draw_coco
+    # from utils import load_dict
+    # gt_files = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json'
+    # gt_results = load_dict(gt_files)
+    #
+    # baseline_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
+    #                 '/fabric_baseline+mode=baseline/mode=test,.bbox.json'
+    # baseline_boxes = load_dict(baseline_path)
+    # baseline_results = copy.deepcopy(gt_results)
+    # baseline_results['annotations'] = baseline_boxes
+    # draw_coco(
+    #     baseline_results,
+    #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
+    #     thresh=0.05, fontsize=16 * 4
+    # )
+    #
+    # trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
+    #              '/fabric_baseline+baseline+multi-scale+anchor_clusters' + \
+    #              '/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json'
+    # trick_boxes = load_dict(trick_path)
+    # trick_results = copy.deepcopy(gt_results)
+    # trick_results['annotations'] = trick_boxes
+    # draw_coco(
+    #     trick_results,
+    #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
+    #     thresh=0.05, fontsize=16 * 4
+    # )
 
 
 if __name__ == '__main__':

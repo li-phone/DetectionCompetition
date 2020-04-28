@@ -8,8 +8,12 @@ import time
 import pandas as pd
 import numpy as np
 import json
-from pandas import json_normalize
 from sklearn.metrics import classification_report
+
+try:
+    from pandas import json_normalize
+except:
+    from pandas.io.json import json_normalize
 
 import mmcv
 import torch

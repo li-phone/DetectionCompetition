@@ -39,8 +39,20 @@ class BatchTrain(object):
             batch_test(cfgs, save_path, self.test_sleep_time, mode=self.data_mode)
 
 
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description='Train model by config')
+    parser.add_argument('config', help='directory')
+    parser.add_argument('--mode', default='test', help='file prefix')
+    parser.add_argument('--train_time', default='0', help='file prefix')
+    parser.add_argument('--test_time', default='60', help='file prefix')
+    args = parser.parse_args()
+    return args
+
+
 def main():
-    pass
+    args = parse_args()
+    BatchTrain(args.config, args.mode, args.train_time, args.test_time).common_train()
 
 
 if __name__ == '__main__':

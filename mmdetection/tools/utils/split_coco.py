@@ -2,61 +2,54 @@ import os
 import json
 import random
 from pycocotools.coco import COCO
-import copy
 
 
-def split_coco(ann_path, save_dir, mode='34', rate=0.8, random_state=666):
+def save_dict(fname, d, mode='w', **kwargs):
+    # 持久化写入
+    with open(fname, mode) as fp:
+        # json.dump(d, fp, cls=NpEncoder, indent=1, separators=(',', ': '))
+        json.dump(d, fp, **kwargs)
+
+
+def get_coco_by_imgids(coco, img_ids):
+    images = coco.loadImgs(ids=img_ids)
+    ann_ids = coco.getAnnIds(imgIds=img_ids)
+    annotations = coco.loadAnns(ids=ann_ids)
+    categories = coco.dataset['categories']
+    instance_coco = dict(info="", images=images, license="", categories=categories, annotations=annotations)
+    return instance_coco
+
+
+def split_coco(ann_path, save_dir, rate=0.8, prefix='instance_', random_state=666):
     coco = COCO(ann_path)
     image_ids = coco.getImgIds()
     random.seed(random_state)
     random.shuffle(image_ids)
 
     train_size = int(len(image_ids) * rate)
-    train_img_ids = image_ids[:train_size]
-    train_image_info = coco.loadImgs(train_img_ids)
-    instance_train = copy.deepcopy(coco.dataset)
-    instance_train['images'] = train_image_info
-    train_img_ids = set(train_img_ids)
-    instance_train['annotations'] = [ann for ann in instance_train['annotations'] if ann['image_id'] in train_img_ids]
-    save_name = os.path.join(save_dir, 'instance_train_{}.json'.format(mode))
-    with open(save_name, 'w') as fp:
-        json.dump(instance_train, fp, indent=1, separators=(',', ': '))
+    train_ids = image_ids[:train_size]
+    test_ids = image_ids[train_size:]
+    train_set = get_coco_by_imgids(coco, train_ids)
+    test_set = get_coco_by_imgids(coco, test_ids)
+    save_dict(os.path.join(save_dir, '{}train.json'.format(prefix)), train_set)
+    save_dict(os.path.join(save_dir, '{}test.json'.format(prefix)), test_set)
 
-    # get no bg annotations for train
-    instance_train['categories'] = [ann for ann in instance_train['categories'] if ann['id'] != 0]
-    instance_train['annotations'] = [ann for ann in instance_train['annotations'] if ann['category_id'] != 0]
-    img_ids = set([ann['image_id'] for ann in instance_train['annotations']])
-    instance_train['images'] = [ann for ann in instance_train['images'] if ann['id'] in img_ids]
-    assert len(img_ids) == len(instance_train['images'])
-    save_name = os.path.join(save_dir, 'instance_train_{}_nobg.json'.format(mode))
-    with open(save_name, 'w') as fp:
-        json.dump(instance_train, fp, indent=1, separators=(',', ': '))
 
-    test_img_ids = image_ids[train_size:]
-    test_image_info = coco.loadImgs(test_img_ids)
-    instance_test = copy.deepcopy(coco.dataset)
-    instance_test['images'] = test_image_info
-    test_img_ids = set(test_img_ids)
-    instance_test['annotations'] = [ann for ann in instance_test['annotations'] if ann['image_id'] in test_img_ids]
-    save_name = os.path.join(save_dir, 'instance_test_{}.json'.format(mode))
-    with open(save_name, 'w') as fp:
-        json.dump(instance_test, fp, indent=1, separators=(',', ': '))
-
-    # get no bg annotations for test
-    instance_test['categories'] = [ann for ann in instance_test['categories'] if ann['id'] != 0]
-    instance_test['annotations'] = [ann for ann in instance_test['annotations'] if ann['category_id'] != 0]
-    img_ids = set([ann['image_id'] for ann in instance_test['annotations']])
-    instance_test['images'] = [ann for ann in instance_test['images'] if ann['id'] in img_ids]
-    assert len(img_ids) == len(instance_test['images'])
-    save_name = os.path.join(save_dir, 'instance_test_{}_nobg.json'.format(mode))
-    with open(save_name, 'w') as fp:
-        json.dump(instance_test, fp, indent=1, separators=(',', ': '))
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description='Check ann_file')
+    parser.add_argument('ann_file', help='annotation file or test image directory')
+    parser.add_argument('save_dir', help='save_dir')
+    parser.add_argument('--rate', default=0.8, help='split rate')
+    parser.add_argument('--prefix', default='instance_', help='save prefix')
+    parser.add_argument('--random_state', default=666, help='random_state')
+    args = parser.parse_args()
+    return args
 
 
 def main():
-    ann_path = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json'
-    save_dir = '/home/liphone/undone-work/data/detection/fabric/annotations'
-    split_coco(ann_path, save_dir, mode='rate={:.2f}'.format(0.8), rate=0.8)
+    args = parse_args()
+    split_coco(args.ann_file, args.save_dir, args.rate, args.prefix, args.random_state)
 
 
 if __name__ == '__main__':

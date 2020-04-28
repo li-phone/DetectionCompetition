@@ -4,10 +4,15 @@ from PIL import Image
 from PIL import ImageFile
 import numpy as np
 import os
-from pandas import json_normalize
 import pandas as pd
 import json
 from tqdm import tqdm
+import argparse
+
+try:
+    from pandas import json_normalize
+except:
+    from pandas.io.json import json_normalize
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -168,3 +173,60 @@ def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thres
             image, list(result['bbox']), list(result['category_id']), label_list, colors,
             scores=scores, box_mode='xywh', fontsize=fontsize, )
         save_img(img_pred, os.path.join(save_dir, file_name + '_draw.jpg'))
+
+
+class MultipleKVAction(argparse.Action):
+    """
+    argparse action to split an argument into KEY=VALUE form
+    on the first = and append to a dictionary. List options should
+    be passed as comma separated values, i.e KEY=V1,V2,V3
+    """
+
+    def _parse_int_float_bool(self, val):
+        try:
+            return int(val)
+        except ValueError:
+            pass
+        try:
+            return float(val)
+        except ValueError:
+            pass
+        if val.lower() in ['true', 'false']:
+            return True if val.lower() == 'true' else False
+        return val
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        options = {}
+        for kv in values:
+            key, val = kv.split('=', maxsplit=1)
+            val = [self._parse_int_float_bool(v) for v in val.split(',')]
+            if len(val) == 1:
+                val = val[0]
+            options[key] = val
+        setattr(namespace, self.dest, options)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
+    parser.add_argument('ann_file', help='ann_file')
+    parser.add_argument('img_dir', help='img_dir')
+    parser.add_argument('save_dir', help='save_dir')
+    parser.add_argument(
+        '--options',
+        nargs='+', action=MultipleKVAction, help='custom options')
+    parser.add_argument(
+        '--fmt',
+        choices=['xml', 'test_dir', 'csv'],
+        default='xml', help='format type')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+    kwargs = {} if args.options is None else args.options
+    draw_coco(args.ann_file, args.img_dir, args.save_dir, **kwargs)
+
+
+if __name__ == '__main__':
+    main()
