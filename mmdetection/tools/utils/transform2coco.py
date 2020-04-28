@@ -80,7 +80,9 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
         bbox = []
         for i in range(anns.shape[0]):
             r = anns.iloc[i]
-            bbox.append([r['xmin'], r['xmin'], r['xmin'], r['xmin'], ])
+            b = [r['xmin'], r['ymin'], r['xmax'], r['ymax']]
+            b = [float(_) for _ in b]
+            bbox.append(b)
         anns['bbox'] = bbox
     if 'name' in list(anns.columns):
         anns = anns.rename(columns={'name': 'file_name'})
@@ -144,7 +146,8 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     with open(save_name, 'w') as fp:
-        json.dump(coco, fp, indent=1, separators=(',', ': '))
+        # json.dump(coco, fp, indent=1, separators=(',', ': '))
+        json.dump(coco, fp)
 
 
 def imgdir2coco(coco_sample, save_name, test_dir=None):
@@ -172,7 +175,8 @@ def imgdir2coco(coco_sample, save_name, test_dir=None):
             coco_test['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
 
     with open(save_name, 'w') as fp:
-        json.dump(coco_test, fp, indent=1, separators=(',', ': '))
+        # json.dump(coco_test, fp, indent=1, separators=(',', ': '))
+        json.dump(coco_test, fp)
 
 
 def fabric2coco():
@@ -330,7 +334,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['xml', 'test_dir', 'csv'],
-        default='xml', help='format type')
+        default='csv', help='format type')
     args = parser.parse_args()
     return args
 
