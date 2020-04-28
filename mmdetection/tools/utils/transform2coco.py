@@ -76,6 +76,12 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
     if isinstance(anns, list):
         anns = json_normalize(anns)
     assert isinstance(anns, pd.DataFrame)
+    if 'bbox' not in list(anns.columns):
+        bbox = []
+        for i in range(anns.shape[0]):
+            r = anns.iloc[i]
+            bbox.append([r['xmin'], r['xmin'], r['xmin'], r['xmin'], ])
+        anns['bbox'] = bbox
     if 'name' in list(anns.columns):
         anns = anns.rename(columns={'name': 'file_name'})
     if 'defect_name' in list(anns.columns):
