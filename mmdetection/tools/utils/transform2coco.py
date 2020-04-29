@@ -122,7 +122,7 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
                 img_ = cv.imread(os.path.join(img_dir, v))
                 height_, width_, _ = img_.shape
             else:
-                height_, width_, _ = None, None, None
+                height_, width_, _ = 1000, 1000, 3
             coco['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
     image2id = {v: i for i, v in enumerate(images)}
 

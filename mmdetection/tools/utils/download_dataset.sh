@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-filename="download_list.csv"
+filename="download_list.txt"
 save_dir="./"
-
+if ${1}!="":
+  save_dir=${1}
+echo "save_dir:${save_dir}"
 while read line
 do
     array=(${line//,/ })
