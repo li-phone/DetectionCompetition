@@ -122,7 +122,10 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                 self.mask_head[i].init_weights()
 
     def extract_feat(self, img):
-        x1 = self.backbone(img, detector=True)
+        if self.dfn_balance is None:
+            x1 = self.backbone(img)
+        else:
+            x1 = self.backbone(img, detector=True)
         if self.with_neck:
             x1 = self.neck(x1)
         return x1

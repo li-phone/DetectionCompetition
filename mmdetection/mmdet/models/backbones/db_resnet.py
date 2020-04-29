@@ -15,6 +15,7 @@ from mmdet.ops import ContextBlock, DeformConv, ModulatedDeformConv
 from ..registry import BACKBONES
 from ..utils import build_conv_layer, build_norm_layer
 from ..builder import build_loss
+# from mmdet.apis.train import get_root_logger
 
 
 class BasicBlock(nn.Module):
@@ -548,6 +549,7 @@ class DB_ResNet(nn.Module):
 
     def init_weights(self, pretrained=None):
         if isinstance(pretrained, str):
+            from mmdet.apis import get_root_logger
             logger = get_root_logger()
             load_checkpoint(self, pretrained, strict=False, logger=logger)
         elif pretrained is None:
