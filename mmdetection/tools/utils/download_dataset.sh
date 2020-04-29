@@ -7,5 +7,5 @@ save_dir=$2
 while read line
 do
     array=(${line//,/ })
-    echo "wget -P $save_dir -c --tries=75 ${array[0]}"
+    wget -P $save_dir -c --tries=75 ${array[0]}
 done < $filename
