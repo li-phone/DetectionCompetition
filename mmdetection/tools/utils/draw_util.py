@@ -214,10 +214,6 @@ def parse_args():
     parser.add_argument(
         '--options',
         nargs='+', action=MultipleKVAction, help='custom options')
-    parser.add_argument(
-        '--fmt',
-        choices=['xml', 'test_dir', 'csv'],
-        default='xml', help='format type')
     args = parser.parse_args()
     return args
 

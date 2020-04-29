@@ -142,6 +142,7 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
                 area=area
             )
             coco['annotations'].append(ann)
+    save_name = save_name.replace('\\', '/')
     save_dir = save_name[:save_name.rfind('/')]
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
