@@ -94,7 +94,7 @@ data = dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/train.json',
         img_prefix=data_root + '/trainval/',
-        pipeline=train_pipeline),
+        pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/train.json',
@@ -121,7 +121,6 @@ log_config = dict(
 # yapf:enable
 # runtime settings
 dataset_name = 'cartoon_face'
-first_model_cfg = None
 total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
