@@ -97,8 +97,8 @@ data = dict(
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/train.json',
-        img_prefix=data_root + '/trainval/',
+        ann_file=data_root + '/annotations/test.json',
+        img_prefix=data_root + '/test/',
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)

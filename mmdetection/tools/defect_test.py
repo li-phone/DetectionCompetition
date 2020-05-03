@@ -405,7 +405,10 @@ def main(**kwargs):
                     cfg.data[args.mode]['ignore_ids'] = None
                 ignore_ids = cfg.data[args.mode]['ignore_ids']
                 coco_result = coco_eval(result_files, eval_types, dataset.coco, classwise=True, ignore_ids=ignore_ids)
-                threshold = cfg.test_cfg['rcnn']['score_thr']
+                if 'rcnn' in cfg.test_cfg:
+                    threshold = cfg.test_cfg['rcnn']['score_thr']
+                else:
+                    threshold = cfg.test_cfg['score_thr']
                 defect_rst = defect_eval(result_files['bbox'], dataset.coco.dataset, result_times, threshold=threshold)
                 defect_test_results.update(log='\n'.join([coco_result['bbox']['log'], defect_rst['log']]))
                 defect_test_results.update(coco_result=coco_result['bbox']['data'])
