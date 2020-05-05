@@ -529,7 +529,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         of imgs[0].
         """
         # recompute feats to save memory
-        if self.dfn_weight is None:
+        if self.dfn_balance is None:
             proposal_list = self.aug_test_rpn(
                 self.extract_feats(imgs), img_metas, self.test_cfg.rpn)
         else:
