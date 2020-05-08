@@ -59,19 +59,16 @@
         "installer": "pip",
         "packages": [
             {
-                "restraint": "EXACT",
-                "package_version": "5.2.0",
-                "package_name": "Pillow"
+                "package_name": "albumentations"
             },
             {
-                "restraint": "EXACT",
-                "package_version": "2.2.4",
-                "package_name": "Keras"
+                "package_name": "imagecorruptions"
             },
             {
-                "restraint": "EXACT",
-                "package_version": "2.2.4",
-                "package_name": "mmdet-1.0rc1+unknown-cp37-cp37m-linux_x86_64.whl"
+                "package_name": "matplotlib"
+            },
+            {
+                "package_name": "numpy"
             }
         ]
     }]

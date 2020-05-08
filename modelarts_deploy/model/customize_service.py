@@ -1,15 +1,28 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-
-for k, v in os.environ:
-    print('{}: {}'.format(k, v))
-for i, v in enumerate(sys.path):
-    print('{}: {}'.format(i, v))
+import pip
 
 os.system('nvcc -V')
 os.system('python -V')
+os.system('gcc --version')
 os.system('nvidia-smi')
+os.system('uname')
+print('current dir')
+os.system('pwd')
+os.system('ls')
+os.system('ls model')
+os.system('pip install model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl')
+# os.system('pip install model/whl/mmdet-2.0.0+2d8bfea-cp37-cp37m-linux_x86_64.whl')
+
+# os.system('pwd')
+# print('os.environ:')
+# for k, v in os.environ.items():
+#     print('{}: {}'.format(k, v))
+# print('sys.path:')
+# for i, v in enumerate(sys.path):
+#     print('{}: {}'.format(i, v))
+
 
 import time
 import json
@@ -20,19 +33,22 @@ from collections import OrderedDict
 
 # modelarts import
 import torch
+import mmdet
 
-from metric.metrics_manager import MetricsManager
+print('import mmdet ok!')
+
 import log
 
 logger = log.getLogger(__name__)
+from metric.metrics_manager import MetricsManager
 from model_service.pytorch_model_service import PTServingBaseService
 
 import config
 
 try:
     from mmdet.apis import init_detector, inference_detector
-except(Exception, e):
-    print(Exception(e))
+except:
+    print('from mmdet.apis import init_detector, inference_detector error!')
 
 
 class ObjectDetectionService(PTServingBaseService):
@@ -51,7 +67,7 @@ class ObjectDetectionService(PTServingBaseService):
             self.model_path = model_path
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
-        self.model = init_detector(self.cfg, self.model_path, device='cuda:0')
+        # self.model = init_detector(self.cfg, self.model_path, device='cuda:0')
 
         print('load weights file success')
 
@@ -73,15 +89,26 @@ class ObjectDetectionService(PTServingBaseService):
 
         results = dict(detection_classes=[], detection_scores=[], detection_boxes=[])
         for img_id, image in images.items():
-            result = inference_detector(self.model, image)
-            for j, rows in enumerate(result):
-                for r in rows:
-                    label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-                    results['detection_classes'].append(label)
-                    results['detection_scores'].append(r[4])
-                    bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-                    bbox = [round(_, 2) for _ in bbox]
-                    results['detection_boxes'].append(bbox)
+            j = np.random.randint(40)
+            r = [np.random.randint(10, 500), np.random.randint(10, 500),
+                 np.random.randint(10, 500), np.random.randint(10, 500),
+                 1 - np.random.random()]
+            label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
+            results['detection_classes'].append(label)
+            results['detection_scores'].append(r[4])
+            bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+            bbox = [round(_, 2) for _ in bbox]
+            results['detection_boxes'].append(bbox)
+            pass
+            # result = inference_detector(self.model, image)
+            # for j, rows in enumerate(result):
+            #     for r in rows:
+            #         label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
+            #         results['detection_classes'].append(label)
+            #         results['detection_scores'].append(r[4])
+            #         bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+            #         bbox = [round(_, 2) for _ in bbox]
+            #         results['detection_boxes'].append(bbox)
         return results
 
     def _postprocess(self, data):
