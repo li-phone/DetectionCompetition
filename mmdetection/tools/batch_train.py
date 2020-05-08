@@ -1,5 +1,4 @@
 # batch train
-from tqdm import tqdm
 import os
 import time
 import mmcv

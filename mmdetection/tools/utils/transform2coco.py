@@ -98,6 +98,10 @@ def transform2coco(anns, save_name, img_dir=None, label2cat=None, bgcat=None, su
             if isinstance(bgcat, dict):
                 label2cat.remove(bgcat['name'])
                 label2cat.insert(bgcat['id'], bgcat['name'])
+            elif isinstance(bgcat, str):
+                label2cat.remove(bgcat)
+                label2cat.insert(0, bgcat)
+
     if supercategory is None:
         supercategory = [None] * len(label2cat)
 
