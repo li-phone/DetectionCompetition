@@ -3,16 +3,17 @@ import os
 import sys
 import pip
 
-os.system('nvcc -V')
-os.system('python -V')
-os.system('gcc --version')
-os.system('nvidia-smi')
-os.system('uname')
-print('current dir')
-os.system('pwd')
-os.system('ls')
-os.system('ls model')
-os.system('pip install model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl')
+# os.system('nvcc -V')
+# os.system('python -V')
+# os.system('gcc --version')
+# os.system('nvidia-smi')
+# os.system('uname')
+# print('current dir')
+# os.system('pwd')
+# os.system('ls')
+# os.system('ls model')
+# os.system('pip install model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl')
+# os.system('pip install -r requirements.txt')
 # os.system('pip install model/whl/mmdet-2.0.0+2d8bfea-cp37-cp37m-linux_x86_64.whl')
 
 # os.system('pwd')

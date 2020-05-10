@@ -59,6 +59,18 @@
         "installer": "pip",
         "packages": [
             {
+                "package_name": "numpy"
+            },
+            {
+                "package_name": "/home/mind/model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl"
+            },
+            {
+                "package_name": "mmcv"
+            },
+            {
+                "package_name": "pycocotools"
+            },
+            {
                 "package_name": "albumentations"
             },
             {
@@ -66,9 +78,6 @@
             },
             {
                 "package_name": "matplotlib"
-            },
-            {
-                "package_name": "numpy"
             }
         ]
     }]
