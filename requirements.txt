@@ -17,7 +17,7 @@ kiwisolver==1.2.0
 matplotlib==3.2.1
 # Editable install with no version control (mmcv==0.5.1)
 -e /home/liphone/anaconda3/envs/py36/lib/python3.6/site-packages
--e git+git@gitee.com:liphone/DetCompetition.git@3f7b31c20ce49340ee4f33c83c2454027ad76e6c#egg=mmdet&subdirectory=mmdetection
+-e git+git@gitee.com:liphone/DetCompetition.git@a210f00c023a05c177cef0d63204e24d15f6e2cc#egg=mmdet&subdirectory=mmdetection
 networkx==2.4
 numpy==1.18.4
 opencv-python==4.2.0.34

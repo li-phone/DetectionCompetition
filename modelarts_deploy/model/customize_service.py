@@ -43,7 +43,7 @@ class ObjectDetectionService(PTServingBaseService):
             self.model_path = model_path
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
-        # self.model = init_detector(self.cfg, self.model_path, device='cuda:0')
+        self.model = init_detector(self.cfg, self.model_path, device='cuda:0')
 
         print('load weights file success')
 
