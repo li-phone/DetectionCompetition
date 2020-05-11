@@ -65,10 +65,10 @@
                 "package_name": "/home/mind/model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl"
             },
             {
-                "package_name": "mmcv"
+                "package_name": "/home/mind/model/whl/mmcv-0.5.1-cp36-cp36m-linux_x86_64.whl"
             },
             {
-                "package_name": "pycocotools"
+                "package_name": "/home/mind/model/whl/pycocotools-2.0-cp36-cp36m-linux_x86_64.whl"
             },
             {
                 "package_name": "albumentations"
