@@ -15,8 +15,9 @@ imgaug==0.2.6
 joblib==0.14.1
 kiwisolver==1.2.0
 matplotlib==3.2.1
-mmcv==0.5.1
--e git+git@gitee.com:liphone/DetCompetition.git@768e4c84648ce748ef7e4457ce789db777b0693d#egg=mmdet&subdirectory=mmdetection
+# Editable install with no version control (mmcv==0.5.1)
+-e /home/liphone/anaconda3/envs/py36/lib/python3.6/site-packages
+-e git+git@gitee.com:liphone/DetCompetition.git@18d87f997730a38e42ad1174d5ecf821cd92fa1d#egg=mmdet&subdirectory=mmdetection
 networkx==2.4
 numpy==1.18.4
 opencv-python==4.2.0.34
@@ -25,7 +26,8 @@ packaging==20.3
 pandas==1.0.3
 Pillow==7.1.2
 pooch==1.1.0
-pycocotools==2.0.0
+# Editable install with no version control (pycocotools==2.0.0)
+-e /home/liphone/anaconda3/envs/py36/lib/python3.6/site-packages
 pyparsing==2.4.7
 python-dateutil==2.8.1
 pytz==2020.1
