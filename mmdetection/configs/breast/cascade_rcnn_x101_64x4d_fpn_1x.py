@@ -203,8 +203,8 @@ data = dict(
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_train.json',
-        img_prefix=data_root + '/images/',
+        ann_file=data_root + '/annotations/test_data_A.json',
+        img_prefix=data_root + '/A/',
         ignore_ids=[0],
         pipeline=test_pipeline))
 # optimizer

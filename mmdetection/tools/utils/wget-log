@@ -1,4 +1,0 @@
---2020-05-11 18:16:22--  https://s3.ap-northeast-2.amazonaws.com/open-mmlab/models/htc/htc_dconv_c3-c5_mstrain_400_1400_x101_64x4d_fpn_20e_20190408-0e50669c.pth
-正在解析主机 s3.ap-northeast-2.amazonaws.com (s3.ap-northeast-2.amazonaws.com)... 52.219.56.113
-正在连接 s3.ap-northeast-2.amazonaws.com (s3.ap-northeast-2.amazonaws.com)|52.219.56.113|:443... 已连接。
-无法建立 SSL 连接。
