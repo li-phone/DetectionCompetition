@@ -30,8 +30,10 @@ except:
 class ObjectDetectionService(PTServingBaseService):
     def __init__(self, cfg=None, model_path=None):
         if torch.cuda.is_available() is True:
+            device = 'cuda:0'
             print('use torch GPU version,', torch.__version__)
         else:
+            device = 'cpu'
             print('use torch CPU version,', torch.__version__)
         if cfg is None:
             self.cfg = config.cfg
@@ -43,8 +45,8 @@ class ObjectDetectionService(PTServingBaseService):
             self.model_path = model_path
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
-        self.model = init_detector(self.cfg, self.model_path, device='cuda:0')
-
+        print('starting init detector model...')
+        self.model = init_detector(self.cfg, self.model_path, device=device)
         print('load weights file success')
 
     def _preprocess(self, data):
