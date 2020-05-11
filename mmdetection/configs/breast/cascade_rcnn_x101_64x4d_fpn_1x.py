@@ -2,7 +2,7 @@
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    pretrained='open-mmlab://resnext101_64x4d',
+    pretrained='../work_dirs/pretrained/resnext101_64x4d-ee2c6f71.pth',
     backbone=dict(
         type='ResNeXt',
         depth=101,
@@ -160,7 +160,7 @@ test_cfg = dict(
         score_thr=0.0001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001), max_per_img=200))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'E:/liphone/data/images/detections/garbage'
+data_root = '/home/liphone/undone-work/data/detection/breast'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -199,11 +199,13 @@ data = dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
+        ignore_ids=[1],
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
+        ignore_ids=[0],
         pipeline=test_pipeline))
 # optimizer
 optimizer = dict(type='SGD', lr=0.02 / 16, momentum=0.9, weight_decay=0.0001)
@@ -233,7 +235,7 @@ log_level = 'INFO'
 uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_x101_64x4d_fpn_1x+multiscale+softnms'
-load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_1x_20181218-e2dc376a.pth'
+load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_2x_20181218-5add321e.pth'
 # load_from = None
 resume_from = None
 workflow = [('train', 1)]
