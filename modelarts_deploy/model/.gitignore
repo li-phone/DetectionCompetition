@@ -119,7 +119,7 @@ work_dirs/
 # Pytorch
 *.pth
 
-mmdet.egg-info/
+#mmdet.egg-info/
 
 checkpoint/
 lib/
