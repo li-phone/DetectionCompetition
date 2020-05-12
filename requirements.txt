@@ -13,7 +13,6 @@ imageio==2.8.0
 imgaug==0.2.6
 kiwisolver==1.2.0
 matplotlib==3.2.1
-mmcv==0.5.1
 networkx==2.4
 numpy==1.18.4
 opencv-python==4.2.0.34
