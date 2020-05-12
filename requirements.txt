@@ -20,7 +20,6 @@ opencv-python-headless==4.2.0.34
 packaging==20.3
 Pillow==7.1.2
 pooch==1.1.0
-pycocotools==2.0
 pyparsing==2.4.7
 python-dateutil==2.8.1
 PyWavelets==1.1.1

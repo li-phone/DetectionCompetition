@@ -69,10 +69,9 @@
                 "package_name": "pillow"
             },
             {
-                "package_name": "/home/mind/model/whl/mmcv-0.5.1-cp36-cp36m-linux_x86_64.whl"
-            },
-            {
-                "package_name": "/home/mind/model/whl/pycocotools-2.0-cp36-cp36m-linux_x86_64.whl"
+                "restraint": "EXACT",
+                "package_version": "",
+                "package_name": "addict"
             },
             {
                 "package_name": "albumentations"

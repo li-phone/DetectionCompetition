@@ -24,7 +24,7 @@ from mmdet.apis import init_detector, inference_detector
 import config
 
 
-class ObjectDetectionService():
+class ObjectDetectionService(PTServingBaseService):
     def __init__(self, cfg=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'
@@ -32,18 +32,14 @@ class ObjectDetectionService():
         else:
             device = 'cpu'
             print('use torch CPU version,', torch.__version__)
-        if cfg is None:
-            self.cfg = config.cfg
-        else:
-            self.cfg = cfg
-        if model_path is None:
-            self.model_path = config.model_path
-        else:
-            self.model_path = model_path
+        print('cfg:', cfg, 'model_path', model_path)
+        self.cfg = config.cfg
+        self.model_path = config.model_path
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
         print('starting init detector model...')
-        self.model = init_detector(self.cfg, self.model_path, device='cpu')
+        print('cfg: ', self.cfg, 'model_path:', self.model_path)
+        self.model = init_detector(self.cfg, self.model_path, device=device)
         print('load weights file success')
 
     def _preprocess(self, data):

@@ -2,7 +2,15 @@ from abc import ABCMeta, abstractmethod
 
 import mmcv
 import numpy as np
-import pycocotools.mask as maskUtils
+
+
+# import pycocotools.mask as maskUtils
+
+
+def maskUtils():
+    pass
+
+
 import torch.nn as nn
 
 from mmdet.core import auto_fp16, get_classes, tensor2imgs
@@ -124,7 +132,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         else:
             return self.aug_test(imgs, img_metas, **kwargs)
 
-    @auto_fp16(apply_to=('img', ))
+    @auto_fp16(apply_to=('img',))
     def forward(self, img, img_meta, return_loss=True, **kwargs):
         """
         Calls either forward_train or forward_test depending on whether
