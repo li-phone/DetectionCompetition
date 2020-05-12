@@ -7,11 +7,14 @@ import numpy as np
 from PIL import Image
 from collections import OrderedDict
 
-# import log
-#
-# logger = log.getLogger(__name__)
-# from metric.metrics_manager import MetricsManager
-# from model_service.pytorch_model_service import PTServingBaseService
+try:
+    import log
+
+    logger = log.getLogger(__name__)
+    from metric.metrics_manager import MetricsManager
+    from model_service.pytorch_model_service import PTServingBaseService
+except:
+    print('model_service error!')
 
 # modelarts import
 import torch
@@ -73,50 +76,50 @@ class ObjectDetectionService():
     def _postprocess(self, data):
         return data
 
-    # def inference(self, data):
-    #     '''
-    #     Wrapper function to run preprocess, inference and postprocess functions.
-    #
-    #     Parameters
-    #     ----------
-    #     data : map of object
-    #         Raw input from request.
-    #
-    #     Returns
-    #     -------
-    #     list of outputs to be sent back to client.
-    #         data to be sent back
-    #     '''
-    #     pre_start_time = time.time()
-    #     data = self._preprocess(data)
-    #     infer_start_time = time.time()
-    #     # Update preprocess latency metric
-    #     pre_time_in_ms = (infer_start_time - pre_start_time) * 1000
-    #     logger.info('preprocess time: ' + str(pre_time_in_ms) + 'ms')
-    #
-    #     if self.model_name + '_LatencyPreprocess' in MetricsManager.metrics:
-    #         MetricsManager.metrics[self.model_name + '_LatencyPreprocess'].update(pre_time_in_ms)
-    #
-    #     data = self._inference(data)
-    #     infer_end_time = time.time()
-    #     infer_in_ms = (infer_end_time - infer_start_time) * 1000
-    #
-    #     logger.info('infer time: ' + str(infer_in_ms) + 'ms')
-    #     data = self._postprocess(data)
-    #
-    #     # Update inference latency metric
-    #     post_time_in_ms = (time.time() - infer_end_time) * 1000
-    #     logger.info('postprocess time: ' + str(post_time_in_ms) + 'ms')
-    #     if self.model_name + '_LatencyInference' in MetricsManager.metrics:
-    #         MetricsManager.metrics[self.model_name + '_LatencyInference'].update(post_time_in_ms)
-    #
-    #     # Update overall latency metric
-    #     if self.model_name + '_LatencyOverall' in MetricsManager.metrics:
-    #         MetricsManager.metrics[self.model_name + '_LatencyOverall'].update(pre_time_in_ms + post_time_in_ms)
-    #
-    #     logger.info('latency: ' + str(pre_time_in_ms + infer_in_ms + post_time_in_ms) + 'ms')
-    #     data['latency_time'] = str(round(pre_time_in_ms + infer_in_ms + post_time_in_ms, 1)) + ' ms'
-    #     return data
+    def inference(self, data):
+        '''
+        Wrapper function to run preprocess, inference and postprocess functions.
+
+        Parameters
+        ----------
+        data : map of object
+            Raw input from request.
+
+        Returns
+        -------
+        list of outputs to be sent back to client.
+            data to be sent back
+        '''
+        pre_start_time = time.time()
+        data = self._preprocess(data)
+        infer_start_time = time.time()
+        # Update preprocess latency metric
+        pre_time_in_ms = (infer_start_time - pre_start_time) * 1000
+        logger.info('preprocess time: ' + str(pre_time_in_ms) + 'ms')
+
+        if self.model_name + '_LatencyPreprocess' in MetricsManager.metrics:
+            MetricsManager.metrics[self.model_name + '_LatencyPreprocess'].update(pre_time_in_ms)
+
+        data = self._inference(data)
+        infer_end_time = time.time()
+        infer_in_ms = (infer_end_time - infer_start_time) * 1000
+
+        logger.info('infer time: ' + str(infer_in_ms) + 'ms')
+        data = self._postprocess(data)
+
+        # Update inference latency metric
+        post_time_in_ms = (time.time() - infer_end_time) * 1000
+        logger.info('postprocess time: ' + str(post_time_in_ms) + 'ms')
+        if self.model_name + '_LatencyInference' in MetricsManager.metrics:
+            MetricsManager.metrics[self.model_name + '_LatencyInference'].update(post_time_in_ms)
+
+        # Update overall latency metric
+        if self.model_name + '_LatencyOverall' in MetricsManager.metrics:
+            MetricsManager.metrics[self.model_name + '_LatencyOverall'].update(pre_time_in_ms + post_time_in_ms)
+
+        logger.info('latency: ' + str(pre_time_in_ms + infer_in_ms + post_time_in_ms) + 'ms')
+        data['latency_time'] = str(round(pre_time_in_ms + infer_in_ms + post_time_in_ms, 1)) + ' ms'
+        return data
 
     def _test_run(self):
         from glob import glob

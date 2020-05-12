@@ -1,5 +1,4 @@
 # config for service
-import os
 
 cfg = 'configs/cascade_rcnn_r50_fpn_1x.py'
 model_path = 'work_dirs/cascade_rcnn_r50_fpn_1x/epoch_12.pth'

@@ -1,5 +1,5 @@
 import numpy as np
-from terminaltables import AsciiTable
+# from terminaltables import AsciiTable
 
 from .bbox_overlaps import bbox_overlaps
 

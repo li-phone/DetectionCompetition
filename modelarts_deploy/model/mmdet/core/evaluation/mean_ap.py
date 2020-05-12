@@ -3,7 +3,7 @@ from multiprocessing import Pool
 
 import mmcv
 import numpy as np
-from terminaltables import AsciiTable
+# from terminaltables import AsciiTable
 
 from .bbox_overlaps import bbox_overlaps
 from .class_names import get_classes

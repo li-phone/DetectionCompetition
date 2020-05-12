@@ -4,7 +4,7 @@ import mmcv
 import numpy as np
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-from terminaltables import AsciiTable
+# from terminaltables import AsciiTable
 
 from .recall import eval_recalls
 

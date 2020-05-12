@@ -123,5 +123,6 @@ mmdet.egg-info/
 
 checkpoint/
 lib/
+work_dirs/
 
 

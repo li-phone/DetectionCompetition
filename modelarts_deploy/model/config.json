@@ -62,22 +62,13 @@
                 "package_name": "numpy"
             },
             {
-                "package_name": "albumentations"
+                "package_name": "pillow"
             },
             {
-                "package_name": "imagecorruptions"
+                "package_name": "torch"
             },
             {
-                "package_name": "matplotlib"
-            },
-            {
-                "package_name": "terminaltables"
-            },
-            {
-                "package_name": "albumentations"
-            },
-            {
-                "package_name": "/home/mind/model/whl/Cython-0.29.17-cp36-cp36m-manylinux1_x86_64.whl"
+                "package_name": "torchvision"
             },
             {
                 "package_name": "/home/mind/model/whl/mmcv-0.5.1-cp36-cp36m-linux_x86_64.whl"
@@ -86,7 +77,10 @@
                 "package_name": "/home/mind/model/whl/pycocotools-2.0-cp36-cp36m-linux_x86_64.whl"
             },
             {
-                "package_name": "/home/mind/model/whl/mmdet-1.0rc1+unknown-cp36-cp36m-linux_x86_64.whl"
+                "package_name": "albumentations"
+            },
+            {
+                "package_name": "imagecorruptions"
             }
         ]
     }]
