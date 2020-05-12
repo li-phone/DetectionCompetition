@@ -59,12 +59,18 @@
         "installer": "pip",
         "packages": [
             {
+                "restraint": "EXACT",
+                "package_version": "",
                 "package_name": "numpy"
             },
             {
+                "restraint": "EXACT",
+                "package_version": "",
                 "package_name": "pillow"
             },
             {
+                "restraint": "EXACT",
+                "package_version": "",
                 "package_name": "torch"
             },
             {

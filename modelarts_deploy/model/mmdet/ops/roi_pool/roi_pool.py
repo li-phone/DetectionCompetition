@@ -4,8 +4,10 @@ from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
+
 # from . import roi_pool_cuda
-from torchvision.ops import roi_pool
+def roi_pool_cuda():
+    pass
 
 
 class RoIPoolFunction(Function):
@@ -24,7 +26,7 @@ class RoIPoolFunction(Function):
         # roi_pool_cuda.forward(features, rois, out_h, out_w, spatial_scale,
         #                       output, argmax)
         roi_pool(features, rois, out_h, out_w, spatial_scale,
-                              output, argmax)
+                 output, argmax)
         ctx.spatial_scale = spatial_scale
         ctx.feature_size = features.size()
         ctx.argmax = argmax
@@ -47,7 +49,7 @@ class RoIPoolFunction(Function):
             # roi_pool_cuda.backward(grad_output.contiguous(), rois, argmax,
             #                        spatial_scale, grad_input)
             roi_pool(grad_output.contiguous(), rois, argmax,
-                                   spatial_scale, grad_input)
+                     spatial_scale, grad_input)
 
         return grad_input, grad_rois, None, None
 
