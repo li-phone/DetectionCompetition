@@ -1,8 +1,22 @@
 import numpy as np
 import torch
+import torchvision
 
-from . import nms_cpu, nms_cuda
-from .soft_nms_cpu import soft_nms_cpu
+from torchvision.ops import deform_conv2d
+
+
+# from . import nms_cpu,nms_cuda
+# from .soft_nms_cpu import soft_nms_cpu
+def nms_cpu():
+    pass
+
+
+def soft_nms_cpu():
+    pass
+
+
+def nms_cuda():
+    pass
 
 
 def nms(dets, iou_thr, device_id=None):
@@ -54,7 +68,10 @@ def nms(dets, iou_thr, device_id=None):
         if dets_th.is_cuda:
             inds = nms_cuda.nms(dets_th, iou_thr)
         else:
-            inds = nms_cpu.nms(dets_th, iou_thr)
+            # inds = nms_cpu.nms(dets_th, iou_thr)
+            boxes = dets_th[:, :4]
+            scores = dets_th[:, 4]
+            inds = torchvision.ops.nms(boxes, scores, iou_thr)
 
     if is_numpy:
         inds = inds.cpu().numpy()

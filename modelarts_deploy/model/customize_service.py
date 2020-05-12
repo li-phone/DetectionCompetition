@@ -7,29 +7,19 @@ import numpy as np
 from PIL import Image
 from collections import OrderedDict
 
+# import log
+#
+# logger = log.getLogger(__name__)
+# from metric.metrics_manager import MetricsManager
+# from model_service.pytorch_model_service import PTServingBaseService
+
 # modelarts import
 import torch
-import mmdet
-
-print(dir(mmdet))
-print('import mmdet ok!')
-
-import log
-
-logger = log.getLogger(__name__)
-from metric.metrics_manager import MetricsManager
-from model_service.pytorch_model_service import PTServingBaseService
-
+from mmdet.apis import init_detector, inference_detector
 import config
 
-try:
-    from mmdet.apis import init_detector, inference_detector
-except:
-    print('from mmdet.apis import init_detector, inference_detector error!')
-    from mmdet.apis.inference import init_detector, inference_detector
 
-
-class ObjectDetectionService(PTServingBaseService):
+class ObjectDetectionService():
     def __init__(self, cfg=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'
@@ -48,7 +38,7 @@ class ObjectDetectionService(PTServingBaseService):
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
         print('starting init detector model...')
-        self.model = init_detector(self.cfg, self.model_path, device=device)
+        self.model = init_detector(self.cfg, self.model_path, device='cpu')
         print('load weights file success')
 
     def _preprocess(self, data):
@@ -69,26 +59,15 @@ class ObjectDetectionService(PTServingBaseService):
 
         results = dict(detection_classes=[], detection_scores=[], detection_boxes=[])
         for img_id, image in images.items():
-            j = np.random.randint(40)
-            r = [np.random.randint(10, 500), np.random.randint(10, 500),
-                 np.random.randint(10, 500), np.random.randint(10, 500),
-                 1 - np.random.random()]
-            label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-            results['detection_classes'].append(label)
-            results['detection_scores'].append(r[4])
-            bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-            bbox = [round(_, 2) for _ in bbox]
-            results['detection_boxes'].append(bbox)
-            pass
-            # result = inference_detector(self.model, image)
-            # for j, rows in enumerate(result):
-            #     for r in rows:
-            #         label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-            #         results['detection_classes'].append(label)
-            #         results['detection_scores'].append(r[4])
-            #         bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-            #         bbox = [round(_, 2) for _ in bbox]
-            #         results['detection_boxes'].append(bbox)
+            result = inference_detector(self.model, image)
+            for j, rows in enumerate(result):
+                for r in rows:
+                    label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
+                    results['detection_classes'].append(label)
+                    results['detection_scores'].append(r[4])
+                    bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+                    bbox = [round(_, 2) for _ in bbox]
+                    results['detection_boxes'].append(bbox)
         return results
 
     def _postprocess(self, data):
@@ -140,29 +119,13 @@ class ObjectDetectionService(PTServingBaseService):
     #     return data
 
     def _test_run(self):
-        data = {
-            '0': {
-                'file_name': r'E:\liphone\data\images\detections\garbage_huawei\JPEGImages\5d54a2d0231f224b592725f9fef0d90.jpg',
-            },
-            '1': {
-                'file_name': r'E:\liphone\data\images\detections\garbage_huawei\JPEGImages\5d77f426ea2b5a13e427b0747631e6d.jpg',
-            },
-        }
+        from glob import glob
+        paths = glob('input/*')
+        data = {str(i): {'file_name': p} for i, p in enumerate(paths)}
         data = self._preprocess(data)
         data = self._inference(data)
         data = self._postprocess(data)
         print(data)
-        pass
-
-
-def parse_classify_rule(json_path=''):
-    with codecs.open(json_path, 'r', 'utf-8') as f:
-        rule = json.load(f)
-    label_map = {}
-    for super_label, labels in rule.items():
-        for label in labels:
-            label_map[label] = super_label
-    return label_map
 
 
 if __name__ == '__main__':

@@ -8,19 +8,19 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-#build/
+build/
 develop-eggs/
 dist/
 downloads/
 eggs/
-#.eggs/
+.eggs/
 lib/
 lib64/
 parts/
 sdist/
 var/
 wheels/
-#*.egg-info/
+*.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
@@ -119,7 +119,7 @@ work_dirs/
 # Pytorch
 *.pth
 
-#mmdet.egg-info/
+mmdet.egg-info/
 
 checkpoint/
 lib/

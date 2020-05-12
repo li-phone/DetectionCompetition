@@ -6,7 +6,10 @@ from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
-from . import masked_conv2d_cuda
+
+# from . import masked_conv2d_cuda
+def masked_conv2d_cuda():
+    pass
 
 
 class MaskedConv2dFunction(Function):
@@ -55,7 +58,7 @@ class MaskedConv2dFunction(Function):
     @staticmethod
     @once_differentiable
     def backward(ctx, grad_output):
-        return (None, ) * 5
+        return (None,) * 5
 
 
 masked_conv2d = MaskedConv2dFunction.apply

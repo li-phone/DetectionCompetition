@@ -3,7 +3,10 @@ from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
-from . import roi_align_cuda
+
+# from . import roi_align_cuda
+def roi_align_cuda():
+    pass
 
 
 class RoIAlignFunction(Function):
