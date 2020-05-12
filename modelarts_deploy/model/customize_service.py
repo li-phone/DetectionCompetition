@@ -6,12 +6,12 @@ import codecs
 import numpy as np
 from PIL import Image
 from collections import OrderedDict
-os.system('df -hl')
 
 # modelarts import
 import torch
 import mmdet
 
+print(dir(mmdet))
 print('import mmdet ok!')
 
 import log
@@ -26,6 +26,7 @@ try:
     from mmdet.apis import init_detector, inference_detector
 except:
     print('from mmdet.apis import init_detector, inference_detector error!')
+    from mmdet.apis.inference import init_detector, inference_detector
 
 
 class ObjectDetectionService(PTServingBaseService):
