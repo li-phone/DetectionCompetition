@@ -6,6 +6,7 @@ import codecs
 import numpy as np
 from PIL import Image
 from collections import OrderedDict
+os.system('df -hl')
 
 # modelarts import
 import torch
