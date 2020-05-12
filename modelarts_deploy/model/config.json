@@ -69,14 +69,6 @@
                 "package_name": "pillow"
             },
             {
-                "restraint": "EXACT",
-                "package_version": "",
-                "package_name": "torch"
-            },
-            {
-                "package_name": "torchvision"
-            },
-            {
                 "package_name": "/home/mind/model/whl/mmcv-0.5.1-cp36-cp36m-linux_x86_64.whl"
             },
             {
