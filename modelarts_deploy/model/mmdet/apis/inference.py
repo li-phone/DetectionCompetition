@@ -86,9 +86,13 @@ def inference_detector(model, img):
     # prepare data
     data = dict(img=img)
     data = test_pipeline(data)
-    # data = scatter(collate([data], samples_per_gpu=1), [device])[0]
-    data = (collate([data], samples_per_gpu=1), [device])[0]
-    data['img_meta'] = data['img_meta'][0].data
+    if device.type == 'cuda':
+        data = scatter(collate([data], samples_per_gpu=1), [device])[0]
+    elif device.type == 'cpu':
+        data = (collate([data], samples_per_gpu=1), [device])[0]
+        data['img_meta'] = data['img_meta'][0].data
+    else:
+        raise Exception('No {} such device type!'.format(device.type))
     # forward the model
     with torch.no_grad():
         result = model(return_loss=False, rescale=True, **data)

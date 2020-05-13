@@ -1,7 +1,7 @@
 # config for service
 
-cfg = 'model/configs/retinanet_r50_fpn_1x.py'
-model_path = 'model/work_dirs/retinanet_r50_fpn_1x/epoch_12.pth'
+cfg = 'configs/retinanet_r50_fpn_1x.py'
+model_path = 'work_dirs/retinanet_r50_fpn_1x/epoch_12.pth'
 cat2label = {
     1: {'name': '一次性快餐盒', 'id': 1, 'supercategory': '其他垃圾'},
     2: {'name': '书籍纸张', 'id': 2, 'supercategory': '可回收物'},

@@ -69,8 +69,6 @@
                 "package_name": "pillow"
             },
             {
-                "restraint": "EXACT",
-                "package_version": "",
                 "package_name": "addict"
             },
             {

@@ -24,7 +24,7 @@ from mmdet.apis import init_detector, inference_detector
 import config
 
 
-class ObjectDetectionService(PTServingBaseService):
+class ObjectDetectionService():
     def __init__(self, cfg=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'
@@ -32,7 +32,7 @@ class ObjectDetectionService(PTServingBaseService):
         else:
             device = 'cpu'
             print('use torch CPU version,', torch.__version__)
-        print('cfg:', cfg, 'model_path', model_path)
+        print('cfg:', cfg, ', model_path', model_path)
         self.cfg = config.cfg
         self.model_path = config.model_path
         self.cat2label = config.cat2label
