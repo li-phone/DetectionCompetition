@@ -124,6 +124,6 @@ uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/retinanet_r50_fpn_1x'
 load_from = '../work_dirs/pretrained/retinanet_r50_fpn_2x_coco_20200131-fdb43119.pth'
-resume_from = None
+resume_from = work_dir+'/epoch_12.pth'
 workflow = [('train', 1)]
 

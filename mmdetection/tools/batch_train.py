@@ -27,9 +27,10 @@ class BatchTrain(object):
         cfg.first_model_cfg = None
         cfg.cfg_name = str(self.cfg_name)
         cfg.uid = str(self.cfg_name)
-        cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
-        if not os.path.exists(cfg.resume_from):
-            cfg.resume_from = None
+        if cfg.resume_from is None:
+            cfg.resume_from = os.path.join(cfg.work_dir, 'latest.pth')
+            if not os.path.exists(cfg.resume_from):
+                cfg.resume_from = None
 
         cfgs = [cfg]
         batch_train(cfgs, sleep_time=self.train_sleep_time)

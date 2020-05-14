@@ -24,7 +24,7 @@ from mmdet.apis import init_detector, inference_detector
 import config
 
 
-class ObjectDetectionService():
+class ObjectDetectionService(PTServingBaseService):
     def __init__(self, cfg=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'
@@ -46,9 +46,9 @@ class ObjectDetectionService():
         preprocessed_data = {}
         for k, v in data.items():
             for file_name, file_content in v.items():
-                image = Image.open(file_content)
-                image = np.array(image)
-                preprocessed_data[k] = image
+                # image = Image.open(file_content)
+                # image = np.array(image)
+                preprocessed_data[k] = file_content
         return preprocessed_data
 
     def _inference(self, data):
@@ -59,16 +59,26 @@ class ObjectDetectionService():
         images = data
 
         results = dict(detection_classes=[], detection_scores=[], detection_boxes=[])
-        for img_id, image in images.items():
+        # import cv2 as cv
+        for img_id, file_content in images.items():
+            image = Image.open(file_content)
+            image = np.array(image)
             result = inference_detector(self.model, image)
             for j, rows in enumerate(result):
                 for r in rows:
+                    r = [float(_) for _ in r]
                     label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
                     results['detection_classes'].append(label)
                     results['detection_scores'].append(r[4])
-                    bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+                    # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+                    bbox = r[:4]
                     bbox = [round(_, 2) for _ in bbox]
                     results['detection_boxes'].append(bbox)
+                    # pt1 = (int(bbox[0]), int(bbox[1]))
+                    # pt2 = (int(bbox[2]), int(bbox[3]))
+                    # cv.rectangle(image, pt1, pt2, color=(0, 0, 255))
+            # cv.imshow('', image)
+            # cv.waitKey()
         return results
 
     def _postprocess(self, data):
@@ -81,6 +91,7 @@ class ObjectDetectionService():
         Parameters
         ----------
         data : map of object
+
             Raw input from request.
 
         Returns
@@ -121,7 +132,7 @@ class ObjectDetectionService():
 
     def _test_run(self):
         from glob import glob
-        paths = glob('input/*')
+        paths = glob('/home/liphone/undone-work/data/detection/garbage_huawei/images/*')
         data = {str(i): {'file_name': p} for i, p in enumerate(paths)}
         data = self._preprocess(data)
         data = self._inference(data)

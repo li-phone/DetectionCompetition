@@ -50,6 +50,7 @@ def coco_eval(result_files,
             cocoEval.params.maxDets = list(max_dets)
         cocoEval.evaluate()
         cocoEval.accumulate()
+
         stats, coco_eval_lines = cocoEval.summarize(ignore_ids=ignore_ids)
 
         class_lines, classwise_data = '', {}

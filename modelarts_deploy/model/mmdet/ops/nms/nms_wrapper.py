@@ -94,7 +94,10 @@ def nms(dets, iou_thr, device_id=None):
         inds = dets_th.new_zeros(0, dtype=torch.long)
     else:
         if dets_th.is_cuda:
-            inds = nms_cuda.nms(dets_th, iou_thr)
+            # inds = nms_cuda.nms(dets_th, iou_thr)
+            boxes = dets_th[:, :4]
+            scores = dets_th[:, 4]
+            inds = nms_cpu(boxes, scores, iou_thr)
         else:
             # inds = nms_cpu.nms(dets_th, iou_thr)
             boxes = dets_th[:, :4]
