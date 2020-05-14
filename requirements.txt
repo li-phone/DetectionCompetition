@@ -15,7 +15,7 @@ joblib==0.14.1
 kiwisolver==1.2.0
 matplotlib==3.2.1
 mmcv==0.5.1
--e git+git@gitee.com:liphone/DetCompetition.git@7f3f2971bcb49c1feae0cef50109f8af4e5f1524#egg=mmdet&subdirectory=mmdetection
+-e git+git@gitee.com:liphone/DetCompetition.git@5afb657efd6ed27c1d40ba03cf06c6de59ec871e#egg=mmdet&subdirectory=mmdetection
 networkx==2.4
 numpy==1.18.4
 opencv-python==4.2.0.34
