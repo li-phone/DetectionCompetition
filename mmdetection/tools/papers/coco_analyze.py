@@ -9,6 +9,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import warnings
+
+warnings.filterwarnings(action='ignore')
 
 try:
     from pandas import json_normalize
@@ -119,17 +122,20 @@ class COCOAnalysis(object):
         # plt.ylim(0, 1000)
         ax = sns.jointplot("bbox_width", "bbox_height", data=box_df,
                            kind="reg", truncate=False,
-                           xlim=(0, 600), ylim=(0, 1000),
+                           xlim=(0, max(box_df['bbox_width']) + 1), ylim=(0, max(box_df['bbox_height']) + 1),
                            color="m", height=7)
         asp = box_df['bbox_height'] / box_df['bbox_width']
         asp_quantiles = []
         for c, p in zip(np.linspace(0.5, 1., K), np.linspace(0., 1., K)):
             k = asp.quantile(p)
             asp_quantiles.append(dict(quantile=p, value=k))
-            x = np.array(list(range(1000)))
+            x = np.array(list(range(max(box_df['bbox_width']))))
             y = k * x
             plt.plot(x, y, color=(c, 0, 0, 1), linewidth=1)
-        print(json_normalize(asp_quantiles))
+        asp_quantiles = json_normalize(asp_quantiles)
+        print(asp_quantiles)
+        asp_copy = list(map(lambda x: round(x, 6), asp_quantiles['value']))
+        print('copy:', asp_copy)
         save_plt(os.path.join(self.save_img_dir, 'bbox_distribution_{}.jpg'.format(str(legend))))
         plt.show()
 
@@ -208,6 +214,11 @@ def main():
         save_img_dir='../results/breast',
         legends=['train'])
     data.summary()
+    # garbage_ana = COCOAnalysis(
+    #     ann_files=['/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'],
+    #     save_img_dir='../results/garbage',
+    #     legends=['train'])
+    # garbage_ana.summary()
     pass
 
 
