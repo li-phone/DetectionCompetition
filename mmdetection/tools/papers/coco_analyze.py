@@ -1,7 +1,6 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import json
-from pandas.io.json import json_normalize
 import os
 import pandas as pd
 import numpy as np
@@ -10,6 +9,11 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+
+try:
+    from pandas import json_normalize
+except:
+    from pandas.io.json import json_normalize
 
 
 def count_image(coco, ignore_id=0):
@@ -102,14 +106,30 @@ class COCOAnalysis(object):
         save_plt(os.path.join(self.save_img_dir, 'category_distribution.jpg'))
         plt.show()
 
-    def bbox_distribution(self, coco, legend=None):
+    def bbox_distribution(self, coco, legend=None, K=11):
         if legend is None:
             legend = ''
         coco = chg2coco(coco)
         dataset = coco.dataset
         boxes = [b['bbox'] for b in dataset['annotations']]
-        box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'bbox width', 'bbox height'])
-        box_df.plot(kind="scatter", x="bbox width", y="bbox height", alpha=0.2)
+        box_df = pd.DataFrame(data=boxes, columns=['x', 'y', 'bbox_width', 'bbox_height'])
+
+        # ax = box_df.plot(kind="scatter", x="bbox width", y="bbox height", alpha=0.2
+        # plt.xlim(0, 1000)
+        # plt.ylim(0, 1000)
+        ax = sns.jointplot("bbox_width", "bbox_height", data=box_df,
+                           kind="reg", truncate=False,
+                           xlim=(0, 600), ylim=(0, 1000),
+                           color="m", height=7)
+        asp = box_df['bbox_height'] / box_df['bbox_width']
+        asp_quantiles = []
+        for c, p in zip(np.linspace(0.5, 1., K), np.linspace(0., 1., K)):
+            k = asp.quantile(p)
+            asp_quantiles.append(dict(quantile=p, value=k))
+            x = np.array(list(range(1000)))
+            y = k * x
+            plt.plot(x, y, color=(c, 0, 0, 1), linewidth=1)
+        print(json_normalize(asp_quantiles))
         save_plt(os.path.join(self.save_img_dir, 'bbox_distribution_{}.jpg'.format(str(legend))))
         plt.show()
 
