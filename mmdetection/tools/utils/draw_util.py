@@ -67,8 +67,8 @@ def draw_bbox(image, boxes, category_ids, label_list, colors, scores=None, box_m
     abs_file = abs_file.replace('\\', '/')
     end_idx = abs_file.rfind('/')
     abs_file = abs_file[:end_idx]
-    font = ImageFont.truetype(os.path.join(abs_file, 'simsun.ttc'), fontsize, encoding='unic')
-    # font = ImageFont.truetype('simsun.ttc', 24, encoding="uti-8")
+    # font = ImageFont.truetype(os.path.join(abs_file, 'simsun.ttc'), fontsize, encoding='unic')
+    font = ImageFont.truetype('simsun.ttc', 24, encoding="uti-8")
     im_width, im_height = image.size
     for idx, bbox, cat_id in zip(range(len(boxes)), boxes, category_ids):
         if box_mode == 'xyxy':

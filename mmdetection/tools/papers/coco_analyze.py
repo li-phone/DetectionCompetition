@@ -45,7 +45,6 @@ def save_plt(save_name, file_types=None):
         plt.savefig(save_name[:-4] + t)
 
 
-
 class COCOAnalysis(object):
     def __init__(self, ann_files, save_img_dir, legends=None, cn2eng=None, style='darkgrid'):
         # matplotlib.style.use('ggplot')  # 使用ggplot样式 %matplotlib inline
@@ -67,6 +66,9 @@ class COCOAnalysis(object):
               .format(img_cnts[0], img_cnts[1], img_cnts[2], img_cnts[1] / max(img_cnts[2], 1)))
         print('total defect number: {}\n'
               .format(len(coco.dataset['annotations'])))
+        images = json_normalize(coco.dataset['images'])
+        resolutions = images.groupby(by=['width', 'height']).count()
+        print(resolutions)
 
     def category_distribution(self, coco, legends=None, cn2eng=None):
         if isinstance(coco, str):
@@ -118,7 +120,7 @@ class COCOAnalysis(object):
         self.category_distribution(self.ann_files, cn2eng=self.cn2eng, legends=self.legends)
 
 
-def main():
+def demo1():
     ann_files = [
         '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json',
         '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json',
@@ -154,6 +156,39 @@ def main():
         save_img_dir='../results/garbage',
         legends=['train'])
     garbage_ana.summary()
+
+
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description='Transform coco submit to other submit format')
+    parser.add_argument('gt_file', help='annotated file')
+    parser.add_argument('dt_file', help='detected file for list type')
+    parser.add_argument('save_name', help='save file or save directory')
+    parser.add_argument(
+        '--columns',
+        nargs='+', action=MultipleKVAction, help='rename dt_file columns')
+    parser.add_argument(
+        '--convert',
+        nargs='+', action=MultipleKVAction,
+        help='convert columns format, filter_id=[0], cvt_img_id=[None, ., .xxx], cvt_box=[None, xywh2xyxy, xyxy2xywh], split_box=[None], cvt_score=[None, append], cvt_cat_id=[None]')
+    parser.add_argument(
+        '--options',
+        nargs='+', action=MultipleKVAction, help='jsons fmt: keyword=[None]')
+    parser.add_argument(
+        '--fmt',
+        choices=['None', 'jsons', 'csv'],
+        default='jsons', help='format type')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    data = COCOAnalysis(
+        ann_files=['/home/liphone/undone-work/data/detection/breast/annotations/instance_train.json'],
+        save_img_dir='../results/breast',
+        legends=['train'])
+    data.summary()
+    pass
 
 
 if __name__ == '__main__':

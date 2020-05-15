@@ -22,7 +22,8 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        anchor_ratios=[0.5, 1.0, 2.0],
+        # anchor_ratios=[0.5, 1.0, 2.0],
+        anchor_ratios=[0.5, 0.89, 0.91, 0.92, 1.0, 1.06],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -30,27 +31,10 @@ model = dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
     bbox_roi_extractor=dict(
-        type='SumGenericRoiExtractor',
+        type='SingleRoIExtractor',
         roi_layer=dict(type='RoIAlign', out_size=7, sample_num=2),
         out_channels=256,
-        featmap_strides=[4, 8, 16, 32],
-        pre_conf=dict(
-            type='ConvModule',
-            in_channels=256,
-            out_channels=256,
-            kernel_size=5,
-            padding=2,
-            inplace=False,
-        ),
-        post_conf=dict(
-            type='GeneralizedAttention',
-            in_dim=256,
-            spatial_range=-1,
-            num_heads=6,
-            attention_type='0100',
-            kv_stride=2
-        )
-    ),
+        featmap_strides=[4, 8, 16, 32]),
     bbox_head=[
         dict(
             type='SharedFCBBoxHead',
@@ -218,12 +202,6 @@ data = dict(
         img_prefix=data_root + '/images/',
         ignore_ids=[1],
         pipeline=train_pipeline),
-    val=dict(
-        type=dataset_type,
-        ann_file=data_root + '/annotations/instance_train.json',
-        img_prefix=data_root + '/images/',
-        ignore_ids=[0],
-        pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + '/annotations/test_data_A.json',
@@ -257,8 +235,8 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 uid = None
 cfg_name = ''
-work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_x101_64x4d_fpn_1x_groie+multiscale+softnms+nobg'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_x101_64x4d_fpn_1x_anchor_ratios+multiscale+softnms'
 load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_2x_20181218-5add321e.pth'
 # load_from = None
-resume_from = work_dir+'/epoch_12.pth'
+resume_from = None
 workflow = [('train', 1)]

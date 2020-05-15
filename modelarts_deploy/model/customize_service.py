@@ -61,24 +61,27 @@ class ObjectDetectionService(PTServingBaseService):
         results = dict(detection_classes=[], detection_scores=[], detection_boxes=[])
         # import cv2 as cv
         for img_id, file_content in images.items():
-            image = Image.open(file_content)
-            image = np.array(image)
-            result = inference_detector(self.model, image)
-            for j, rows in enumerate(result):
-                for r in rows:
-                    r = [float(_) for _ in r]
-                    label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-                    results['detection_classes'].append(label)
-                    results['detection_scores'].append(r[4])
-                    # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-                    bbox = r[:4]
-                    bbox = [round(_, 2) for _ in bbox]
-                    results['detection_boxes'].append(bbox)
-                    # pt1 = (int(bbox[0]), int(bbox[1]))
-                    # pt2 = (int(bbox[2]), int(bbox[3]))
-                    # cv.rectangle(image, pt1, pt2, color=(0, 0, 255))
-            # cv.imshow('', image)
-            # cv.waitKey()
+            try:
+                image = Image.open(file_content)
+                image = np.array(image)
+                result = inference_detector(self.model, image)
+                for j, rows in enumerate(result):
+                    for r in rows:
+                        r = [float(_) for _ in r]
+                        label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
+                        results['detection_classes'].append(label)
+                        results['detection_scores'].append(r[4])
+                        # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
+                        bbox = r[:4]
+                        bbox = [round(_, 2) for _ in bbox]
+                        results['detection_boxes'].append(bbox)
+                        # pt1 = (int(bbox[0]), int(bbox[1]))
+                        # pt2 = (int(bbox[2]), int(bbox[3]))
+                        # cv.rectangle(image, pt1, pt2, color=(0, 0, 255))
+                # cv.imshow('', image)
+                # cv.waitKey()
+            except:
+                print('inference_detector error!')
         return results
 
     def _postprocess(self, data):

@@ -5,7 +5,10 @@ import numpy as np
 import os
 import seaborn as sns
 
-from .kmeans import kmeans, avg_iou
+try:
+    from .kmeans import kmeans, avg_iou
+except:
+    from kmeans import kmeans, avg_iou
 
 ANNOTATIONS_PATH = "Annotations"
 CLUSTERS = 5
@@ -54,7 +57,7 @@ def coco_kmeans(coco, k=7):
     print("Boxes:\n {}".format(out))
     ratios = np.around(out[:, 0] / out[:, 1], decimals=2).tolist()
     print("Ratios:\n {}".format(sorted(ratios)))
-    return ratios
+    return ratios, acc, out
 
     # [32, 64, 128, 256, 512]
 
@@ -89,7 +92,7 @@ def main():
     ks, accs = [], []
     for i in tqdm(range(1, 11)):
         ratios, acc, out = coco_kmeans(
-            '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train_rate=0.80.json', k=i)
+            '/home/liphone/undone-work/data/detection/breast/annotations/instance_train.json', k=i)
         ks.append(i)
         accs.append(acc)
     acc_df = pd.DataFrame(data={'k': ks, 'avg_iou': accs})
@@ -97,7 +100,7 @@ def main():
         x='k', y='avg_iou', marker='^',
         grid=True, xlim=(1, 10), ylim=(0., 100.))
     plt.ylabel('avg_iou')
-    save_plt('../../../results/fabric/fabric_defect_detection/k-means_cluster/k-means_cluster.jpg')
+    save_plt('../../results/breast/k-means_cluster/k-means_cluster.jpg')
     plt.show()
 
 

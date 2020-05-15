@@ -62,5 +62,5 @@ def main(anns, min_iou=0.2):
 
 
 if __name__ == '__main__':
-    main('E:/liphone/data/images/detections/underwater/annotations/underwater_train.json', min_iou=0.15)
-    main('E:/liphone/data/images/detections/garbage/annotations/instances_train2017.json', min_iou=0.2)
+    main('/home/liphone/undone-work/data/detection/breast/annotations/instance_train.json', min_iou=0.05)
+    # main('E:/liphone/data/images/detections/garbage/annotations/instances_train2017.json', min_iou=0.2)
