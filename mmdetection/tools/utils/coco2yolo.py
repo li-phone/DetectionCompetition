@@ -5,6 +5,7 @@ import os
 import json
 import numpy as np
 import random
+import pandas as pd
 
 
 def convert(size, box):
@@ -21,68 +22,71 @@ def convert(size, box):
     return (x, y, w, h)
 
 
-def coco2yolo(ann_path, IMG_DIR, SAVE_PATH):
+def coco2yolo(ann_file, img_dir, save_dir):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     from pycocotools.coco import COCO
-    coco_api = COCO(ann_path)
-    image_ids = coco_api.getImgIds()
+    coco = COCO(ann_file)
+    img_ids = coco.getImgIds()
+    targets = []
+    for img_id in tqdm(img_ids):
+        image_info = coco.loadImgs(img_id)[0]
+        ann_ids = coco.getAnnIds(imgIds=img_id)
+        annotations = coco.loadAnns(ann_ids)
 
-    random.seed(666)
-    random.shuffle(image_ids)
-    if not os.path.exists(SAVE_PATH):
-        os.makedirs(SAVE_PATH)
-
-    for img_id in tqdm(image_ids):
-        image_info = coco_api.loadImgs(img_id)[0]
-        ann_ids = coco_api.getAnnIds(imgIds=img_id)
-        annotations = coco_api.loadAnns(ann_ids)
-
-        img_path = os.path.join(IMG_DIR, image_info['file_name'])
+        img_path = os.path.join(img_dir, image_info['file_name'])
         if not os.path.exists(img_path):
             print(img_path, "not exists")
             continue
-        file_name = os.path.join(SAVE_PATH, '{}.txt'.format(image_info['file_name'].split('.')[0]))
+
+        file_name = os.path.join(save_dir, '{}.txt'.format(image_info['file_name'].split('.')[0]))
         with open(file_name, 'w') as fp:
-            for anno in annotations:
-                bb = anno['bbox']
+            for ann in annotations:
+                bb = ann['bbox']
                 bb[2] += bb[0]
                 bb[3] += bb[1]
                 img_w = image_info['width']
                 img_h = image_info['height']
+                bb[2] = min(bb[2], img_w)
+                bb[3] = min(bb[3], img_h)
                 bb = convert((img_w, img_h), bb)
-                cls_id = int(anno['category_id']) - 1
+                cls_id = int(ann['category_id']) - 1
                 fp.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+        targets.append(dict(img=img_path, target=file_name))
+    return coco, targets
 
 
-def split_data(save_path, paths, img_dir):
-    with open(save_path, 'w') as fp:
-        for p in paths:
-            img_id = os.path.basename(p).split('.')[0]
-            img_p = os.path.join(img_dir, '{}.jpg'.format(img_id))
-            if os.path.exists(p) and os.path.exists(img_p):
-                fp.write('{}\n'.format(img_p))
+def parse_args():
+    import argparse
+    parser = argparse.ArgumentParser(description='coco2yolo')
+    parser.add_argument('--coco',
+                        default='/home/liphone/undone-work/data/detection/garbage_huawei/annotations/train.json',
+                        help='coco')
+    parser.add_argument('--img_dir', default='/home/liphone/undone-work/data/detection/garbage_huawei/images',
+                        help='img_dir')
+    parser.add_argument('--save_dir', default='/home/liphone/undone-work/data/detection/garbage_huawei/yolo',
+                        help='save_dir')
+    parser.add_argument('--frac', default=0.8, type=float, help='frac')
+    parser.add_argument('--random_state', default=666, help='random_state')
+    args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parse_args()
+    coco, targets = coco2yolo(args.coco, args.img_dir, os.path.join(args.save_dir, 'labels'))
+    categories = pd.json_normalize(coco.dataset['categories'])
+    categories['name'].to_csv(os.path.join(args.save_dir, 'label_list.txt'), index=False, header=False)
+
+    targets = pd.json_normalize(targets)
+    targets = targets.sample(frac=1., random_state=args.random_state)
+    train_samples = targets.sample(frac=args.frac, random_state=args.random_state)
+    val_samples = targets.drop(train_samples.index)
+    targets.to_csv(os.path.join(args.save_dir, 'trainval.txt'), index=False, header=False)
+    train_samples.to_csv(os.path.join(args.save_dir, 'train.txt'), index=False, header=False)
+    val_samples.to_csv(os.path.join(args.save_dir, 'val.txt'), index=False, header=False)
 
 
 if __name__ == "__main__":
-    ann_path = r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\annotations\VOCtest_06-Nov-2007_instances_coco_pascalvoc_test.json'
-    img_dir = r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\test'
-    save_dir = r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\yolo\labels'
-
-    coco2yolo(ann_path, img_dir, save_dir)
-
-    label_paths = glob.glob(save_dir + '\*')
-    train_size = int(len(label_paths) * 0.8)
-    split_data(
-        r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\yolo\trainval.txt',
-        label_paths,
-        img_dir
-    )
-    split_data(
-        r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\yolo\train.txt',
-        label_paths[:train_size],
-        img_dir
-    )
-    split_data(
-        r'C:\Users\zl\liphone\home\data\detection\pascalvoc\coco_pascalvoc\yolo\val.txt',
-        label_paths[train_size:],
-        img_dir
-    )
+    main()
