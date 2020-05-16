@@ -70,10 +70,10 @@ class ObjectDetectionService(PTServingBaseService):
                         r = [float(_) for _ in r]
                         label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
                         results['detection_classes'].append(label)
-                        results['detection_scores'].append(r[4])
+                        results['detection_scores'].append(round(r[4], 4))
                         # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-                        bbox = r[:4]
-                        bbox = [round(_, 2) for _ in bbox]
+                        bbox = [r[1], r[0], r[3], r[2]]
+                        bbox = [round(_, 1) for _ in bbox]
                         results['detection_boxes'].append(bbox)
                         # pt1 = (int(bbox[0]), int(bbox[1]))
                         # pt2 = (int(bbox[2]), int(bbox[3]))

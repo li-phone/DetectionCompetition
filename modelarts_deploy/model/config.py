@@ -1,4 +1,3 @@
-# config for service
 
 cfg = 'model/configs/retinanet_r50_fpn_1x.py'
 model_path = 'model/work_dirs/retinanet_r50_fpn_1x/epoch_12.pth'
