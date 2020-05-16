@@ -11,7 +11,10 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        style='pytorch'),
+        style='pytorch',
+        dcn=dict(
+            modulated=False, deformable_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True)),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -22,8 +25,10 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        # anchor_ratios=[0.5, 1.0, 2.0],
-        anchor_ratios=[0.5, 0.89, 0.91, 0.92, 1.0, 1.06],
+        # anchor_ratios=[0.5, 1.0, 2.0], # default
+        # anchor_ratios=[0.5, 0.89, 0.91, 0.92, 1.0, 1.06], # YOLO cluster
+        # [0.119048, 0.674242, 0.868182, 1.0, 1.008065, 1.141304, 1.314961, 1.530303, 1.818966, 2.214286, 6.634921]
+        anchor_ratios=[0.674242, 0.868182, 1.0, 1.141304, 1.314961, 1.530303, 1.818966, 2.214286],  # quantile
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -235,7 +240,7 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 uid = None
 cfg_name = ''
-work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_x101_64x4d_fpn_1x_anchor_ratios+multiscale+softnms'
+work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_x101_64x4d_fpn_1x_quantile_dcn+multiscale+softnms'
 load_from = '../work_dirs/pretrained/cascade_rcnn_x101_64x4d_fpn_2x_20181218-5add321e.pth'
 # load_from = None
 resume_from = None

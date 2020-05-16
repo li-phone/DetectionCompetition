@@ -24,7 +24,7 @@ kiwisolver==1.2.0
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 mmcv==0.5.1
--e git+git@gitee.com:liphone/DetCompetition.git@d64bf9a345624805ee00448c7c04b31f3001e306#egg=mmdet&subdirectory=mmdetection
+-e git+git@gitee.com:liphone/DetCompetition.git@f750865bc21368f5f2d89ee0035f26441656c0ad#egg=mmdet&subdirectory=mmdetection
 modelarts==1.1.3
 networkx==2.4
 numpy==1.18.4
