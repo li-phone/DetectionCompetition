@@ -7,6 +7,11 @@ import numpy as np
 import random
 import pandas as pd
 
+try:
+    from pandas import json_normalize
+except:
+    from pandas.io.json import json_normalize
+
 
 def convert(size, box):
     dw = 1. / (size[0])
@@ -76,10 +81,10 @@ def parse_args():
 def main():
     args = parse_args()
     coco, targets = coco2yolo(args.coco, args.img_dir, os.path.join(args.save_dir, 'labels'))
-    categories = pd.json_normalize(coco.dataset['categories'])
+    categories = json_normalize(coco.dataset['categories'])
     categories['name'].to_csv(os.path.join(args.save_dir, 'label_list.txt'), index=False, header=False)
 
-    targets = pd.json_normalize(targets)
+    targets = json_normalize(targets)
     targets = targets.sample(frac=1., random_state=args.random_state)
     train_samples = targets.sample(frac=args.frac, random_state=args.random_state)
     val_samples = targets.drop(train_samples.index)
