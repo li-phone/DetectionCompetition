@@ -7,11 +7,11 @@ work_dirs = './work_dirs/garbage/yolov3/'
 # train config
 epochs = 60
 lr = 1e-4
-batch_size = 32
+batch_size = 4
 
 gradient_accumulations = 2
 model_def = "config/yolov3-44.cfg"
-pretrained_weights = None
+pretrained_weights = 'weights/darknet53.conv.74'
 
 n_cpu = 8
 img_size = 416
