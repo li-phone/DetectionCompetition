@@ -2,7 +2,8 @@ from __future__ import division
 
 import torch
 
-from ..registry import ROI_EXTRACTORS
+# from ..registry import ROI_EXTRACTORS
+from mmdet.models.builder import ROI_EXTRACTORS
 from .single_level import SingleRoIExtractor
 
 

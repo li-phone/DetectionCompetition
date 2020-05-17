@@ -7,10 +7,13 @@ from torch import nn
 from copy import deepcopy
 
 from mmdet.core import force_fp32
-from mmdet.models.plugins.non_local import NonLocal2D
-from mmdet.models.plugins.generalized_attention import GeneralizedAttention
+# from mmdet.models.plugins.non_local import NonLocal2D
+from mmdet.ops.non_local import NonLocal2D
+# from mmdet.models.plugins.generalized_attention import GeneralizedAttention
+from mmdet.ops.generalized_attention import GeneralizedAttention
 from mmdet.models.utils import ConvModule
-from ..registry import ROI_EXTRACTORS
+# from ..registry import ROI_EXTRACTORS
+from mmdet.models.builder import ROI_EXTRACTORS
 from .single_level import SingleRoIExtractor
 
 
