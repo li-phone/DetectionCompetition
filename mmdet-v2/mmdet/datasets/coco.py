@@ -17,7 +17,6 @@ from .custom import CustomDataset
 
 @DATASETS.register_module()
 class CocoDataset(CustomDataset):
-
     CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
                'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
@@ -35,8 +34,15 @@ class CocoDataset(CustomDataset):
 
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
-        self.cat_ids = self.coco.getCatIds(catNms=self.CLASSES)
-        self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
+        if self.v1_style:
+            self.cat_ids = self.coco.getCatIds()
+            self.cat2label = {
+                cat_id: i + 1
+                for i, cat_id in enumerate(self.cat_ids)
+            }
+        else:
+            self.cat_ids = self.coco.getCatIds(catNms=self.CLASSES)
+            self.cat2label = {cat_id: i for i, cat_id in enumerate(self.cat_ids)}
         self.img_ids = self.coco.getImgIds()
         data_infos = []
         for i in self.img_ids:
@@ -300,7 +306,7 @@ class CocoDataset(CustomDataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-            format(len(results), len(self)))
+                format(len(results), len(self)))
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()

@@ -39,6 +39,7 @@ class CustomDataset(Dataset):
     def __init__(self,
                  ann_file,
                  pipeline,
+                 v1_style=None,
                  classes=None,
                  data_root=None,
                  img_prefix='',
@@ -54,6 +55,9 @@ class CustomDataset(Dataset):
         self.test_mode = test_mode
         self.filter_empty_gt = filter_empty_gt
         self.CLASSES = self.get_classes(classes)
+
+        # add coco style for mmdet v1
+        self.v1_style = v1_style
 
         # join paths if data_root is specified
         if self.data_root is not None:
