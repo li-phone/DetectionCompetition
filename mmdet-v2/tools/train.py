@@ -18,7 +18,7 @@ from mmdet.utils import collect_env, get_root_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('config', help='train config file path')
+    parser.add_argument('--config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from', help='the checkpoint file to resume from')
@@ -31,13 +31,13 @@ def parse_args():
         '--gpus',
         type=int,
         help='number of gpus to use '
-        '(only applicable to non-distributed training)')
+             '(only applicable to non-distributed training)')
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
         nargs='+',
         help='ids of gpus to use '
-        '(only applicable to non-distributed training)')
+             '(only applicable to non-distributed training)')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument(
         '--deterministic',
@@ -62,10 +62,16 @@ def parse_args():
     return args
 
 
-def main():
+def main(**kwargs):
     args = parse_args()
+    for k, v in kwargs.items():
+        args.__setattr__(k, v)
 
-    cfg = Config.fromfile(args.config)
+    if isinstance(args.config, str):
+        cfg = Config.fromfile(args.config)
+    else:
+        cfg = args.config
+
     if args.options is not None:
         cfg.merge_from_dict(args.options)
     # set cudnn_benchmark
