@@ -23,7 +23,7 @@ kwarray==0.5.8
 matplotlib==3.2.1
 mccabe==0.6.1
 mmcv==0.5.4
--e git+git@gitee.com:liphone/DetCompetition.git@8f17cc59c4213db0521dc0e1b5a637ff26b30647#egg=mmdet&subdirectory=mmdet-v2
+-e git+git@gitee.com:liphone/DetCompetition.git@204a0c654a377e537e4785d7f27cfecea1370a09#egg=mmdet&subdirectory=mmdet-v2
 more-itertools==8.3.0
 networkx==2.4
 numpy==1.18.4
