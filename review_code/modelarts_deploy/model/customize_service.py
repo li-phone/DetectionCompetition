@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-import json
-import codecs
+import torch
 import numpy as np
 from PIL import Image
-from collections import OrderedDict
 
+# modelarts import
 try:
     import log
-
-    logger = log.getLogger(__name__)
     from metric.metrics_manager import MetricsManager
     from model_service.pytorch_model_service import PTServingBaseService
+
+    logger = log.getLogger(__name__)
 except:
     print('model_service error!')
 
-# modelarts import
-import torch
-
-print('torch.__version__', torch.__version__)
 from mmdet.apis import init_detector, inference_detector
 import config
 
@@ -33,8 +28,9 @@ class ObjectDetectionService(PTServingBaseService):
             device = 'cpu'
             print('use torch CPU version,', torch.__version__)
         print('model_name:', model_name, ', model_path', model_path)
+
         self.cfg = config.cfg
-        self.model_path = model_path
+        self.model_path = config.model_path
         self.cat2label = config.cat2label
         self.model_name = os.path.basename(self.cfg[:-3])
         print('starting init detector model...')
@@ -59,42 +55,24 @@ class ObjectDetectionService(PTServingBaseService):
         images = data
 
         results = dict(detection_classes=[], detection_scores=[], detection_boxes=[])
-        # for j, rows in enumerate(range(44)):
-        #     rows = np.random.random(4) * 1000
-        #     rows = np.sort(rows)
-        #     rows = [np.append(rows, np.random.random())]
-        #     for r in rows:
-        #         r = [float(_) for _ in r]
-        #         label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-        #         results['detection_classes'].append(label)
-        #         results['detection_scores'].append(round(r[4], 4))
-        #         # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-        #         bbox = [r[1], r[0], r[3], r[2]]
-        #         bbox = [round(_, 1) for _ in bbox]
-        #         results['detection_boxes'].append(bbox)
         # # import cv2 as cv
         for img_id, file_content in images.items():
-            try:
-                image = Image.open(file_content)
-                image = np.array(image)
-                result = inference_detector(self.model, image)
-                for j, rows in enumerate(result):
-                    for r in rows:
-                        r = [float(_) for _ in r]
-                        label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
-                        results['detection_classes'].append(label)
-                        results['detection_scores'].append(round(r[4], 4))
-                        # bbox = [float(r[0]), float(r[1]), float(r[2] - r[0]), float(r[3] - r[1])]
-                        bbox = [r[1], r[0], r[3], r[2]]
-                        bbox = [round(_, 1) for _ in bbox]
-                        results['detection_boxes'].append(bbox)
-                        # pt1 = (int(bbox[0]), int(bbox[1]))
-                        # pt2 = (int(bbox[2]), int(bbox[3]))
-                        # cv.rectangle(image, pt1, pt2, color=(0, 0, 255))
-                # cv.imshow('', image)
-                # cv.waitKey()
-            except:
-                print('inference_detector error!')
+            image = Image.open(file_content)
+            image = np.array(image)
+            result = inference_detector(self.model, image)
+            for j, rows in enumerate(result):
+                for r in rows:
+                    r = list(map(float, r))
+                    label = self.cat2label[j + 1]['supercategory'] + '/' + self.cat2label[j + 1]['name']
+                    results['detection_classes'].append(label)
+                    results['detection_scores'].append(round(r[4], 4))
+                    bbox = [round(_, 1) for _ in r[:4]]
+                    results['detection_boxes'].append(bbox)
+                    # pt1 = (int(bbox[0]), int(bbox[1]))
+                    # pt2 = (int(bbox[2]), int(bbox[3]))
+                    # cv.rectangle(image, pt1, pt2, color=(0, 0, 255))
+            # cv.imshow('', image)
+            # cv.waitKey()
         return results
 
     def _postprocess(self, data):
@@ -148,17 +126,18 @@ class ObjectDetectionService(PTServingBaseService):
 
     def _test_run(self):
         from glob import glob
-        paths = glob('/home/liphone/undone-work/data/detection/garbage_huawei/images/*')
-        data = {str(0): {'file_name': p} for i, p in enumerate(paths)}
-        start_time = time.time()
-        data = self._preprocess(data)
-        data = self._inference(data)
-        data = self._postprocess(data)
-        end_time = time.time()
-        time_in_ms = (end_time - start_time) * 1000
-        data['latency_time'] = str(round(time_in_ms, 1)) + ' ms'
-        for k, v in data.items():
-            print(k, ':', v)
+        paths = glob('/home/liphone/undone-work/data/detection/garbage_huawei/images/*/*')
+        for i, p in enumerate(paths):
+            data = {str(i): {'file_name': p}}
+            start_time = time.time()
+            data = self._preprocess(data)
+            data = self._inference(data)
+            data = self._postprocess(data)
+            end_time = time.time()
+            time_in_ms = (end_time - start_time) * 1000
+            data['latency_time'] = str(round(time_in_ms, 1)) + ' ms'
+            for k, v in data.items():
+                print(k, ':', v)
 
 
 if __name__ == '__main__':
