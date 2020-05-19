@@ -1,5 +1,5 @@
 dataset_type = 'CocoDataset'
-data_root = '/home/liphone/undone-work/data/detection/breast/'
+data_root = '/home/liphone/undone-work/data/detection/garbage_huawei/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -39,7 +39,7 @@ data = dict(
         ann_file=data_root + 'annotations/instance_train.json',
         img_prefix=data_root + 'images/',
         v1_style=True,
-        mixup=dict(type='multiMix', img_label=[0]),
+        mixup=dict(type='multiMix'),
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,

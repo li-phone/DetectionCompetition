@@ -60,7 +60,7 @@ class CustomDataset(Dataset):
         # add coco style for mmdet v1
         self.v1_style = v1_style
         # add multiple images mixup
-        self.mixup = mixup
+        self.mixup = {} if mixup is None else mixup
 
         # join paths if data_root is specified
         if self.data_root is not None:
@@ -94,7 +94,7 @@ class CustomDataset(Dataset):
         if not self.test_mode:
             self._set_group_flag()
         # processing pipeline
-        self.pipeline = Compose(pipeline, self.mixup)
+        self.pipeline = Compose(pipeline, ann_file=ann_file, img_prefix=img_prefix, **self.mixup)
 
     def __len__(self):
         return len(self.data_infos)

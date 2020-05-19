@@ -15,13 +15,14 @@ import cv2
 class Compose(object):
 
     def __init__(self, transforms, ann_file=None, img_prefix=None,
-                 type=None, mix_ratio=0.5, img_label=None, alpha=0.01, **kwargs):
+                 type=None, mix_ratio=0.5, img_label=None, use_max=True, alpha=10, **kwargs):
         assert isinstance(transforms, collections.abc.Sequence)
         self.ann_file = ann_file
         self.img_prefix = img_prefix
         self.type = type
         self.mix_ratio = mix_ratio
         self.img_label = img_label
+        self.use_max = use_max
         self.alpha = alpha
         self.transforms = []
         for transform in transforms:
@@ -34,7 +35,7 @@ class Compose(object):
                 raise TypeError('transform must be callable or a dict')
         if self.type is not None:
             self.coco = COCO(self.ann_file)
-            if 'img_label' in self.coco.dataset['images'][0]:
+            if 'img_label' in self.coco.dataset['images'][0] and self.img_label is not None:
                 if isinstance(self.img_label, int):
                     self.img_label = [self.img_label]
                 self.images = [r for r in self.coco.dataset['images'] if r['img_label'] in self.img_label]
@@ -42,7 +43,10 @@ class Compose(object):
                 self.images = self.coco.dataset['images']
 
     def multi_mix(self, img1, img2):
-        scale = (img1.shape[0], img1.shape[1])
+        cv2.imshow("img1", img1)
+        img1 = img1.astype(np.float) / 255.0
+        img2 = img2.astype(np.float) / 255.0
+        scale = (img1.shape[1], img1.shape[0],)
         img2 = cv2.resize(img2, scale, interpolation=cv2.INTER_LINEAR)
         # roi2, _rescale = mmcv.imrescale(roi2, tuple(scale), return_scale=True)
         lamb = np.random.beta(self.alpha, self.alpha)
@@ -51,6 +55,9 @@ class Compose(object):
         else:
             new_lamb = lamb
         img1 = new_lamb * img1 + (1 - new_lamb) * img2
+        img11 = np.array(img1 * 255).astype(np.uint8)
+        cv2.imshow("img11", img11)
+        cv2.waitKey(0)
         return img1
 
     def __call__(self, data):
@@ -68,9 +75,8 @@ class Compose(object):
             if data is None:
                 return None
             if self.type is not None and i == 1 and data['multiMix']:
-                img, bbox = self.multi_mix(data['img'], img2)
+                img = self.multi_mix(data['img'], img2)
                 data['img'] = img
-                data['gt_bboxes'] = bbox
         return data
 
     def __repr__(self):
