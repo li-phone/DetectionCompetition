@@ -1,10 +1,6 @@
 numpy
 pillow
-torch>=1.1
-mmcv
-pycocotools
-torchvision
-albumentations>=0.3.2
+addict
+albumentations
 imagecorruptions
-
 

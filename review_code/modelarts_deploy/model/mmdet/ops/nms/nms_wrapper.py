@@ -6,7 +6,8 @@ import torch
 # from .soft_nms_cpu import soft_nms_cpu
 # NMS算法
 # bboxes维度为[N,4]，scores维度为[N,], 均为tensor
-def nms_cpu(bboxes, scores, threshold=0.5):
+
+def third_nms_cpu(bboxes, scores, threshold=0.5):
     x1 = bboxes[:, 0]
     y1 = bboxes[:, 1]
     x2 = bboxes[:, 2]
@@ -37,6 +38,14 @@ def nms_cpu(bboxes, scores, threshold=0.5):
             break
         order = order[idx + 1]  # 修补索引之间的差值
     return torch.LongTensor(keep)  # Pytorch的索引值为LongTensor
+
+
+try:
+    from torchvision.ops import nms as tv_nms
+
+    nms_cpu = tv_nms
+except:
+    nms_cpu = third_nms_cpu
 
 
 def soft_nms_cpu():
@@ -94,10 +103,10 @@ def nms(dets, iou_thr, device_id=None):
         inds = dets_th.new_zeros(0, dtype=torch.long)
     else:
         if dets_th.is_cuda:
-            # inds = nms_cuda.nms(dets_th, iou_thr)
-            boxes = dets_th[:, :4]
-            scores = dets_th[:, 4]
-            inds = nms_cpu(boxes, scores, iou_thr)
+            inds = nms_cuda.nms(dets_th, iou_thr)
+            # boxes = dets_th[:, :4]
+            # scores = dets_th[:, 4]
+            # inds = nms_cpu(boxes, scores, iou_thr)
         else:
             # inds = nms_cpu.nms(dets_th, iou_thr)
             boxes = dets_th[:, :4]

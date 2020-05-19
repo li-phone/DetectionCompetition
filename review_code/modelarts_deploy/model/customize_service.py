@@ -19,7 +19,7 @@ from mmdet.apis import init_detector, inference_detector
 import config
 
 
-class ObjectDetectionService(PTServingBaseService):
+class ObjectDetectionService():
     def __init__(self, model_name=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'
@@ -124,10 +124,11 @@ class ObjectDetectionService(PTServingBaseService):
         data['latency_time'] = str(round(pre_time_in_ms + infer_in_ms + post_time_in_ms, 1)) + ' ms'
         return data
 
-    def _test_run(self):
+    def local_run(self):
         from glob import glob
-        paths = glob('/home/liphone/undone-work/data/detection/garbage_huawei/images/*/*')
-        for i, p in enumerate(paths):
+        paths = glob('/home/liphone/undone-work/data/detection/garbage_huawei/images/*')
+        avg_times = []
+        for i, p in enumerate(paths[:10]):
             data = {str(i): {'file_name': p}}
             start_time = time.time()
             data = self._preprocess(data)
@@ -135,10 +136,12 @@ class ObjectDetectionService(PTServingBaseService):
             data = self._postprocess(data)
             end_time = time.time()
             time_in_ms = (end_time - start_time) * 1000
+            avg_times.append(time_in_ms)
             data['latency_time'] = str(round(time_in_ms, 1)) + ' ms'
             for k, v in data.items():
                 print(k, ':', v)
+        print('avg time: {:.2f} ms'.format(np.mean(avg_times)))
 
 
 if __name__ == '__main__':
-    ObjectDetectionService()._test_run()
+    ObjectDetectionService().local_run()

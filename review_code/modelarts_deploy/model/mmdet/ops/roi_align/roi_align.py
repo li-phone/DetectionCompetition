@@ -3,6 +3,11 @@ from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
+try:
+    from torchvision.ops import roi_align as tv_roi_align
+except:
+    print('from torchvision.ops import roi_align as tv_roi_align error!')
+
 
 # from . import roi_align_cuda
 def roi_align_cuda():
@@ -75,7 +80,6 @@ class RoIAlign(nn.Module):
 
     def forward(self, features, rois):
         if self.use_torchvision:
-            from torchvision.ops import roi_align as tv_roi_align
             return tv_roi_align(features, rois, self.out_size,
                                 self.spatial_scale, self.sample_num)
         else:
