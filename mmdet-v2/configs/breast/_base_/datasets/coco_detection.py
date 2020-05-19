@@ -39,6 +39,7 @@ data = dict(
         ann_file=data_root + 'annotations/instance_train.json',
         img_prefix=data_root + 'images/',
         v1_style=True,
+        mixup=dict(type='',),
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
