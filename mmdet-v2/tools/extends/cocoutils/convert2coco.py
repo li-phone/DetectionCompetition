@@ -247,8 +247,9 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
         label2cat = np.sort(label2cat)
         label2cat = list(label2cat)
         label2cat = {i + 1: v for i, v in enumerate(label2cat)}
-        if bgcat is not None:
-            label2cat[0] = bgcat
+        # not including background label
+        # if bgcat is not None:
+        #     label2cat[0] = bgcat
 
     if supercategory is None:
         supercategory = [None] * (len(label2cat) + 1)
@@ -273,6 +274,8 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
 
     annotations = anns.to_dict('records')
     for v in annotations:
+        if v['label'] is None or v['label'] == bgcat or v['bbox'] is None:
+            continue
         bbox = v['bbox']
         area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
         points = [[bbox[0], bbox[1]], [bbox[2], bbox[1]], [bbox[2], bbox[3]], [bbox[0], bbox[3]]]
