@@ -11,11 +11,17 @@ from ..builder import PIPELINES
 @PIPELINES.register_module()
 class LoadImageFromFile(object):
 
-    def __init__(self, to_float32=False, color_type='color'):
+    def __init__(self, to_float32=False, color_type='color', ignore_imlabels=None):
         self.to_float32 = to_float32
         self.color_type = color_type
+        if ignore_imlabels is None:
+            self.ignore_imlabels = []
+        else:
+            self.ignore_imlabels = ignore_imlabels
 
     def __call__(self, results):
+        if 'img_label' in results['img_info'] and results['img_info']['img_label'] in self.ignore_imlabels:
+            return None
         if results['img_prefix'] is not None:
             filename = osp.join(results['img_prefix'],
                                 results['img_info']['filename'])
@@ -40,7 +46,7 @@ class LoadImageFromFile(object):
 
     def __repr__(self):
         return f'{self.__class__.__name__}(to_float32={self.to_float32}, ' \
-            f"color_type='{self.color_type}')"
+               f"color_type='{self.color_type}')"
 
 
 @PIPELINES.register_module()
@@ -81,7 +87,7 @@ class LoadMultiChannelImageFromFiles(object):
 
     def __repr__(self):
         return f'{self.__class__.__name__}(to_float32={self.to_float32}, ' \
-            f"color_type='{self.color_type}')"
+               f"color_type='{self.color_type}')"
 
 
 @PIPELINES.register_module()
@@ -213,4 +219,4 @@ class LoadProposals(object):
 
     def __repr__(self):
         return self.__class__.__name__ + \
-            f'(num_max_proposals={self.num_max_proposals})'
+               f'(num_max_proposals={self.num_max_proposals})'
