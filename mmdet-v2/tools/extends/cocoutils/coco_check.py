@@ -169,9 +169,9 @@ def check_box(coco, save_name, img_dir):
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
-    parser.add_argument('--ann_file', help='annotation file or test image directory')
-    parser.add_argument('--save_name', help='save_name')
-    parser.add_argument('--img_dir', help='img_dir')
+    parser.add_argument('ann_file', help='annotation file or test image directory')
+    parser.add_argument('save_name', help='save_name')
+    parser.add_argument('img_dir', help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()
     return args
@@ -179,10 +179,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    args.ann_file = '/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json'
-    args.save_name = '/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json'
-    args.img_dir = '/home/liphone/undone-work/data/detection/garbage_huawei/images'
-    args.check_type = 'box'
     check_type = args.check_type.split(',')
     if 'coco' in check_type:
         args.ann_file = check_coco(args.ann_file, args.save_name, args.img_dir)
