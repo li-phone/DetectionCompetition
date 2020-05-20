@@ -43,7 +43,6 @@ class Compose(object):
                 self.images = self.coco.dataset['images']
 
     def multi_mix(self, img1, img2):
-        cv2.imshow("img1", img1)
         img1 = img1.astype(np.float) / 255.0
         img2 = img2.astype(np.float) / 255.0
         scale = (img1.shape[1], img1.shape[0],)
@@ -55,15 +54,13 @@ class Compose(object):
         else:
             new_lamb = lamb
         img1 = new_lamb * img1 + (1 - new_lamb) * img2
-        img11 = np.array(img1 * 255).astype(np.uint8)
-        cv2.imshow("img11", img11)
-        cv2.waitKey(0)
+        img1 = np.array(img1 * 255).astype(np.uint8)
         return img1
 
     def __call__(self, data):
         if self.type is not None:
             if 'multiMix' not in data:
-                flip = True if np.random.rand() < self.mix_ratio else False
+                flip = True if np.random.rand() <= self.mix_ratio else False
                 data['multiMix'] = flip
             if data['multiMix']:
                 ind = np.random.randint(len(self.images))
