@@ -55,7 +55,7 @@ def coco_kmeans(coco, k=7):
     acc = avg_iou(data, out) * 100
     print("Accuracy: {:.2f}%".format(acc))
     print("Boxes:\n {}".format(out))
-    ratios = np.around(out[:, 0] / out[:, 1], decimals=2).tolist()
+    ratios = np.around(out[:, 1] / out[:, 0], decimals=2).tolist()
     print("Ratios:\n {}".format(sorted(ratios)))
     return ratios, acc, out
 
@@ -92,7 +92,7 @@ def main():
     ks, accs = [], []
     for i in tqdm(range(1, 11)):
         ratios, acc, out = coco_kmeans(
-            '/home/liphone/undone-work/data/detection/breast/annotations/instance_train.json', k=i)
+            '/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json', k=i)
         ks.append(i)
         accs.append(acc)
     acc_df = pd.DataFrame(data={'k': ks, 'avg_iou': accs})
@@ -100,7 +100,7 @@ def main():
         x='k', y='avg_iou', marker='^',
         grid=True, xlim=(1, 10), ylim=(0., 100.))
     plt.ylabel('avg_iou')
-    save_plt('../../results/breast/k-means_cluster/k-means_cluster.jpg')
+    save_plt('./results/garbage_huawei/k-means_cluster/k-means_cluster.jpg')
     plt.show()
 
 
