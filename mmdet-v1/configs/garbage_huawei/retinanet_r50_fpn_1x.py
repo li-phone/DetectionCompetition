@@ -24,7 +24,9 @@ model = dict(
         feat_channels=256,
         octave_base_scale=4,
         scales_per_octave=3,
-        anchor_ratios=[0.5, 1.0, 2.0],
+        # anchor_ratios=[0.5, 1.0, 2.0],
+        # quantile
+        anchor_ratios=[0.480082, 0.623359, 0.724574, 0.82696, 0.953147, 1.081633, 1.287464, 1.575806, 2.230221],
         anchor_strides=[8, 16, 32, 64, 128],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -60,7 +62,9 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+    # dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+    dict(type='Resize', img_scale=[(4096, 600), (4096, 1000)],
+         multiscale_mode='range', keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
@@ -71,7 +75,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1333, 800),
+        img_scale=(4096, 800),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -96,7 +100,7 @@ data = dict(
         img_prefix=data_root + '/images/',
         pipeline=test_pipeline))
 # optimizer
-optimizer = dict(type='SGD', lr=0.01/8, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.01 / 8, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -124,6 +128,5 @@ uid = None
 cfg_name = ''
 work_dir = '../work_dirs/' + dataset_name + '/retinanet_r50_fpn_1x'
 load_from = '../work_dirs/pretrained/retinanet_r50_fpn_2x_coco_20200131-fdb43119.pth'
-resume_from = work_dir+'/epoch_12.pth'
+resume_from = work_dir + '/epoch_12.pth'
 workflow = [('train', 1)]
-
