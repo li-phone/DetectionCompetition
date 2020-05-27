@@ -19,9 +19,9 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        # img_scale=(1333, 800),
-        img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
-        flip=True,
+        img_scale=(1333, 800),
+        # img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
+        flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -53,4 +53,4 @@ data = dict(
         img_prefix=data_root + 'A/',
         v1_style=True,
         pipeline=test_pipeline))
-evaluation = dict(interval=1, metric='bbox')
+evaluation = dict(interval=12, metric='bbox')

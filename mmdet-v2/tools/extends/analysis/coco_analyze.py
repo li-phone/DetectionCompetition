@@ -129,7 +129,7 @@ class COCOAnalysis(object):
         for c, p in zip(np.linspace(0.5, 1., K), np.linspace(0., 1., K)):
             k = asp.quantile(p)
             asp_quantiles.append(dict(quantile=p, value=k))
-            x = np.array(list(range(max(box_df['bbox_width']))))
+            x = np.array(list(range(int(max(box_df['bbox_width'])))))
             y = k * x
             plt.plot(x, y, color=(c, 0, 0, 1), linewidth=1)
         asp_quantiles = json_normalize(asp_quantiles)
@@ -210,8 +210,8 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=['/home/liphone/undone-work/data/detection/breast/annotations/instance_train.json'],
-        save_img_dir='./results/breast',
+        ann_files=['/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json'],
+        save_img_dir='./results/garbage_huawei',
         legends=['train'])
     data.summary()
     # garbage_ana = COCOAnalysis(
