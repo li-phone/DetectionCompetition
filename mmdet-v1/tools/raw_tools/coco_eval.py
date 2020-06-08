@@ -5,8 +5,11 @@ from mmdet.core import coco_eval
 
 def main():
     parser = ArgumentParser(description='COCO Evaluation')
-    parser.add_argument('--result', help='result file path')
-    parser.add_argument('--ann', help='annotation file path')
+    parser.add_argument('--result',
+                        default='/home/liphone/undone-work/DetCompetition/mmdet-v1/work_dirs/garbage_huawei/cascade_rcnn_r50_fpn_1x/data_mode=test+.bbox.json',
+                        help='result file path')
+    parser.add_argument('--ann', default='/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json',
+                        help='annotation file path')
     parser.add_argument(
         '--types',
         type=str,

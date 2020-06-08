@@ -20,7 +20,8 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        anchor_ratios=[0.5, 1.0, 2.0],
+        # anchor_ratios=[0.5, 1.0, 2.0],
+        anchor_ratios=[0.480082, 0.623359, 0.724574, 0.82696, 0.953147, 1.081633, 1.287464, 1.575806, 2.230221],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -189,7 +190,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    imgs_per_gpu=2,
+    imgs_per_gpu=1,
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
@@ -198,11 +199,11 @@ data = dict(
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_test.json',
+        ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
         pipeline=test_pipeline))
 # optimizer
-optimizer = dict(type='SGD', lr=0.02 / 8, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02 / 16, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -228,5 +229,5 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = '../work_dirs/' + dataset_name + '/cascade_rcnn_r50_fpn_1x'
 resume_from = None
-load_from = '../work_dirs/pretrained/cascade_rcnn_r50_fpn_1x_20190501-3b6211ab.pth'
+load_from = '../work_dirs/pretrained/htc_dconv_c3-c5_mstrain_400_1400_x101_64x4d_fpn_20e_20190408-0e50669c.pth'
 workflow = [('train', 1)]

@@ -66,6 +66,7 @@ train_pipeline = [
     dict(type='Resize', img_scale=[(4096, 600), (4096, 1000)],
          multiscale_mode='range', keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    # dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
@@ -91,12 +92,12 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/train.json',
+        ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_test.json',
+        ann_file=data_root + '/annotations/split_test.json',
         img_prefix=data_root + '/images/',
         pipeline=test_pipeline))
 # optimizer

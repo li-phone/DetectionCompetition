@@ -210,7 +210,7 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=['/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json'],
+        ann_files=['/home/liphone/undone-work/data/detection/bottle/annotations/instance_train.json'],
         save_img_dir='./results/garbage_huawei',
         legends=['train'])
     data.summary()
