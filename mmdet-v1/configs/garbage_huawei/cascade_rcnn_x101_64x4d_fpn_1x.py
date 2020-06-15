@@ -160,7 +160,7 @@ test_cfg = dict(
         score_thr=0.0001, nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001), max_per_img=200))
 # dataset settings
 dataset_type = 'CocoDataset'
-data_root = 'E:/liphone/data/images/detections/garbage'
+data_root = '/home/liphone/undone-work/data/detection/garbage_huawei/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -181,8 +181,10 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         # img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
-        img_scale=[(4096, 600), (4096, 700), (4096, 800), (4096, 900), (4096, 1000)],
-        flip=True,
+        # img_scale=[(4096, 600), (4096, 700), (4096, 800), (4096, 900), (4096, 1000)],
+        # flip=True,
+        # img_scale=(1333, 800),#0.816
+        img_scale=(4096, 800),#0.816
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -197,12 +199,12 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/train.json',
+        ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
         pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '/annotations/instance_test.json',
+        ann_file=data_root + '/annotations/instance_train.json',
         img_prefix=data_root + '/images/',
         pipeline=test_pipeline))
 # optimizer

@@ -20,8 +20,7 @@ model = dict(
         in_channels=256,
         feat_channels=256,
         anchor_scales=[8],
-        # anchor_ratios=[0.5, 1.0, 2.0],
-        anchor_ratios=[0.480082, 0.623359, 0.724574, 0.82696, 0.953147, 1.081633, 1.287464, 1.575806, 2.230221],
+        anchor_ratios=[0.5, 1.0, 2.0],
         anchor_strides=[4, 8, 16, 32, 64],
         target_means=[.0, .0, .0, .0],
         target_stds=[1.0, 1.0, 1.0, 1.0],
@@ -178,6 +177,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
+        # img_scale=(int(1333 * 3 / 4), int(800 * 3 / 4)),
         img_scale=(1333, 800),
         flip=False,
         transforms=[

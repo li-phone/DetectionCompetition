@@ -66,7 +66,7 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='coco2yolo')
     parser.add_argument('--coco',
-                        default='/home/liphone/undone-work/data/detection/garbage_huawei/annotations/train.json',
+                        default='/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json',
                         help='coco')
     parser.add_argument('--img_dir', default='/home/liphone/undone-work/data/detection/garbage_huawei/images',
                         help='img_dir')
