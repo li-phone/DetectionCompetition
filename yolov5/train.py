@@ -9,8 +9,8 @@ from torch.utils.tensorboard import SummaryWriter
 
 import test  # import test.py to get mAP after each epoch
 from models.yolo import Model
-from utils.datasets import *
-from utils.utils import *
+from yoloutils.datasets import *
+from yoloutils.utils import *
 
 mixed_precision = True
 try:  # Mixed precision training https://github.com/NVIDIA/apex
@@ -354,6 +354,7 @@ def train(hyp):
 
     if not opt.evolve:
         plot_results()  # save as results.png
+    epoch = epochs if start_epoch == epochs else epoch
     print('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
     dist.destroy_process_group() if torch.cuda.device_count() > 1 else None
     torch.cuda.empty_cache()

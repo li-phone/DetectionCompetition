@@ -4,8 +4,8 @@ import json
 import yaml
 from torch.utils.data import DataLoader
 
-from utils.datasets import *
-from utils.utils import *
+from yoloutils.datasets import *
+from yoloutils.utils import *
 
 
 def test(data,
@@ -123,7 +123,8 @@ def test(data,
             # Append to pycocotools JSON dictionary
             if save_json:
                 # [{"image_id": 42, "category_id": 18, "bbox": [258.15, 41.29, 348.26, 243.78], "score": 0.236}, ...
-                image_id = int(Path(paths[si]).stem.split('_')[-1])
+                # image_id = int(Path(paths[si]).stem.split('_')[-1])
+                image_id = str(Path(paths[si]).stem)
                 box = pred[:, :4].clone()  # xyxy
                 scale_coords(imgs[si].shape[1:], box, shapes[si][0], shapes[si][1])  # to original shape
                 box = xyxy2xywh(box)  # xywh
@@ -158,6 +159,9 @@ def test(data,
                             d = ti[i[j]]  # detected target
                             if d not in detected:
                                 detected.append(d)
+                                # _ind = ious[j] > iouv  # iou_thres is 1xn
+                                # _ind = _ind.type(torch.bool)
+                                # correct[pi[j]] = _ind
                                 correct[pi[j]] = ious[j] > iouv  # iou_thres is 1xn
                                 if len(detected) == nl:  # all targets already located in image
                                     break
@@ -198,7 +202,8 @@ def test(data,
 
     # Save JSON
     if save_json and map50 and len(jdict):
-        imgIds = [int(Path(x).stem.split('_')[-1]) for x in dataloader.dataset.img_files]
+        # imgIds = [int(Path(x).stem.split('_')[-1]) for x in dataloader.dataset.img_files]
+        imgIds = [str(Path(x).stem) for x in dataloader.dataset.img_files]
         f = 'detections_val2017_%s_results.json' % \
             (weights.split(os.sep)[-1].replace('.pt', '') if weights else '')  # filename
         print('\nCOCO mAP with pycocotools... saving %s...' % f)
@@ -232,12 +237,12 @@ def test(data,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='test.py')
-    parser.add_argument('--weights', type=str, default='weights/yolov5s.pt', help='model.pt path')
+    parser.add_argument('--weights', type=str, default='weights/best.pt', help='model.pt path')
     parser.add_argument('--data', type=str, default='data/coco.yaml', help='*.data path')
     parser.add_argument('--batch-size', type=int, default=32, help='size of each image batch')
     parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.001, help='object confidence threshold')
-    parser.add_argument('--iou-thres', type=float, default=0.65, help='IOU threshold for NMS')
+    parser.add_argument('--iou-thres', type=float, default=0.5, help='IOU threshold for NMS')
     parser.add_argument('--save-json', action='store_true', help='save a cocoapi-compatible JSON results file')
     parser.add_argument('--task', default='val', help="'val', 'test', 'study'")
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')

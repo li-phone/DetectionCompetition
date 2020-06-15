@@ -1,7 +1,7 @@
 import argparse
 
-from utils.datasets import *
-from utils.utils import *
+from yoloutils.datasets import *
+from yoloutils.utils import *
 
 
 def detect(save_img=False):

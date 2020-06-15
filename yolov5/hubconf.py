@@ -9,7 +9,7 @@ dependencies = ['torch', 'yaml']
 import torch
 
 from models.yolo import Model
-from utils import google_utils
+from yoloutils import google_utils
 
 
 def create(name, pretrained, channels, classes):
