@@ -124,8 +124,8 @@ class DrawBox(object):
             if scores is not None:
                 lab = '{}:{:.2f}'.format(lab, scores[i])
 
-            character_size = int((1 + check_unicode_len(lab)) * fontsize / 2)
-            text_height = 32.0 / 24 * fontsize
+            character_size = int((2 + check_unicode_len(lab)) * fontsize / 2)
+            text_height = 36.0 / 24 * fontsize
             if t - text_height > 0 and l + character_size < im_width:
                 pos_x = l
                 pos_y = t - text_height
@@ -211,7 +211,7 @@ def draw_bbox(image, boxes, category_ids, label_list, colors, scores=None, box_m
     return image
 
 
-def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thresh=0., fontsize=16):
+def draw_coco(ann_file, img_dir, save_dir, cat2label=None, on='image_id', thresh=0., fontsize=16):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     if isinstance(ann_file, str):
@@ -219,11 +219,11 @@ def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thres
             anns = json.load(fp, )
     else:
         anns = ann_file
-    if label_list is None:
+    if cat2label is None:
         if 'categories' in anns:
-            label_list = [None] * (len(anns['categories']) + 1)
+            cat2label = {}
             for i, v in enumerate(anns['categories']):
-                label_list[v['id']] = v['name']
+                cat2label[v['id']] = v['name']
 
     images = json_normalize(anns['images'])
     if 'id' in list(images.columns):
@@ -233,19 +233,15 @@ def draw_coco(ann_file, img_dir, save_dir, label_list=None, on='image_id', thres
     columns = list(results.columns)
     if 'score' in columns:
         results = results[results['score'] >= thresh]
-    colors = set_colors(len(label_list))
+    drawbox = DrawBox(len(cat2label), box_mode='xywh')
     file_names = results['file_name'].unique()
     for file_name in tqdm(file_names):
         result = results[results['file_name'] == file_name]
-        image = read_img(os.path.join(img_dir, file_name))
-        if 'score' not in columns:
-            scores = None
-        else:
-            scores = list(result['score'])
-        img_pred = draw_bbox(
-            image, list(result['bbox']), list(result['category_id']), label_list, colors,
-            scores=scores, box_mode='xywh', fontsize=fontsize, )
-        save_img(img_pred, os.path.join(save_dir, file_name + '_draw.jpg'))
+        image = Image.open(os.path.join(img_dir, file_name)).convert('RGB')
+        labels = [cat2label[id] for id in list(result['category_id'])]
+        scores = list(result['score']) if 'score' in columns else None
+        img = drawbox.draw_box(image, list(result['bbox']), labels, scores)
+        imsave(img, os.path.join(save_dir, file_name + '_draw.jpg'))
 
 
 class MultipleKVAction(argparse.Action):
@@ -281,9 +277,9 @@ class MultipleKVAction(argparse.Action):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
-    parser.add_argument('ann_file', help='ann_file')
-    parser.add_argument('img_dir', help='img_dir')
-    parser.add_argument('save_dir', help='save_dir')
+    parser.add_argument('--ann_file', help='ann_file')
+    parser.add_argument('--img_dir', help='img_dir')
+    parser.add_argument('--save_dir', help='save_dir')
     parser.add_argument(
         '--options',
         nargs='+', action=MultipleKVAction, help='custom options')
@@ -293,7 +289,13 @@ def parse_args():
 
 def main():
     args = parse_args()
-    kwargs = {} if args.options is None else args.options
+    args.ann_file = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/annotations/instance_train.json'
+    args.img_dir = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/trainval'
+    args.save_dir = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/draw_box_eng'
+    cat2label = {0: 'background', 1: 'cap damage', 2: 'cap deformation', 3: 'bad cap side', 4: 'cap swirling',
+                 5: 'cap breakpoint', 6: 'label skew', 7: 'label corrugate', 8: 'label bubble',
+                 9: 'normal code-spurting', 10: 'abnormal code-spurting'}
+    kwargs = {'cat2label': cat2label} if args.options is None else args.options
     draw_coco(args.ann_file, args.img_dir, args.save_dir, **kwargs)
 
 

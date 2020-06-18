@@ -19,7 +19,7 @@ from mmdet.apis import init_detector, inference_detector
 import config
 
 
-class ObjectDetectionService(PTServingBaseService):
+class ObjectDetectionService():
     def __init__(self, model_name=None, model_path=None):
         if torch.cuda.is_available() is True:
             device = 'cuda:0'

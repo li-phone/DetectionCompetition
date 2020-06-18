@@ -158,7 +158,7 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05,
+        score_thr=0.001,
         # nms=dict(type='soft_nms', iou_thr=0.5, min_score=0.0001),
         nms=dict(type='nms', iou_thr=0.5),
         max_per_img=200))
@@ -184,7 +184,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(int(1333 * 2 / 3), int(800 * 2 / 3)),
+        img_scale=(int(1333 * 3 / 3), int(800 * 3 / 3)),
         # img_scale=[(4096, 600), (4096, 800), (4096, 1000)],
         # img_scale=[(4096, 600), (4096, 700), (4096, 800), (4096, 900), (4096, 1000)],
         flip=False,
