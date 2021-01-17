@@ -2,36 +2,15 @@ import os.path as osp
 import pickle
 import shutil
 import tempfile
+import time
 
 import mmcv
-import numpy as np
-import pycocotools.mask as mask_util
 import torch
 import torch.distributed as dist
+from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
 
-from mmdet.core import tensor2imgs
-
-
-# TODO: move this function to more proper place
-def encode_mask_results(mask_results):
-    if isinstance(mask_results, tuple):  # mask scoring
-        cls_segms, cls_mask_scores = mask_results
-    else:
-        cls_segms = mask_results
-    num_classes = len(cls_segms)
-    encoded_mask_results = [[] for _ in range(num_classes)]
-    for i in range(len(cls_segms)):
-        for cls_segm in cls_segms[i]:
-            encoded_mask_results[i].append(
-                mask_util.encode(
-                    np.array(
-                        cls_segm[:, :, np.newaxis], order='F',
-                        dtype='uint8'))[0])  # encoded with RLE
-    if isinstance(mask_results, tuple):
-        return encoded_mask_results, cls_mask_scores
-    else:
-        return encoded_mask_results
+from mmdet.core import encode_mask_results
 
 
 def single_gpu_test(model,
@@ -46,20 +25,18 @@ def single_gpu_test(model,
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
-            # encode mask results
-            if isinstance(result, tuple):
-                bbox_results, mask_results = result
-                encoded_mask_results = encode_mask_results(mask_results)
-                result = bbox_results, encoded_mask_results
-        results.append(result)
 
+        batch_size = len(result)
         if show or out_dir:
-            img_tensor = data['img'][0]
+            if batch_size == 1 and isinstance(data['img'][0], torch.Tensor):
+                img_tensor = data['img'][0]
+            else:
+                img_tensor = data['img'][0].data[0]
             img_metas = data['img_metas'][0].data[0]
             imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
             assert len(imgs) == len(img_metas)
 
-            for img, img_meta in zip(imgs, img_metas):
+            for i, (img, img_meta) in enumerate(zip(imgs, img_metas)):
                 h, w, _ = img_meta['img_shape']
                 img_show = img[:h, :w, :]
 
@@ -67,18 +44,23 @@ def single_gpu_test(model,
                 img_show = mmcv.imresize(img_show, (ori_w, ori_h))
 
                 if out_dir:
-                    out_file = osp.join(out_dir, img_meta['filename'])
+                    out_file = osp.join(out_dir, img_meta['ori_filename'])
                 else:
                     out_file = None
 
                 model.module.show_result(
                     img_show,
-                    result,
+                    result[i],
                     show=show,
                     out_file=out_file,
                     score_thr=show_score_thr)
 
-        batch_size = data['img'][0].size(0)
+        # encode mask results
+        if isinstance(result[0], tuple):
+            result = [(bbox_results, encode_mask_results(mask_results))
+                      for bbox_results, mask_results in result]
+        results.extend(result)
+
         for _ in range(batch_size):
             prog_bar.update()
     return results
@@ -109,20 +91,18 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
     rank, world_size = get_dist_info()
     if rank == 0:
         prog_bar = mmcv.ProgressBar(len(dataset))
+    time.sleep(2)  # This line can prevent deadlock problem in some cases.
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=True, **data)
             # encode mask results
-            if isinstance(result, tuple):
-                bbox_results, mask_results = result
-                encoded_mask_results = encode_mask_results(mask_results)
-                result = bbox_results, encoded_mask_results
-        results.append(result)
+            if isinstance(result[0], tuple):
+                result = [(bbox_results, encode_mask_results(mask_results))
+                          for bbox_results, mask_results in result]
+        results.extend(result)
 
         if rank == 0:
-            batch_size = (
-                len(data['img_meta']._data)
-                if 'img_meta' in data else data['img'][0].size(0))
+            batch_size = len(result)
             for _ in range(batch_size * world_size):
                 prog_bar.update()
 
@@ -145,7 +125,8 @@ def collect_results_cpu(result_part, size, tmpdir=None):
                                 dtype=torch.uint8,
                                 device='cuda')
         if rank == 0:
-            tmpdir = tempfile.mkdtemp()
+            mmcv.mkdir_or_exist('.dist_test')
+            tmpdir = tempfile.mkdtemp(dir='.dist_test')
             tmpdir = torch.tensor(
                 bytearray(tmpdir.encode()), dtype=torch.uint8, device='cuda')
             dir_tensor[:len(tmpdir)] = tmpdir

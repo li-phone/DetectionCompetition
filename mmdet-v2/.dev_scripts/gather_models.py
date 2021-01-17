@@ -8,18 +8,6 @@ import subprocess
 import mmcv
 import torch
 
-# build schedule look-up table to automatically find the final model
-SCHEDULES_LUT = {
-    '1x': 12,
-    '2x': 24,
-    '20e': 20,
-    '3x': 36,
-    '4x': 48,
-    '24e': 24,
-    '6x': 73
-}
-RESULTS_LUT = ['bbox_mAP', 'segm_mAP']
-
 
 def process_checkpoint(in_file, out_file):
     checkpoint = torch.load(in_file, map_location='cpu')
@@ -36,27 +24,26 @@ def process_checkpoint(in_file, out_file):
 
 
 def get_final_epoch(config):
-    if config.find('grid_rcnn') != -1 and config.find('2x') != -1:
-        # grid_rcnn 2x trains 25 epochs
-        return 25
-
-    for schedule_name, epoch_num in SCHEDULES_LUT.items():
-        if config.find(schedule_name) != -1:
-            return epoch_num
+    cfg = mmcv.Config.fromfile('./configs/' + config)
+    return cfg.total_epochs
 
 
-def get_final_results(log_json_path, epoch):
+def get_final_results(log_json_path, epoch, results_lut):
+    result_dict = dict()
     with open(log_json_path, 'r') as f:
         for line in f.readlines():
             log_line = json.loads(line)
             if 'mode' not in log_line.keys():
                 continue
 
+            if log_line['mode'] == 'train' and log_line['epoch'] == epoch:
+                result_dict['memory'] = log_line['memory']
+
             if log_line['mode'] == 'val' and log_line['epoch'] == epoch:
-                result_dict = {
+                result_dict.update({
                     key: log_line[key]
-                    for key in RESULTS_LUT if key in log_line
-                }
+                    for key in results_lut if key in log_line
+                })
                 return result_dict
 
 
@@ -77,6 +64,7 @@ def main():
     args = parse_args()
     models_root = args.root
     models_out = args.out
+    mmcv.mkdir_or_exist(models_out)
 
     # find all models in the root directory to be gathered
     raw_configs = list(mmcv.scandir('./configs', '.py', recursive=True))
@@ -102,10 +90,18 @@ def main():
         if not osp.exists(model_path):
             continue
 
-        # get logs
-        log_json_path = glob.glob(osp.join(exp_dir, '*.log.json'))[0]
-        log_txt_path = glob.glob(osp.join(exp_dir, '*.log'))[0]
-        model_performance = get_final_results(log_json_path, final_epoch)
+        # get the latest logs
+        log_json_path = list(
+            sorted(glob.glob(osp.join(exp_dir, '*.log.json'))))[-1]
+        log_txt_path = list(sorted(glob.glob(osp.join(exp_dir, '*.log'))))[-1]
+        cfg = mmcv.Config.fromfile('./configs/' + used_config)
+        results_lut = cfg.evaluation.metric
+        if not isinstance(results_lut, list):
+            results_lut = [results_lut]
+        # case when using VOC, the evaluation key is only 'mAP'
+        results_lut = [key + '_mAP' for key in results_lut if 'mAP' not in key]
+        model_performance = get_final_results(log_json_path, final_epoch,
+                                              results_lut)
 
         if model_performance is None:
             continue
@@ -126,9 +122,8 @@ def main():
         mmcv.mkdir_or_exist(model_publish_dir)
 
         model_name = osp.split(model['config'])[-1].split('.')[0]
-        for k, v in model['results'].items():
-            model_name += '_{}-{}_'.format(k, v)
-        model_name += model['model_time']
+
+        model_name += '_' + model['model_time']
         publish_model_path = osp.join(model_publish_dir, model_name)
         trained_model_path = osp.join(models_root, model['config'],
                                       'epoch_{}.pth'.format(model['epochs']))
@@ -140,12 +135,11 @@ def main():
         # copy log
         shutil.copy(
             osp.join(models_root, model['config'], model['log_json_path']),
-            osp.join(model_publish_dir, model['log_json_path']))
+            osp.join(model_publish_dir, f'{model_name}.log.json'))
         shutil.copy(
             osp.join(models_root, model['config'],
                      model['log_json_path'].rstrip('.json')),
-            osp.join(model_publish_dir,
-                     model['log_json_path'].rstrip('.json')))
+            osp.join(model_publish_dir, f'{model_name}.log'))
 
         # copy config to guarantee reproducibility
         config_path = model['config']
@@ -160,6 +154,7 @@ def main():
         publish_model_infos.append(model)
 
     models = dict(models=publish_model_infos)
+    print(f'Totally gathered {len(publish_model_infos)} models')
     mmcv.dump(models, osp.join(models_out, 'model_info.json'))
 
 

@@ -1,10 +1,7 @@
-from .groie import SumGenericRoiExtractor, ConcatGenericRoiExtractor
-from .random_single_level import RandomSingleRoIExtractor
-from .single_level import SingleRoIExtractor
+from .generic_roi_extractor import GenericRoIExtractor
+from .single_level_roi_extractor import SingleRoIExtractor
 
 __all__ = [
-    'ConcatGenericRoiExtractor',
-    'RandomSingleRoIExtractor',
     'SingleRoIExtractor',
-    'SumGenericRoiExtractor'
+    'GenericRoIExtractor',
 ]

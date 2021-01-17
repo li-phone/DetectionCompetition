@@ -1,12 +1,18 @@
+from .darknet import Darknet
+from .detectors_resnet import DetectoRS_ResNet
+from .detectors_resnext import DetectoRS_ResNeXt
+from .hourglass import HourglassNet
 from .hrnet import HRNet
+from .regnet import RegNet
+from .res2net import Res2Net
+from .resnest import ResNeSt
 from .resnet import ResNet, ResNetV1d
 from .resnext import ResNeXt
 from .ssd_vgg import SSDVGG
+from .trident_resnet import TridentResNet
 
-from .db_resnet import DB_ResNet
-from .tb_resnet import TB_ResNet
-from .db_resnext import DB_ResNeXt
-from .tb_resnext import TB_ResNeXt
-
-__all__ = ['ResNet', 'ResNetV1d', 'ResNeXt', 'SSDVGG', 'HRNet', 'DB_ResNet', 'DB_ResNeXt', 'TB_ResNet',
-           'TB_ResNeXt']
+__all__ = [
+    'RegNet', 'ResNet', 'ResNetV1d', 'ResNeXt', 'SSDVGG', 'HRNet', 'Res2Net',
+    'HourglassNet', 'DetectoRS_ResNet', 'DetectoRS_ResNeXt', 'Darknet',
+    'ResNeSt', 'TridentResNet'
+]

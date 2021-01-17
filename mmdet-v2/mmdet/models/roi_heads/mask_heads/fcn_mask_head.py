@@ -2,13 +2,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mmcv.cnn import ConvModule, build_upsample_layer
+from mmcv.cnn import Conv2d, ConvModule, build_upsample_layer
+from mmcv.ops.carafe import CARAFEPack
+from mmcv.runner import auto_fp16, force_fp32
 from torch.nn.modules.utils import _pair
 
-from mmdet.core import auto_fp16, force_fp32, mask_target
+from mmdet.core import mask_target
 from mmdet.models.builder import HEADS, build_loss
-from mmdet.ops import Conv2d
-from mmdet.ops.carafe import CARAFEPack
 
 BYTES_PER_FLOAT = 4
 # TODO: This memory limit may be too much or too little. It would be better to
@@ -48,7 +48,7 @@ class FCNMaskHead(nn.Module):
         self.conv_kernel_size = conv_kernel_size
         self.conv_out_channels = conv_out_channels
         self.upsample_method = self.upsample_cfg.get('type')
-        self.scale_factor = self.upsample_cfg.pop('scale_factor')
+        self.scale_factor = self.upsample_cfg.pop('scale_factor', None)
         self.num_classes = num_classes
         self.class_agnostic = class_agnostic
         self.conv_cfg = conv_cfg
@@ -80,9 +80,11 @@ class FCNMaskHead(nn.Module):
                 out_channels=self.conv_out_channels,
                 kernel_size=self.scale_factor,
                 stride=self.scale_factor)
+            self.upsample = build_upsample_layer(upsample_cfg_)
         elif self.upsample_method == 'carafe':
             upsample_cfg_.update(
                 channels=upsample_in_channels, scale_factor=self.scale_factor)
+            self.upsample = build_upsample_layer(upsample_cfg_)
         else:
             # suppress warnings
             align_corners = (None
@@ -91,7 +93,7 @@ class FCNMaskHead(nn.Module):
                 scale_factor=self.scale_factor,
                 mode=self.upsample_method,
                 align_corners=align_corners)
-        self.upsample = build_upsample_layer(upsample_cfg_)
+            self.upsample = build_upsample_layer(upsample_cfg_)
 
         out_channels = 1 if self.class_agnostic else self.num_classes
         logits_in_channel = (
@@ -136,7 +138,7 @@ class FCNMaskHead(nn.Module):
     def loss(self, mask_pred, mask_targets, labels):
         loss = dict()
         if mask_pred.size(0) == 0:
-            loss_mask = mask_pred.sum() * 0
+            loss_mask = mask_pred.sum()
         else:
             if self.class_agnostic:
                 loss_mask = self.loss_mask(mask_pred, mask_targets,
@@ -178,13 +180,30 @@ class FCNMaskHead(nn.Module):
         if rescale:
             img_h, img_w = ori_shape[:2]
         else:
-            img_h = np.round(ori_shape[0] * scale_factor).astype(np.int32)
-            img_w = np.round(ori_shape[1] * scale_factor).astype(np.int32)
+            if isinstance(scale_factor, float):
+                img_h = np.round(ori_shape[0] * scale_factor).astype(np.int32)
+                img_w = np.round(ori_shape[1] * scale_factor).astype(np.int32)
+            else:
+                w_scale, h_scale = scale_factor[0], scale_factor[1]
+                img_h = np.round(ori_shape[0] * h_scale.item()).astype(
+                    np.int32)
+                img_w = np.round(ori_shape[1] * w_scale.item()).astype(
+                    np.int32)
             scale_factor = 1.0
 
         if not isinstance(scale_factor, (float, torch.Tensor)):
             scale_factor = bboxes.new_tensor(scale_factor)
         bboxes = bboxes / scale_factor
+
+        if torch.onnx.is_in_onnx_export():
+            # TODO: Remove after F.grid_sample is supported.
+            from torchvision.models.detection.roi_heads \
+                import paste_masks_in_image
+            masks = paste_masks_in_image(mask_pred, bboxes, ori_shape[:2])
+            thr = rcnn_test_cfg.get('mask_thr_binary', 0)
+            if thr > 0:
+                masks = masks >= thr
+            return masks
 
         N = len(mask_pred)
         # The actual implementation split the input into chunks,
@@ -231,7 +250,7 @@ class FCNMaskHead(nn.Module):
             im_mask[(inds, ) + spatial_inds] = masks_chunk
 
         for i in range(N):
-            cls_segms[labels[i]].append(im_mask[i].cpu().numpy())
+            cls_segms[labels[i]].append(im_mask[i].detach().cpu().numpy())
         return cls_segms
 
 
@@ -297,6 +316,9 @@ def _do_paste_mask(masks, boxes, img_h, img_w, skip_empty=True):
     gy = img_y[:, :, None].expand(N, img_y.size(1), img_x.size(1))
     grid = torch.stack([gx, gy], dim=3)
 
+    if torch.onnx.is_in_onnx_export():
+        raise RuntimeError(
+            'Exporting F.grid_sample from Pytorch to ONNX is not supported.')
     img_masks = F.grid_sample(
         masks.to(dtype=torch.float32), grid, align_corners=False)
 
