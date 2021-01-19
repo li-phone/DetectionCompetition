@@ -34,6 +34,10 @@ class Compose(object):
 
         Returns:
            dict: Transformed data.
+
+            我们修改了compose使得它能够支持多个data的处理
+            返回：
+                返回单个data或者若干个data [list]
         """
         if 'img' in data and isinstance(data['img'], list):
             many_data = dict(img_metas=[], img=[])
@@ -46,10 +50,23 @@ class Compose(object):
                 many_data['img'].extend(data_['img'])
                 many_data['img_metas'].extend(data_['img_metas'])
             return many_data
-        for t in self.transforms:
+
+        last_ind = 0
+        for i, t in enumerate(self.transforms):
+            last_ind = i
             data = t(data)
+            if isinstance(data, list):
+                break
             if data is None:
                 return None
+        if (last_ind + 1) < len(self.transforms) and isinstance(data, list):
+            data, data_list = [], data
+            for idx, d in enumerate(data_list):
+                for i, t in enumerate(self.transforms[last_ind + 1:]):
+                    d = t(d)
+                    if d is None:
+                        break
+                data.append(d)
         return data
 
     def __repr__(self):
