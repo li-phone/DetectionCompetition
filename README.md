@@ -1,39 +1,62 @@
-# defectNet
 
-#### 介绍
-{**以下是码云平台说明，您可以替换此简介**
-码云是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用码云实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## Introduction
 
-#### 软件架构
-软件架构说明
+This repository inherits from MMDetection which is an open source object detection toolbox based on PyTorch 
+and also is a part of the OpenMMLab project developed by [Multimedia Laboratory, CUHK](http://mmlab.ie.cuhk.edu.hk/).
 
 
-#### 安装教程
+### Highlights
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+#### third_party
 
-#### 使用说明
+- **Parallel**
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+    我们增加了使用多线程去完成多任务资源的处理接口
 
-#### 参与贡献
+#### datasets/pipelines
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+- **Slice Image**
 
+    我们增加了Slice Image管道，包括两个处理过程：
+    * SliceROI：使用canny算法从图像中切割出感兴趣的区域
+    * SliceImage：使用滑动窗口方法从图像中切割成若干张小图片
 
-#### 码云特技
+- **Compose**
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5.  码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+    我们修改了compose使得它能够支持多个data的处理
+
+#### tools/3rd_party
+
+- **x2coco**
+
+    我们增加了多种格式转换成coco格式的工具，包括Pascal VOC（xml）、天池（json）、测试图片目录转coco伪标签等
+    
+- **COCO Check**
+
+    我们增加了检查coco原始标注是否正确的工具，同时提供基于opencv imshow接口的修正功能
+    
+- **COCO Split**
+
+    我们增加了将coco数据集划分成训练数据和验证数据的工具
+    
+- **Parallel Inference**
+
+    我们增加了多线程切图推理工具，同时也包括了后处理的NMS操作
+
+- **Do Submit**
+
+    我们增加了coco测试输出结果转换成若干种格式提交的工具，包括天池（单个json文件）、和鲸（多个json文件）等格式
+
+- **Parallel Slice**
+
+    我们增加了多线程将图像切割成若干张小图片的工具
+
+## License
+
+This project is released under the [Apache 2.0 license](LICENSE).
+
+## Changelog
+None
+
+## Contributions
+[li-phone](https://github.com/li-phone)
