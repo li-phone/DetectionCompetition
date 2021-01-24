@@ -14,15 +14,15 @@ class Config(object):
     train_pipeline = [
         dict(type='LoadImageFromFile'),
         # dict(type='SliceROI', training=False),
-        dict(type='SliceImage', training=True, window=(600, 600), step=(300, 300), order_index=False)
+        dict(type='SliceImage', training=True, window=(800, 800), step=(400, 400), order_index=False)
     ]
     compose = Compose(train_pipeline)
 
     # data module
     img_dir = "/home/lifeng/undone-work/dataset/detection/tile/raw/tile_round1_train_20201231/train_imgs/"
-    save_img_dir = "/home/lifeng/undone-work/dataset/detection/tile/trainval/cut_600x600/"
+    save_img_dir = "/home/lifeng/undone-work/dataset/detection/tile/trainval/cut_800x800/"
     ann_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_all-check.json"
-    save_ann_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_600x600/cut_600x600_all.json"
+    save_ann_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_800x800/cut_800x800_all.json"
     original_coco = COCO(ann_file)
 
 
@@ -44,7 +44,7 @@ def process(image, **kwargs):
     if results is None: return save_results
     for i, result in enumerate(results):
         tmp_image = {k: v for k, v in image.items()}
-        tmp_image['file_name'] = "{}__{}.jpg".format(tmp_image['file_name'], i)
+        tmp_image['file_name'] = "{}__{:03d}.jpg".format(tmp_image['file_name'], i)
         tmp_image['height'] = result['img'].shape[0]
         tmp_image['width'] = result['img'].shape[1]
         save_name = os.path.join(config.save_img_dir, tmp_image['file_name'])

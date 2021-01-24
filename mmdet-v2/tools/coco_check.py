@@ -90,7 +90,7 @@ def check_box(coco, save_name, img_dir):
         if not (0 <= b[0] <= image['width'] and 0 <= b[1] <= image['height'] and b[2] > 0 and b[3] > 0 \
                 and 0 <= b[0] + b[2] <= image['width'] and 0 <= b[1] + b[3] <= image['height']):
             error_boxes.append(v['id'])
-    from draw_box import DrawBox
+    from third_party.useless.cocoutils.draw_box import DrawBox
     draw = DrawBox(len(cat2label))
 
     def save_coco():
@@ -173,10 +173,10 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default='/home/lifeng/undone-work/DefectNet/tools/data/tile/annotations/cut_images_all.json',
+                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default='/home/lifeng/undone-work/DefectNet/tools/data/tile/annotations/cut_images_all-check.json',
+                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all-check.json",
                         help='save_name')
     parser.add_argument('--img_dir',
                         default='"/home/lifeng/undone-work/dataset/detection/tile/tile_round1_train_20201231/train_imgs/"',

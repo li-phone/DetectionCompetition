@@ -16,7 +16,7 @@ class Config(object):
     train_pipeline = [
         dict(type='LoadImageFromFile'),
         dict(type='SliceROI', training=False, padding=10),
-        dict(type='SliceImage', training=False, window=(1000, 1000), step=(800, 800), order_index=False,
+        dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
              is_keep_none=True)
     ]
     compose = Compose(train_pipeline)
@@ -24,7 +24,7 @@ class Config(object):
     # data module
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testA_20201231/testA_imgs"
     test_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_testA.json"
-    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000_2/do_submit_testA.json"
+    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000_2/baseline_cut_1000x1000_2_do_submit_testA.json"
     original_coco = COCO(test_file)
     label2name = {x['id']: x['name'] for x in original_coco.dataset['categories']}
 
@@ -62,7 +62,7 @@ def process(image, **kwargs):
                 bbox_result[j][:, 3] += result['slice_image__left_top'][1]
             bboxes = np.append(bboxes, bbox_result[j][:, :4], axis=0)
             scores = np.append(scores, bbox_result[j][:, 4], axis=0)
-            labels = np.append(labels, [j] * len(bbox_result[j]), axis=0)
+            labels = np.append(labels, [j + 1] * len(bbox_result[j]), axis=0)
     if len(bboxes) < 1 or len(scores) < 1 or len(labels) < 1:
         return save_results
     bboxes = torch.from_numpy(bboxes)

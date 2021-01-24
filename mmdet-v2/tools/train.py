@@ -21,7 +21,7 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/tile/cascade_rcnn/cascade_rcnn_r50_fpn_1x_coco.py',
+                        default='../configs/tile/cascade_rcnn/cascade_rcnn_x101_32x4d_fpn_20e_cut_1000x1000.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
@@ -40,7 +40,7 @@ def parse_args():
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
-        default=[1],
+        default=[0],
         nargs='+',
         help='ids of gpus to use '
              '(only applicable to non-distributed training)')

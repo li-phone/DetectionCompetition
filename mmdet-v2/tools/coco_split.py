@@ -32,20 +32,20 @@ def split_coco(ann_path, save_dir, rate=0.8, prefix='instance_', random_state=66
     train_set = get_coco_by_imgids(coco, train_ids)
     test_set = get_coco_by_imgids(coco, test_ids)
     save_dict(os.path.join(save_dir, '{}train.json'.format(prefix)), train_set)
-    save_dict(os.path.join(save_dir, '{}test.json'.format(prefix)), test_set)
+    save_dict(os.path.join(save_dir, '{}val.json'.format(prefix)), test_set)
 
 
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default='/home/lifeng/undone-work/DefectNet/tools/data/tile/annotations/cut_images_all-check.json',
+                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all-check.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_dir',
-                        default='/home/lifeng/undone-work/dataset/detection/tile/annotations/',
+                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/",
                         help='save_dir')
     parser.add_argument('--rate', type=float, default=0.9, help='split rate')
-    parser.add_argument('--prefix', default='cut_images_', help='save prefix')
+    parser.add_argument('--prefix', default='cut_1000x1000_', help='save prefix')
     parser.add_argument('--random_state', type=int, default=666, help='random_state')
     args = parser.parse_args()
     return args

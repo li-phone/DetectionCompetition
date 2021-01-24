@@ -11,9 +11,10 @@ from pandas import json_normalize
 
 class Config(object):
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testA_20201231/testA_imgs"
-    post_process_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000/do_submit_testA.json"
-    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000/post_process_submit_testA_IoU_0_2.json"
+    post_process_file = "/data/liphone/detcomp/mmdet-v2/tile/baseline_cut_1000x1000_2/baseline_cut_1000x1000_2_do_submit_testA.json"
+    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000_2/post_process_submit_testA_IoU_0_2.json"
     nms = dict(type='nms', iou_threshold=0.2)
+    score_thr = 0.1
 
 
 def post_process():
@@ -21,6 +22,7 @@ def post_process():
     with open(config.post_process_file, "r") as fp:
         results = json.load(fp)
     results = json_normalize(results)
+    results = results[results['score'] > config.score_thr]
     save_results = []
     for filename in tqdm(np.unique(results['name'])):
         result = results[results['name'] == filename].sort_values(by='category')
