@@ -1,11 +1,11 @@
 
 ## Introduction
 
-This repository inherits from MMDetection which is an open source object detection toolbox based on PyTorch 
-and also is a part of the OpenMMLab project developed by [Multimedia Laboratory, CUHK](http://mmlab.ie.cuhk.edu.hk/).
+本仓库包含了MMDetection和华为ModelArt云部署的代码
 
+## Highlights
 
-### Highlights
+### MMDetection
 
 #### third_party
 
@@ -50,6 +50,14 @@ and also is a part of the OpenMMLab project developed by [Multimedia Laboratory,
 - **Parallel Slice**
 
     我们增加了多线程将图像切割成若干张小图片的工具
+
+### Huawei ModelArt
+
+#### deploys
+
+- **mmdet-v1**
+
+    我们增加了无需CUDA、C编译的最小化空间占用的mmdet-v1的CPU推理，非常适用于华为云服务器的评测阶段
 
 ## License
 
