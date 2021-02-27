@@ -237,8 +237,7 @@ def read_json(anns):
     return anns
 
 
-def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercategory=None, info=None,
-                 license=None):
+def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercategory=None, **kwargs):
     assert isinstance(anns, pd.DataFrame)
     if 'id' not in list(anns.columns):
         anns['id'] = list(range(anns.shape[0]))
@@ -258,16 +257,15 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
     if supercategory is None:
         supercategory = [None] * (len(label2cat) + 1)
 
-    coco = dict(info=info, license=license, categories=[], images=[], annotations=[])
+    coco = dict(info=None, license=None, categories=[], images=[], annotations=[])
     label2cat = {v: k for k, v in label2cat.items()}
     coco['categories'] = [dict(name=str(k), id=v, supercategory=supercategory[v]) for k, v in label2cat.items()]
 
     images = list(anns['file_name'].unique())
-    import cv2 as cv
     for i, v in tqdm(enumerate(images)):
         if os.path.exists(os.path.join(img_dir, v)):
             img_ = Image.open(os.path.join(img_dir, v))
-            height_, width_, _ = img_.height, img_.width
+            height_, width_, _ = img_.height, img_.width, 3
         else:
             row = anns.iloc[i]
             height_, width_, _ = int(row['image_height']), int(row['image_width']), 3
@@ -313,12 +311,11 @@ def imgdir2coco(coco_sample, save_name, img_dir):
         images=[], annotations=[])
     images = glob.glob(os.path.join(img_dir, '*'))
 
-    import cv2 as cv
     for i, v in tqdm(enumerate(images)):
         v = os.path.basename(v)
         if os.path.exists(os.path.join(img_dir, v)):
-            img_ = cv.imread(os.path.join(img_dir, v))
-            height_, width_, _ = img_.shape
+            img_ = Image.open(os.path.join(img_dir, v))
+            height_, width_, _ = img_.height, img_.width, 3
         else:
             height_, width_, _ = None, None, None
         coco_test['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
@@ -330,13 +327,13 @@ def imgdir2coco(coco_sample, save_name, img_dir):
 def parse_args():
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_train.json",
+                        default="/home/lifeng/data/detection/patterned-fabric/annotations/anno_all.json",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/submit_testA.json",
+                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/tile_round1_testA_20201231/testA_imgs/",
+                        default="/home/lifeng/data/detection/patterned-fabric/images/",
                         help='img_dir')
     parser.add_argument(
         '--options',
@@ -346,7 +343,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['json', 'xml', 'test_dir', 'csv'],
-        default='test_dir', help='format type')
+        default='json', help='format type')
     args = parser.parse_args()
     return args
 
@@ -355,13 +352,13 @@ def main():
     args = parse_args()
     kwargs = {} if args.options is None else args.options
     if args.fmt == 'xml':
-        anns = read_xml(args.ann_or_dir, args.img_dir)
+        anns = read_xml(args.x, args.img_dir)
         convert2coco(anns, args.save_name, args.img_dir, **kwargs)
     elif args.fmt == 'csv' or args.fmt == 'json':
-        anns = read_json(args.ann_or_dir)
+        anns = read_json(args.x)
         convert2coco(anns, args.save_name, args.img_dir, **kwargs)
     elif args.fmt == 'test_dir':
-        imgdir2coco(args.ann_or_dir, args.save_name, args.img_dir)
+        imgdir2coco(args.x, args.save_name, args.img_dir)
 
 
 if __name__ == '__main__':

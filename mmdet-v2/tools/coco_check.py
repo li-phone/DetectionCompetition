@@ -2,6 +2,7 @@ import os
 import json
 import cv2 as cv
 import numpy as np
+from PIL import Image
 from tqdm import tqdm
 
 try:
@@ -63,8 +64,8 @@ def check_coco(src, dst, img_dir=None, replace=True):
     if img_dir is not None:
         for i, v in tqdm(enumerate(coco['images'])):
             if os.path.exists(os.path.join(img_dir, v['file_name'])):
-                img_ = cv.imread(os.path.join(img_dir, v['file_name']))
-                height_, width_, _ = img_.shape
+                img_ = Image.open(os.path.join(img_dir, v['file_name']))
+                height_, width_, _ = img_.height, img_.width, 3
             else:
                 row = coco['images'][i]
                 height_, width_, _ = int(row['height']), int(row['width']), 3
@@ -173,13 +174,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all.json",
+                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all-check.json",
+                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all-check.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='"/home/lifeng/undone-work/dataset/detection/tile/tile_round1_train_20201231/train_imgs/"',
+                        default='/home/lifeng/data/detection/patterned-fabric/images/',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()

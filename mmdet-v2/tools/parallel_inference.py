@@ -16,22 +16,24 @@ class Config(object):
     train_pipeline = [
         dict(type='LoadImageFromFile'),
         dict(type='SliceROI', training=False, padding=10),
-        dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
-             is_keep_none=True)
+        # dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
+        #      is_keep_none=True),
+        # dict(type='SliceImage', training=False, window=(800, 800), step=(400, 400), order_index=False,
+        #      is_keep_none=True),
     ]
     compose = Compose(train_pipeline)
 
     # data module
-    img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testA_20201231/testA_imgs"
-    test_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_testA.json"
-    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000_2/baseline_cut_1000x1000_2_do_submit_testA.json"
+    img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
+    test_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/submit_testB.json"
+    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/resize_4000x3000_testB.json"
     original_coco = COCO(test_file)
     label2name = {x['id']: x['name'] for x in original_coco.dataset['categories']}
 
     # inference module
-    device = 'cuda:0'
-    config_file = '../configs/tile/cascade_rcnn/cascade_rcnn_r50_fpn_1x_coco.py'
-    checkpoint_file = 'work_dirs/tile/baseline_cut_1000x1000_2/epoch_12.pth'
+    device = 'cuda:1'
+    config_file = '../configs/tile/cascade_rcnn/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800.py'
+    checkpoint_file = 'work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/epoch_20.pth'
     model = init_detector(config_file, checkpoint_file, device=device)
 
 
@@ -42,6 +44,8 @@ def process(image, **kwargs):
     results = {'img_prefix': config.img_dir, 'img_info': image}
     results = config.compose(results)
     if results is None: return save_results
+    if isinstance(results, dict):
+        results = [results]
     bboxes = np.empty([0, 4], dtype=np.float32)
     scores = np.empty([0], dtype=np.float32)
     labels = np.empty([0], dtype=np.int)
@@ -85,6 +89,9 @@ def process(image, **kwargs):
     # bbox = np.array([[b[0], b[1], b[2], b[3], score[i]] for i, b in enumerate(anns)])
     # img = imshow_det_bboxes(os.path.join(config.img_dir, image['file_name']), bbox, labels, show=False)
     # cv2.imwrite(image['file_name'], img)
+    end = time.time()
+    print('s/img: {:.2f}'.format(end - kwargs['time']['start']))
+    kwargs['time']['start'] = end
     return save_results
 
 
@@ -92,9 +99,9 @@ def parallel_infer():
     config = Config()
     if not os.path.exists(os.path.dirname(config.save_file)):
         os.makedirs(os.path.dirname(config.save_file))
-    process_params = dict(config=config)
+    process_params = dict(config=config, time=dict(start=time.time()))
     settings = dict(tasks=config.original_coco.dataset['images'],
-                    process=process, collect=['result'], workers_num=10,
+                    process=process, collect=['result'], workers_num=1,
                     process_params=process_params, print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

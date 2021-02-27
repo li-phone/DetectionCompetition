@@ -10,11 +10,11 @@ from pandas import json_normalize
 
 
 class Config(object):
-    img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testA_20201231/testA_imgs"
-    post_process_file = "/data/liphone/detcomp/mmdet-v2/tile/baseline_cut_1000x1000_2/baseline_cut_1000x1000_2_do_submit_testA.json"
-    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/baseline_cut_1000x1000_2/post_process_submit_testA_IoU_0_2.json"
+    img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
+    post_process_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/resize_4000x3000_testB.json"
+    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/resize_4000x3000_testB_IoU_02.json"
     nms = dict(type='nms', iou_threshold=0.2)
-    score_thr = 0.1
+    score_thr = 0.05
 
 
 def post_process():
@@ -36,12 +36,12 @@ def post_process():
             category_id, score = int(label), r[4]
             save_results.append({'name': str(filename), 'category': int(category_id),
                                  'bbox': bbox, 'score': float(score)})
-        # from mmcv.visualization.image import imshow_det_bboxes
-        # anns = np.array(result['bbox'])[list(keep)]
-        # score = np.array(result['score'])[list(keep)]
-        # bbox = np.array([[b[0], b[1], b[2], b[3], score[i]] for i, b in enumerate(anns)])
-        # img = imshow_det_bboxes(os.path.join(config.img_dir, filename), bbox, labels, show=False)
-        # cv2.imwrite(filename, img)
+        from mmcv.visualization.image import imshow_det_bboxes
+        anns = np.array(result['bbox'])[list(keep)]
+        score = np.array(result['score'])[list(keep)]
+        bbox = np.array([[b[0], b[1], b[2], b[3], score[i]] for i, b in enumerate(anns)])
+        img = imshow_det_bboxes(os.path.join(config.img_dir, filename), bbox, labels, show=False)
+        cv2.imwrite(filename, img)
     with open(config.save_file, "w") as fp:
         json.dump(save_results, fp, indent=4, ensure_ascii=False)
     print("process ok!")

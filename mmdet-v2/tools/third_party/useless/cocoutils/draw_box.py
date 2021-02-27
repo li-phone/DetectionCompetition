@@ -289,13 +289,14 @@ def parse_args():
 
 def main():
     args = parse_args()
-    args.ann_file = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/annotations/instance_train.json'
-    args.img_dir = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/trainval'
-    args.save_dir = '/home/liphone/undone-work/DefectNet/work_dirs/data/bottle/draw_box_eng'
-    cat2label = {0: 'background', 1: 'cap damage', 2: 'cap deformation', 3: 'bad cap side', 4: 'cap swirling',
-                 5: 'cap breakpoint', 6: 'label skew', 7: 'label corrugate', 8: 'label bubble',
-                 9: 'normal code-spurting', 10: 'abnormal code-spurting'}
-    kwargs = {'cat2label': cat2label} if args.options is None else args.options
+    args.ann_file = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/annotations/instance_all-check.json'
+    args.img_dir = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/images'
+    args.save_dir = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/draw_box_eng'
+    # cat2label = {0: 'background', 1: 'cap damage', 2: 'cap deformation', 3: 'bad cap side', 4: 'cap swirling',
+    #              5: 'cap breakpoint', 6: 'label skew', 7: 'label corrugate', 8: 'label bubble',
+    #              9: 'normal code-spurting', 10: 'abnormal code-spurting'}
+    # kwargs = {'cat2label': cat2label} if args.options is None else args.options
+    kwargs = {} if args.options is None else args.options
     draw_coco(args.ann_file, args.img_dir, args.save_dir, **kwargs)
 
 
