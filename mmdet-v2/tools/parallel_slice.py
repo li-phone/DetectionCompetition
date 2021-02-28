@@ -44,11 +44,12 @@ def process(image, **kwargs):
     if results is None: return save_results
     for i, result in enumerate(results):
         tmp_image = {k: v for k, v in image.items()}
-        tmp_image['file_name'] = "{}__{:03d}.jpg".format(tmp_image['file_name'], i)
+        x1, y1, x2, y2 = result['slice_image']['left_top']
+        tmp_image['file_name'] = "{}__{:04d}_{:04d}_{:04d}_{:04d}.jpg".format(tmp_image['file_name'], x1, y1, x2, y2)
         tmp_image['height'] = result['img'].shape[0]
         tmp_image['width'] = result['img'].shape[1]
         save_name = os.path.join(config.save_img_dir, tmp_image['file_name'])
-        if True or not os.path.exists(save_name):
+        if not os.path.exists(save_name):
             cv2.imwrite(save_name, result['img'])
         tmp_image['id'] = tmp_image['file_name']
         kwargs['__results__']['images'].append(tmp_image)

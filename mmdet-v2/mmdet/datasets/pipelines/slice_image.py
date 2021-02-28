@@ -190,24 +190,27 @@ class SliceImage(object):
         cut_results = []
         for i in range(0, img_h, self.step[1]):
             for j in range(0, img_w, self.step[0]):
-                h1 = min(self.window[1], img_h - i)
-                w1 = min(self.window[0], img_w - j)
+                left, top, right, bottom = j, i, min(img_w, j + self.window[0]), min(img_h, i + self.window[1])
+                if j + self.window[0] > img_w:
+                    left = right - self.window[0]
+                if j + self.window[0] > img_w:
+                    top = bottom - self.window[1]
                 result = copy.deepcopy(results)
                 for k, v in result.items():
                     result[k] = copy.deepcopy(results[k])
 
                 result['slice_image'] = {'ori_shape': [img_h, img_w, _]}
-                result['slice_image']['left_top'] = [j, i]
-                result['slice_image__left_top'] = [j, i]
+                result['slice_image']['left_top'] = (left, top, right, bottom)
+                result['slice_image__left_top'] = (left, top, right, bottom)
                 is_cut_img = True
                 if self.training:
                     result['ann_info']['bboxes'][:, 0] -= result['slice_image__left_top'][0]
-                    result['ann_info']['bboxes'][:, 2] -= result['slice_image__left_top'][0]
                     result['ann_info']['bboxes'][:, 1] -= result['slice_image__left_top'][1]
+                    result['ann_info']['bboxes'][:, 2] -= result['slice_image__left_top'][0]
                     result['ann_info']['bboxes'][:, 3] -= result['slice_image__left_top'][1]
                     bboxes = result['ann_info']['bboxes']
                     keep_idx = [i for i in range(len(bboxes)) if bboxes[i][0] >= 0
-                                and bboxes[i][1] >= 0 and bboxes[i][2] < w1 and bboxes[i][3] < h1]
+                                and bboxes[i][1] >= 0 and bboxes[i][2] < right and bboxes[i][3] < bottom]
                     result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
                     result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
                     # result['ann_info']['bboxes_ignore'] = result['ann_info']['bboxes_ignore'][keep_idx]
@@ -217,11 +220,9 @@ class SliceImage(object):
                     if len(result['gt_bboxes']) <= 0 and len(result['gt_labels']) <= 0:
                         is_cut_img = False
                 if self.is_keep_none or is_cut_img:
-                    h = min(img_h, i + self.window[1])
-                    w = min(img_w, j + self.window[0])
-                    img = results['img'][i:h, j:w, :]
+                    img = results['img'][top:bottom, left:right, :]
                     h2, w2, c2 = img.shape
-                    assert h1 == h2 and w1 == w2
+                    assert bottom - top == h2 and right - left == w2
                     result['img_info']['height'] = img.shape[0]
                     result['img_info']['width'] = img.shape[1]
                     result['img'] = img
