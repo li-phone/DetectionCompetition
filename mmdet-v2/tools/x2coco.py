@@ -1,135 +1,19 @@
 import glob
-from tqdm import tqdm
-import glob
-import xml.etree.ElementTree as ET
 import os
 import json
+import uuid
 import pandas as pd
 import numpy as np
 import argparse
-import PIL
+import xml.etree.ElementTree as ET
 from PIL import Image
-import random
+from tqdm import tqdm
 
 try:
     from pandas import json_normalize
 except:
     from pandas.io.json import json_normalize
 
-
-# def fabric2coco():
-#     ann_file = '/home/liphone/undone-work/data/detection/fabric/annotations/anno_train_20190818-20190928.json'
-#     save_ann_name = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_train,type=34,.json'
-#     img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
-#     with open(ann_file) as fp:
-#         ann_json = json.load(fp)
-#     normal_images = glob.glob(os.path.join(img_dir, 'normal_Images_*.jpg'))
-#     bbox = [0, 0, 32, 32]
-#     for p in normal_images:
-#         ann_json.append(dict(name=os.path.basename(p), defect_name='背景', bbox=bbox))
-#     label2cat = {
-#         '背景': 0, '破洞': 1, '水渍': 2, '油渍': 3, '污渍': 4, '三丝': 5, '结头': 6, '花板跳': 7, '百脚': 8, '毛粒': 9,
-#         '粗经': 10, '松经': 11, '断经': 12, '吊经': 13, '粗维': 14, '纬缩': 15, '浆斑': 16, '整经结': 17, '星跳': 18, '跳花': 19,
-#         '断氨纶': 20, '稀密档': 21, '浪纹档': 22, '色差档': 23, '磨痕': 24, '轧痕': 25, '修痕': 26, '烧毛痕': 27, '死皱': 28, '云织': 29,
-#         '双纬': 30, '双经': 31, '跳纱': 32, '筘路': 33, '纬纱不良': 34,
-#     }
-#     defect_name2label = {
-#         '背景': 0, '破洞': 1, '水渍': 2, '油渍': 2, '污渍': 2, '三丝': 3, '结头': 4, '花板跳': 5, '百脚': 6, '毛粒': 7,
-#         '粗经': 8, '松经': 9, '断经': 10, '吊经': 11, '粗维': 12, '纬缩': 13, '浆斑': 14, '整经结': 15, '星跳': 16, '跳花': 16,
-#         '断氨纶': 17, '稀密档': 18, '浪纹档': 18, '色差档': 18, '磨痕': 19, '轧痕': 19, '修痕': 19, '烧毛痕': 19, '死皱': 20, '云织': 20,
-#         '双纬': 20, '双经': 20, '跳纱': 20, '筘路': 20, '纬纱不良': 20,
-#     }
-#     # name2label_20 = {
-#     #     '背景': 0, '破洞': 1, '水渍_油渍_污渍': 2, '三丝': 3, '结头': 4, '花板跳': 5, '百脚': 6, '毛粒': 7,
-#     #     '粗经': 8, '松经': 9, '断经': 10, '吊经': 11, '粗维': 12, '纬缩': 13, '浆斑': 14, '整经结': 15, '星跳_跳花': 16,
-#     #     '断氨纶': 17, '稀密档_浪纹档_色差档': 18, '磨痕_轧痕_修痕_烧毛痕': 19,
-#     #     '死皱_云织_双纬_双经_跳纱_筘路_纬纱不良': 20,
-#     # }
-#     # transform2coco(ann_json, save_ann_name, label2cat)
-#     cn2eng = {
-#         '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
-#         '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
-#         '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
-#         '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
-#         '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
-#         '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
-#         '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
-#         '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
-#         '纬纱不良': 'bad weft yarn',
-#     }
-#     label_list = [v for k, v in cn2eng.items()]
-#     from draw_util import draw_coco
-#     draw_coco(
-#         save_ann_name, img_dir, '/home/liphone/undone-work/data/detection/fabric/.instance_train,type=34,', label_list
-#     )
-#
-#
-# def underwater2coco():
-#     data_root = 'E:/liphone/data/images/detections/underwater'
-#
-#     save_name = data_root + '/annotations/underwater_train.json'
-#     img_dir = data_root + '/train/image'
-#     if not os.path.exists(save_name):
-#         xml_dir = data_root + '/train/box'
-#         anns = xml2list(xml_dir, img_dir)
-#         transform2coco(anns, save_name, img_dir=img_dir, bgcat={'id': 0, 'name': 'waterweeds'})
-#
-#     test_name = data_root + '/annotations/underwater_testB.json'
-#     if not os.path.exists(test_name):
-#         test_img_dir = data_root + '/test-B-image'
-#         imgdir2coco(save_name, test_name, test_img_dir)
-#
-#     # from draw_util import draw_coco
-#     # draw_coco(
-#     #     save_name, img_dir, data_root + '/train/.aquatic'
-#     # )
-#
-
-# def main():
-#     underwater2coco()
-#
-#     # img_dir = '/home/liphone/undone-work/data/detection/fabric/trainval'
-#     # cn2eng = {
-#     #     '背景': 'background', '破洞': 'hole', '水渍': 'water stain', '油渍': 'oil stain',
-#     #     '污渍': 'soiled', '三丝': 'three silk', '结头': 'knots', '花板跳': 'card skip', '百脚': 'mispick',
-#     #     '毛粒': 'card neps', '粗经': 'coarse end', '松经': 'loose warp', '断经': 'cracked ends',
-#     #     '吊经': 'buttonhold selvage', '粗维': 'coarse picks', '纬缩': 'looped weft', '浆斑': 'hard size',
-#     #     '整经结': 'warping knot', '星跳': 'stitch', '跳花': 'skips',
-#     #     '断氨纶': 'broken spandex', '稀密档': 'thin thick place', '浪纹档': 'buckling place', '色差档': 'color shading',
-#     #     '磨痕': 'smash', '轧痕': 'roll marks', '修痕': 'take marks', '烧毛痕': 'singeing', '死皱': 'crinked',
-#     #     '云织': 'uneven weaving', '双纬': 'double pick', '双经': 'double end', '跳纱': 'felter', '筘路': 'reediness',
-#     #     '纬纱不良': 'bad weft yarn',
-#     # }
-#     # label_list = [v for k, v in cn2eng.items()]
-#     #
-#     # import copy
-#     # from draw_util import draw_coco
-#     # from utils import load_dict
-#     # gt_files = '/home/liphone/undone-work/data/detection/fabric/annotations/instance_test_rate=0.80.json'
-#     # gt_results = load_dict(gt_files)
-#     #
-#     # baseline_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-#     #                 '/fabric_baseline+mode=baseline/mode=test,.bbox.json'
-#     # baseline_boxes = load_dict(baseline_path)
-#     # baseline_results = copy.deepcopy(gt_results)
-#     # baseline_results['annotations'] = baseline_boxes
-#     # draw_coco(
-#     #     baseline_results,
-#     #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+type=34,', label_list,
-#     #     thresh=0.05, fontsize=16 * 4
-#     # )
-#     #
-#     # trick_path = '/home/liphone/undone-work/defectNet/DefectNet/work_dirs/fabric/cascade_rcnn_r50_fpn_1x/fabric_baseline' + \
-#     #              '/fabric_baseline+baseline+multi-scale+anchor_clusters' + \
-#     #              '/baseline+multi-scale+anchor_clusters+soft-nms+mode=test,.bbox.json'
-#     # trick_boxes = load_dict(trick_path)
-#     # trick_results = copy.deepcopy(gt_results)
-#     # trick_results['annotations'] = trick_boxes
-#     # draw_coco(
-#     #     trick_results,
-#     #     img_dir, '/home/liphone/undone-work/data/detection/fabric/baseline_results+tricks+type=34,', label_list,
-#     #     thresh=0.05, fontsize=16 * 4
-#     # )
 
 class MultipleKVAction(argparse.Action):
     """
@@ -234,16 +118,56 @@ def read_json(anns):
         anns = anns.rename(columns={'name': 'file_name'})
     if 'defect_name' in list(anns.columns):
         anns = anns.rename(columns={'defect_name': 'label'})
+    elif 'category' in list(anns.columns):
+        anns = anns.rename(columns={'category': 'label'})
     return anns
+
+
+def read_PANDA(path):
+    def __get_box__(obj, w, h):
+        x1 = obj['tl']['x'] * w
+        y1 = obj['tl']['y'] * h
+        x2 = obj['br']['x'] * w
+        y2 = obj['br']['y'] * h
+        return [x1, y1, x2 - x1, y2 - y1]
+
+    files = glob.glob(os.path.join(path, "*.json"))
+    results, ignore_labels = [], set()
+    for file in files:
+        collect_keys = {
+            "person": "person",
+            "small car": "car", "midsize car": "car", "large car": "car", "bicycle": "car", "motcycle": "car",
+            "tricycle": "car", "electric car": "car", "baby carriage": "car", "vehicles": "car", "unsure": "car"}
+        with open(file, 'r') as fp:
+            annotations = json.load(fp)
+            for fname, img_obj in annotations.items():
+                img_w, img_h = img_obj["image size"]["width"], img_obj["image size"]["height"]
+                for obj in img_obj["objects list"]:
+                    if obj['category'] in collect_keys.keys():
+                        rects = {}
+                        if 'rect' in obj.keys():
+                            rects = {collect_keys[obj['category']]: obj['rect']}
+                        elif 'rects' in obj.keys():
+                            rects = obj['rects']
+                        uuid_str = str(uuid.uuid4()).replace('-', '')
+                        for k, v in rects.items():
+                            label, bbox = k, __get_box__(v, img_w, img_h)
+                            result = dict(ori_img_id=img_obj['image id'], file_name=fname)
+                            result['label'] = label
+                            result['bbox'] = bbox
+                            result['uuid'] = uuid_str
+                            result['ori_info'] = obj
+                            results.append(result)
+    results = json_normalize(results)
+    print(results.groupby(by='label').count())
+    return results
 
 
 def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercategory=None, **kwargs):
     assert isinstance(anns, pd.DataFrame)
-    if 'id' not in list(anns.columns):
-        anns['id'] = list(range(anns.shape[0]))
+    assert 'bbox' in list(anns.columns) and 'label' in list(anns.columns) and 'file_name' in list(anns.columns)
+    if 'id' not in list(anns.columns): anns['id'] = list(range(anns.shape[0]))
     if label2cat is None:
-        if 'category' in list(anns.columns):
-            anns.rename(columns={'category': 'label'}, inplace=True)
         label2cat = list(np.array(anns['label'].unique()))
         if bgcat in label2cat:
             label2cat.remove(bgcat)
@@ -253,14 +177,15 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
         # not including background label
         # if bgcat is not None:
         #     label2cat[0] = bgcat
-
     if supercategory is None:
         supercategory = [None] * (len(label2cat) + 1)
 
+    # ------------------categories-----------------#
     coco = dict(info=None, license=None, categories=[], images=[], annotations=[])
     label2cat = {v: k for k, v in label2cat.items()}
     coco['categories'] = [dict(name=str(k), id=v, supercategory=supercategory[v]) for k, v in label2cat.items()]
 
+    # ------------------images-----------------#
     images = list(anns['file_name'].unique())
     for i, v in tqdm(enumerate(images)):
         if os.path.exists(os.path.join(img_dir, v)):
@@ -272,10 +197,11 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
         assert height_ is not None and width_ is not None
         keep_df = anns[anns['file_name'] == v]
         cats = list(keep_df['label'].unique())
-        img_label = 0 if len(cats) == 0 or (len(cats) == 1 and cats[0] == bgcat) else 1
-        coco['images'].append(dict(file_name=v, id=i, width=width_, height=height_, img_label=img_label))
+        has_object = 0 if len(cats) == 0 or (len(cats) == 1 and cats[0] == bgcat) else 1
+        coco['images'].append(dict(file_name=v, id=i, width=width_, height=height_, has_object=has_object))
     image2id = {v['file_name']: v['id'] for i, v in enumerate(coco['images'])}
 
+    # ------------------bboxes-----------------#
     annotations = anns.to_dict('records')
     for v in annotations:
         if v['label'] is None or v['label'] == bgcat or v['bbox'] is None:
@@ -292,9 +218,11 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
             ignore=0,
             area=area
         )
+        for k1, v1 in v.items():
+            ann[k1] = v1
         coco['annotations'].append(ann)
     save_name = save_name.replace('\\', '/')
-    save_dir = save_name[:save_name.rfind('/')]
+    save_dir = os.path.dirname(save_name)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     with open(save_name, 'w', encoding='utf-8') as fp:
@@ -324,16 +252,23 @@ def imgdir2coco(coco_sample, save_name, img_dir):
         json.dump(coco_test, fp)
 
 
+def help():
+    print('''
+    Transform other dataset format into coco format, including PANDA数据集, Pascal VOC xml注解, 天池检测json注解等\n
+    ''')
+
+
 def parse_args():
+    help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default="/home/lifeng/data/detection/patterned-fabric/annotations/anno_all.json",
+                        default=r"/home/lifeng/data/detection/track/panda_round1_train_annos_202104",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all.json",
+                        default=r"/home/lifeng/data/detection/track/annotations/ori_instance_all.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
-                        default="/home/lifeng/data/detection/patterned-fabric/images/",
+                        default=r"/home/lifeng/data/detection/track/panda_round1_train_202104_part1",
                         help='img_dir')
     parser.add_argument(
         '--options',
@@ -342,8 +277,8 @@ def parse_args():
     )
     parser.add_argument(
         '--fmt',
-        choices=['json', 'xml', 'test_dir', 'csv'],
-        default='json', help='format type')
+        choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
+        default='PANDA', help='format type')
     args = parser.parse_args()
     return args
 
@@ -356,6 +291,9 @@ def main():
         convert2coco(anns, args.save_name, args.img_dir, **kwargs)
     elif args.fmt == 'csv' or args.fmt == 'json':
         anns = read_json(args.x)
+        convert2coco(anns, args.save_name, args.img_dir, **kwargs)
+    elif args.fmt == 'PANDA':
+        anns = read_PANDA(args.x)
         convert2coco(anns, args.save_name, args.img_dir, **kwargs)
     elif args.fmt == 'test_dir':
         imgdir2coco(args.x, args.save_name, args.img_dir)

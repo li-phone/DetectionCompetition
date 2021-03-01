@@ -1,3 +1,4 @@
+import sys
 import threading
 
 
@@ -53,7 +54,7 @@ class Parallel(object):
                     self.results[k].extend(v)
             if self.print_process is not None and ((self.task_size - len(self.init_tasks)) % self.print_process == 0
                                                    or len(self.init_tasks) == 0):
-                print('process {}/{}...'.format(self.task_size - len(self.init_tasks), self.task_size))
+                print('process {}/{}...'.format(self.task_size - len(self.init_tasks), self.task_size), flush=True)
 
     def __call__(self, **kwargs):
         threads = [threading.Thread(target=self.do_work)

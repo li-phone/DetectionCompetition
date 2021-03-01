@@ -193,10 +193,11 @@ class SliceImage(object):
                 left, top, right, bottom = j, i, min(img_w, j + self.window[0]), min(img_h, i + self.window[1])
                 if j + self.window[0] > img_w:
                     left = right - self.window[0]
-                if j + self.window[0] > img_w:
+                if i + self.window[1] > img_h:
                     top = bottom - self.window[1]
-                result = copy.deepcopy(results)
-                for k, v in result.items():
+                # result = copy.deepcopy(results)
+                result = {}
+                for k, v in results.items():
                     result[k] = copy.deepcopy(results[k])
 
                 result['slice_image'] = {'ori_shape': [img_h, img_w, _]}

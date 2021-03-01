@@ -14,15 +14,15 @@ class Config(object):
     train_pipeline = [
         dict(type='LoadImageFromFile'),
         # dict(type='SliceROI', training=False),
-        dict(type='SliceImage', training=True, window=(800, 800), step=(400, 400), order_index=False)
+        dict(type='SliceImage', training=True, window=(4000, 4000), step=(3500, 3500), order_index=False)
     ]
     compose = Compose(train_pipeline)
 
     # data module
-    img_dir = "/home/lifeng/undone-work/dataset/detection/tile/raw/tile_round1_train_20201231/train_imgs/"
-    save_img_dir = "/home/lifeng/undone-work/dataset/detection/tile/trainval/cut_800x800/"
-    ann_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_all-check.json"
-    save_ann_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_800x800/cut_800x800_all.json"
+    img_dir = "/home/lifeng/data/detection/track/panda_round1_train_202104_part1"
+    save_img_dir = "/home/lifeng/data/detection/track/trainval/cut_4000x4000/"
+    ann_file = "/home/lifeng/data/detection/track/annotations/ori_instance_all.json"
+    save_ann_file = "/home/lifeng/data/detection/track/annotations/cut_4000x4000/cut_4000x4000_all.json"
     original_coco = COCO(ann_file)
 
 
@@ -43,22 +43,24 @@ def process(image, **kwargs):
     results = config.compose(results)
     if results is None: return save_results
     for i, result in enumerate(results):
-        tmp_image = {k: v for k, v in image.items()}
+        tmp_img = {k: v for k, v in image.items()}
         x1, y1, x2, y2 = result['slice_image']['left_top']
-        tmp_image['file_name'] = "{}__{:04d}_{:04d}_{:04d}_{:04d}.jpg".format(tmp_image['file_name'], x1, y1, x2, y2)
-        tmp_image['height'] = result['img'].shape[0]
-        tmp_image['width'] = result['img'].shape[1]
-        save_name = os.path.join(config.save_img_dir, tmp_image['file_name'])
+        tmp_img['file_name'] = "{}__{:06d}_{:06d}_{:06d}_{:06d}.jpg".format(tmp_img['file_name'][-4:], x1, y1, x2, y2)
+        tmp_img['height'] = result['img'].shape[0]
+        tmp_img['width'] = result['img'].shape[1]
+        save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
+        if not os.path.exists(os.path.dirname(save_name)):
+            os.makedirs(os.path.dirname(save_name))
         if not os.path.exists(save_name):
             cv2.imwrite(save_name, result['img'])
-        tmp_image['id'] = tmp_image['file_name']
-        kwargs['__results__']['images'].append(tmp_image)
+        tmp_img['id'] = tmp_img['file_name']
+        kwargs['__results__']['images'].append(tmp_img)
         for bbox, label in zip(result['gt_bboxes'], result['gt_labels']):
             area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
             points = [[bbox[0], bbox[1]], [bbox[2], bbox[1]], [bbox[2], bbox[3]], [bbox[0], bbox[3]]]
             ann = dict(
                 id=len(kwargs['__results__']['annotations']),
-                image_id=tmp_image['id'],
+                image_id=tmp_img['id'],
                 category_id=int(label),
                 bbox=_get_box(points),
                 iscrowd=0,
