@@ -20,8 +20,8 @@ class Config(object):
 
     # data module
     img_dir = "/home/lifeng/data/detection/track/panda_round1_train_202104_part1"
-    save_img_dir = "/home/lifeng/data/detection/track/trainval/cut_4000x4000/"
     ann_file = "/home/lifeng/data/detection/track/annotations/ori_instance_all.json"
+    save_img_dir = "/home/lifeng/data/detection/track/trainval/cut_4000x4000/"
     save_ann_file = "/home/lifeng/data/detection/track/annotations/cut_4000x4000/cut_4000x4000_all.json"
     original_coco = COCO(ann_file)
 
@@ -45,7 +45,7 @@ def process(image, **kwargs):
     for i, result in enumerate(results):
         tmp_img = {k: v for k, v in image.items()}
         x1, y1, x2, y2 = result['slice_image']['left_top']
-        tmp_img['file_name'] = "{}__{:06d}_{:06d}_{:06d}_{:06d}.jpg".format(tmp_img['file_name'][-4:], x1, y1, x2, y2)
+        tmp_img['file_name'] = "{}__{:06d}_{:06d}_{:06d}_{:06d}.jpg".format(tmp_img['file_name'][:-4], x1, y1, x2, y2)
         tmp_img['height'] = result['img'].shape[0]
         tmp_img['width'] = result['img'].shape[1]
         save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
@@ -91,7 +91,7 @@ def parallel_slice():
         os.makedirs(os.path.dirname(config.save_ann_file))
     process_params = dict(config=config)
     settings = dict(tasks=config.original_coco.dataset['images'],
-                    process=process, collect=['images', 'annotations'], workers_num=10,
+                    process=process, collect=['images', 'annotations'], workers_num=4,
                     process_params=process_params, print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

@@ -198,7 +198,10 @@ class SliceImage(object):
                 # result = copy.deepcopy(results)
                 result = {}
                 for k, v in results.items():
-                    result[k] = copy.deepcopy(results[k])
+                    if isinstance(v, np.ndarray):
+                        result[k] = v
+                    else:
+                        result[k] = copy.deepcopy(results[k])
 
                 result['slice_image'] = {'ori_shape': [img_h, img_w, _]}
                 result['slice_image']['left_top'] = (left, top, right, bottom)
