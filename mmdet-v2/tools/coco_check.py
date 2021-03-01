@@ -41,7 +41,7 @@ def check_coco(src, dst, img_dir=None, replace=True):
     imgs = json_normalize(coco['images'])
     if 'image_id' in list(imgs.columns):
         imgs = imgs.rename(columns={'image_id': 'id'})
-    imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
+    # imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
     imgs = imgs.sort_values(by='id')
     coco['images'] = imgs.to_dict('records')
 
@@ -174,15 +174,15 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all.json",
+                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="/home/lifeng/data/detection/patterned-fabric/annotations/instance_all-check.json",
+                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='/home/lifeng/data/detection/patterned-fabric/images/',
+                        default='data/track/trainval/cut_4000x4000/',
                         help='img_dir')
-    parser.add_argument('--check_type', default='coco,box', help='check_type')
+    parser.add_argument('--check_type', default='box', help='check_type')
     args = parser.parse_args()
     return args
 

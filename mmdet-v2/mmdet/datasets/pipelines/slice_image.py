@@ -213,8 +213,9 @@ class SliceImage(object):
                     result['ann_info']['bboxes'][:, 2] -= result['slice_image__left_top'][0]
                     result['ann_info']['bboxes'][:, 3] -= result['slice_image__left_top'][1]
                     bboxes = result['ann_info']['bboxes']
-                    keep_idx = [i for i in range(len(bboxes)) if bboxes[i][0] >= 0
-                                and bboxes[i][1] >= 0 and bboxes[i][2] < right and bboxes[i][3] < bottom]
+                    # 限制在指定窗口的width和height中
+                    keep_idx = [i for i in range(len(bboxes)) if bboxes[i][0] >= 0 and bboxes[i][1] >= 0
+                                and bboxes[i][2] < (right - left) and bboxes[i][3] < (bottom - top)]
                     result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
                     result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
                     # result['ann_info']['bboxes_ignore'] = result['ann_info']['bboxes_ignore'][keep_idx]
