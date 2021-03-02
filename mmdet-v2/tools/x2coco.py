@@ -263,15 +263,15 @@ def help():
 def parse_args():
     help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
-    parser.add_argument('--x',
-                        default=r"data/track/annotations/cut_4000x4000/instance_train.json",
+    parser.add_argument('x',
+                        default=r"",
                         help='x file/folder or original annotation file in test_img mode')
-    parser.add_argument('--save_name',
-                        default=r"data/track/annotations/cut_4000x4000/submit_testA.json",
+    parser.add_argument('save_name',
+                        default=r"",
                         help='save coco filename')
-    parser.add_argument('--img_dir',
-                        default=r"data/track/panda_round1_test_202104_A/*",
-                        help='img_dir')
+    parser.add_argument('img_dir',
+                        default=r"",
+                        help='img_dir, use "*" to match folder')
     parser.add_argument(
         '--options',
         nargs='+', action=MultipleKVAction,
@@ -280,7 +280,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
-        default='test_dir', help='format type')
+        default='PANDA', help='format type')
     args = parser.parse_args()
     return args
 

@@ -15,24 +15,35 @@ class Config(object):
     # process module
     train_pipeline = [
         dict(type='LoadImageFromFile'),
-        # dict(type='SliceROI', training=False, padding=10),
-        dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
+        dict(type='SliceImage', training=False, window=(4000, 4000), step=(3500, 3500), order_index=False,
              is_keep_none=True),
     ]
     compose = Compose(train_pipeline)
 
     # data module
-    img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
-    test_file = "/home/lifeng/undone-work/dataset/detection/tile/annotations/submit_testB.json"
-    save_file = "/home/lifeng/undone-work/DetCompetition/mmdet-v2/work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/resize_4000x3000_testB.json"
+    img_dir = "data/track/panda_round1_test_202104_A/"
+    test_file = "data/track/annotations/cut_4000x4000/submit_testA.json"
+    save_file = "work_dirs/track/submit_testA_4000x4000_bs_r50_20e_track.json"
     original_coco = COCO(test_file)
-    label2name = {x['id']: x['name'] for x in original_coco.dataset['categories']}
+    # label2name = {x['id']: x['name'] for x in original_coco.dataset['categories']}
+    label2name = {1: 4, 2: 2, 3: 3, 4: 1}
+    from fname2id import fname2id
+    fname2id = fname2id
 
     # inference module
     device = 'cuda:1'
-    config_file = '../configs/tile/cascade_rcnn/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800.py'
-    checkpoint_file = 'work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/epoch_20.pth'
+    config_file = '../configs/track/bs_r50_20e_track.py'
+    checkpoint_file = 'work_dirs/bs_r50_20e_track/latest.pth'
     model = init_detector(config_file, checkpoint_file, device=device)
+
+
+def mkdirs(path, is_file=True):
+    if is_file:
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+    else:
+        if not os.path.exists(path):
+            os.makedirs(path)
 
 
 def process(image, **kwargs):
@@ -77,8 +88,15 @@ def process(image, **kwargs):
         if int(label) not in config.label2name:
             continue
         category_id, score = config.label2name[int(label)], r[4]
-        save_results['result'].append({'name': str(image['filename']), 'category': int(category_id),
-                                       'bbox': bbox, 'score': float(score)})
+        save_results['result'].append({
+            'image_id': config.fname2id[str(image['filename'])],
+            'category_id': int(category_id),
+            'bbox_left': bbox[0],
+            'bbox_top': bbox[1],
+            'bbox_width': bbox[2] - bbox[0],
+            'bbox_height': bbox[3] - bbox[1],
+            'score': float(score)
+        })
     # from pandas.io.json import json_normalize
     # from mmcv.visualization.image import imshow_det_bboxes
     # df = json_normalize(save_results['result'])
@@ -86,9 +104,10 @@ def process(image, **kwargs):
     # score = np.array(df['score'])
     # bbox = np.array([[b[0], b[1], b[2], b[3], score[i]] for i, b in enumerate(anns)])
     # img = imshow_det_bboxes(os.path.join(config.img_dir, image['file_name']), bbox, labels, show=False)
+    # mkdirs(image['file_name'])
     # cv2.imwrite(image['file_name'], img)
     end = time.time()
-    print('s/img: {:.2f}'.format(end - kwargs['time']['start']))
+    print('second/img: {:.2f}'.format(end - kwargs['time']['start']))
     kwargs['time']['start'] = end
     return save_results
 

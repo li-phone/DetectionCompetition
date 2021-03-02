@@ -182,9 +182,9 @@ test_cfg = dict(
         nms_thr=0.7,
         min_bbox_size=0),
     rcnn=dict(
-        score_thr=0.05,
+        score_thr=0.001,
         nms=dict(type='nms', iou_threshold=0.5),
-        max_per_img=100))
+        max_per_img=200))
 
 dataset_type = 'CocoDataset'
 data_root = 'data/track/'
@@ -205,7 +205,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1000, 1000),
+        img_scale=(4000, 4000),
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
