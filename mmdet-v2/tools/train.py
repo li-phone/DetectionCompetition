@@ -21,12 +21,12 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/patterned-fabric/bs_x101_64x4d_20e.py',
+                        default='../configs/track/bs_r50_20e_track.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--resume-from',
-        # default='./work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/latest.pth',
+        default='work_dirs/bs_r50_20e_track/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',

@@ -124,7 +124,7 @@ def check_box(coco, save_name, img_dir):
                 break
             elif key == 56:
                 try:
-                    s = float(input('please input number: '))
+                    s = float(input('please input stride number: '))
                     stride = s
                     print('stride', stride)
                 except:
@@ -170,11 +170,59 @@ def check_box(coco, save_name, img_dir):
     print('check_box done!')
 
 
+def view_coco(src, dst, img_dir=None, replace=True):
+    if not replace:
+        print('There is an existed {}.'.format(dst))
+        return
+    coco = load_dict(src)
+    cats = json_normalize(coco['categories'])
+    cats = cats.sort_values(by='id')
+    coco['categories'] = cats.to_dict('records')
+
+    imgs = json_normalize(coco['images'])
+    if 'image_id' in list(imgs.columns):
+        imgs = imgs.rename(columns={'image_id': 'id'})
+    # imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
+    imgs = imgs.sort_values(by='id')
+    coco['images'] = imgs.to_dict('records')
+
+    if 'annotations' in coco:
+        anns = json_normalize(coco['annotations'])
+    else:
+        ann_fakes = [
+            {"area": 100, "iscrowd": 0, "image_id": image['id'], "bbox": [0, 0, 10, 10], "category_id": 1, "id": 1}
+            for image in coco['images']
+        ]
+        anns = json_normalize(ann_fakes)
+    anns['id'] = list(range(anns.shape[0]))
+    anns = anns.to_dict('records')
+    for v in anns:
+        if 'segmentation' not in v:
+            seg = get_segmentation(v['bbox'])
+            v['segmentation'] = [[float(_) for _ in seg]]
+    coco['annotations'] = anns
+    # check image shape
+    if img_dir is not None:
+        for i, v in tqdm(enumerate(coco['images'])):
+            if os.path.exists(os.path.join(img_dir, v['file_name'])):
+                img_ = Image.open(os.path.join(img_dir, v['file_name']))
+                height_, width_, _ = img_.height, img_.width, 3
+            else:
+                row = coco['images'][i]
+                height_, width_, _ = int(row['height']), int(row['width']), 3
+            assert height_ is not None and width_ is not None
+            v['width'] = width_
+            v['height'] = height_
+    save_dict(dst, coco)
+    print('check_coco done!')
+    return dst
+
+
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json",
+                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
                         default="data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json",
@@ -182,7 +230,7 @@ def parse_args():
     parser.add_argument('--img_dir',
                         default='data/track/trainval/cut_4000x4000/',
                         help='img_dir')
-    parser.add_argument('--check_type', default='box', help='check_type')
+    parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()
     return args
 

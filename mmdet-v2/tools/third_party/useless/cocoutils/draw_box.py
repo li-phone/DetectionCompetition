@@ -17,6 +17,15 @@ except:
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
+def mkdirs(path, is_file=True):
+    if is_file:
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+    else:
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+
 def imsave(image, image_path):
     if isinstance(image, np.ndarray):
         image = Image.fromarray(image)
@@ -241,7 +250,9 @@ def draw_coco(ann_file, img_dir, save_dir, cat2label=None, on='image_id', thresh
         labels = [cat2label[id] for id in list(result['category_id'])]
         scores = list(result['score']) if 'score' in columns else None
         img = drawbox.draw_box(image, list(result['bbox']), labels, scores)
-        imsave(img, os.path.join(save_dir, file_name + '_draw.jpg'))
+        save_name = os.path.join(save_dir, file_name[:-4] + '_draw.jpg')
+        mkdirs(save_name)
+        imsave(img, save_name)
 
 
 class MultipleKVAction(argparse.Action):
@@ -289,9 +300,9 @@ def parse_args():
 
 def main():
     args = parse_args()
-    args.ann_file = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/annotations/instance_all-check.json'
-    args.img_dir = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/images'
-    args.save_dir = '/home/lifeng/undone-work/dataset/detection/patterned-fabric/draw_box_eng'
+    args.ann_file = '/home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json'
+    args.img_dir = '/home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/data/track/trainval/cut_4000x4000'
+    args.save_dir = '/home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/data/track/trainval/draw_box_eng'
     # cat2label = {0: 'background', 1: 'cap damage', 2: 'cap deformation', 3: 'bad cap side', 4: 'cap swirling',
     #              5: 'cap breakpoint', 6: 'label skew', 7: 'label corrugate', 8: 'label bubble',
     #              9: 'normal code-spurting', 10: 'abnormal code-spurting'}

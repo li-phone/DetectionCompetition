@@ -240,13 +240,15 @@ def imgdir2coco(coco_sample, save_name, img_dir):
     images = glob.glob(os.path.join(img_dir, '*'))
 
     for i, v in tqdm(enumerate(images)):
-        v = os.path.basename(v)
-        if os.path.exists(os.path.join(img_dir, v)):
-            img_ = Image.open(os.path.join(img_dir, v))
+        file_name = v
+        if os.path.exists(file_name):
+            img_ = Image.open(file_name)
             height_, width_, _ = img_.height, img_.width, 3
         else:
             height_, width_, _ = None, None, None
-        coco_test['images'].append(dict(file_name=v, id=i, width=width_, height=height_))
+        dir_idx = len(os.path.dirname(img_dir)) + 1
+        file_name = file_name[dir_idx:]
+        coco_test['images'].append(dict(file_name=file_name, id=i, width=width_, height=height_))
 
     with open(save_name, 'w') as fp:
         json.dump(coco_test, fp)
@@ -262,13 +264,13 @@ def parse_args():
     help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default=r"/home/lifeng/data/detection/track/panda_round1_train_annos_202104",
+                        default=r"data/track/annotations/cut_4000x4000/instance_train.json",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default=r"/home/lifeng/data/detection/track/annotations/ori_instance_all.json",
+                        default=r"data/track/annotations/cut_4000x4000/submit_testA.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
-                        default=r"/home/lifeng/data/detection/track/panda_round1_train_202104_part1",
+                        default=r"data/track/panda_round1_test_202104_A/*",
                         help='img_dir')
     parser.add_argument(
         '--options',
@@ -278,7 +280,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
-        default='PANDA', help='format type')
+        default='test_dir', help='format type')
     args = parser.parse_args()
     return args
 

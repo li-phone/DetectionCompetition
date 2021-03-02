@@ -15,11 +15,9 @@ class Config(object):
     # process module
     train_pipeline = [
         dict(type='LoadImageFromFile'),
-        dict(type='SliceROI', training=False, padding=10),
-        # dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
-        #      is_keep_none=True),
-        # dict(type='SliceImage', training=False, window=(800, 800), step=(400, 400), order_index=False,
-        #      is_keep_none=True),
+        # dict(type='SliceROI', training=False, padding=10),
+        dict(type='SliceImage', training=False, window=(1000, 1000), step=(500, 500), order_index=False,
+             is_keep_none=True),
     ]
     compose = Compose(train_pipeline)
 
