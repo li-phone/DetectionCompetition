@@ -7,5 +7,5 @@ git push origin master
 git checkout li-phone
 git add *
 git commit -m "${1} commit in ${time_str} by `whoami`"
-git push github li-phone
+git push origin li-phone
 exit
