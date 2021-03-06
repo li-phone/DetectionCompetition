@@ -164,6 +164,16 @@ class SliceROI(object):
             self.method)
 
 
+def box_overlap(b1, b2):
+    if b1[0] > b2[2] or b1[1] > b2[3] or b1[2] < b2[0] or b1[3] < b2[1]:
+        return 0.
+    xmin, ymin = max(b1[0], b2[0]), max(b1[1], b2[1])
+    xmax, ymax = min(b1[2], b2[2]), min(b1[3], b2[3])
+    w1, h1, w2, h2 = b1[2] - b1[0], b1[3] - b1[1], b2[2] - b2[0], b2[3] - b2[1]
+    iou = (xmax - xmin) * (ymax - ymin) / min(w1 * h1, w2 * h2)
+    return iou
+
+
 @PIPELINES.register_module()
 class SliceImage(object):
     """
@@ -178,8 +188,10 @@ class SliceImage(object):
             返回单个results或者若干个results [list]
     """
 
-    def __init__(self, training=True, window=(2666, 1600), step=(1333, 800), order_index=True, is_keep_none=False):
+    def __init__(self, training=True, overlap=0.7, window=(2666, 1600), step=(1333, 800), order_index=True,
+                 is_keep_none=False):
         self.training = training
+        self.overlap = overlap
         self.window = window
         self.step = step
         self.order_index = {} if order_index else None
@@ -214,8 +226,8 @@ class SliceImage(object):
                     result['ann_info']['bboxes'][:, 3] -= result['slice_image__left_top'][1]
                     bboxes = result['ann_info']['bboxes']
                     # 限制在指定窗口的width和height中
-                    keep_idx = [i for i in range(len(bboxes)) if bboxes[i][0] >= 0 and bboxes[i][1] >= 0
-                                and bboxes[i][2] < (right - left) and bboxes[i][3] < (bottom - top)]
+                    window = [0, 0, right - left, bottom - top]
+                    keep_idx = [i for i in range(len(bboxes)) if box_overlap(bboxes[i], window) > self.overlap]
                     result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
                     result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
                     # result['ann_info']['bboxes_ignore'] = result['ann_info']['bboxes_ignore'][keep_idx]

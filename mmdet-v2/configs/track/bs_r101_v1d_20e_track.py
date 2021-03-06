@@ -5,10 +5,10 @@ fp16 = dict(loss_scale=512.)
 num_classes = 4
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet50',
+    pretrained='torchvision://resnet101',
     backbone=dict(
-        type='ResNet',
-        depth=50,
+        type='ResNetV1d',
+        depth=101,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -193,7 +193,7 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1000, 1000), keep_ratio=True),
+    dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
     # dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
@@ -206,7 +206,7 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         img_scale=(800, 800),
-        flip=True,
+        flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
             dict(type='RandomFlip'),
@@ -249,7 +249,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[16, 22])
-total_epochs = 36
+total_epochs = 24
 
 checkpoint_config = dict(interval=1)
 # yapf:disable

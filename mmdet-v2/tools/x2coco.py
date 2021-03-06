@@ -271,7 +271,7 @@ def parse_args():
                         help='save coco filename')
     parser.add_argument('img_dir',
                         default=r"",
-                        help='img_dir, use "*" to match folder')
+                        help='img_dir, including "*" to match folder')
     parser.add_argument(
         '--options',
         nargs='+', action=MultipleKVAction,

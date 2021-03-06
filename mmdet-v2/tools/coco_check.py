@@ -77,7 +77,7 @@ def check_coco(src, dst, img_dir=None, replace=True):
     return dst
 
 
-def check_box(coco, save_name, img_dir):
+def check_box(coco, save_name, img_dir, overlap=0.7):
     if isinstance(coco, str):
         coco = load_dict(coco)
     images = {v['id']: v for v in coco['images']}
@@ -88,8 +88,10 @@ def check_box(coco, save_name, img_dir):
         b = v['bbox']
         image = images[v['image_id']]
         assert image is not None and image['width'] is not None
-        if not (0 <= b[0] <= image['width'] and 0 <= b[1] <= image['height'] and b[2] > 0 and b[3] > 0 \
-                and 0 <= b[0] + b[2] <= image['width'] and 0 <= b[1] + b[3] <= image['height']):
+        from mmdet.datasets.pipelines.slice_image import box_overlap
+        # if not (0 <= b[0] <= image['width'] and 0 <= b[1] <= image['height'] and b[2] > 0 and b[3] > 0 \
+        #         and 0 <= b[0] + b[2] <= image['width'] and 0 <= b[1] + b[3] <= image['height']):
+        if box_overlap([b[0], b[1], b[0] + b[2], b[1] + b[3]], [0, 0, image['width'], image['height']]) < overlap:
             error_boxes.append(v['id'])
     from third_party.useless.cocoutils.draw_box import DrawBox
     draw = DrawBox(len(cat2label))
@@ -222,13 +224,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all.json",
+                        default="data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json",
+                        default="data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all-check.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='data/track/trainval/cut_4000x4000/',
+                        default='data/track/trainval/cut_4000x4000_overlap_70/',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()

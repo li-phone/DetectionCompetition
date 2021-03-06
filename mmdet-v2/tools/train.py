@@ -21,12 +21,16 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/track/bs_r50_20e_track.py',
+                        default='../configs/track/bs_r101_v1d_20e_track.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
-        '--resume-from',
+        '--load-from',
         default='work_dirs/bs_r50_20e_track/latest.pth',
+        help='the checkpoint file to resume from')
+    parser.add_argument(
+        '--resume-from',
+        # default='work_dirs/bs_r101_v1d_20e_track/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
@@ -42,7 +46,7 @@ def parse_args():
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
-        default=[1],
+        default=[0],
         nargs='+',
         help='ids of gpus to use '
              '(only applicable to non-distributed training)')
@@ -111,6 +115,8 @@ def main():
         # use config filename as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
+    if args.load_from is not None:
+        cfg.load_from = args.load_from
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
     if args.gpu_ids is not None:

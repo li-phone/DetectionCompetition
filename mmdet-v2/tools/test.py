@@ -20,10 +20,10 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='MMDet test (and eval) a model')
     parser.add_argument('--config',
-                        default='../configs/tile/cascade_rcnn/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800.py',
+                        default='../configs/track/bs_resnest101_20e_track.py',
                         help='test config file path')
     parser.add_argument('--checkpoint',
-                        default='./work_dirs/tile/cascade_rcnn_x101_64x4d_fpn_20e_cut_800x800/epoch_20.pth',
+                        default='./work_dirs/bs_resnest101_20e_track/latest.pth',
                         help='checkpoint file')
     parser.add_argument('--out', help='output result file in pickle format')
     parser.add_argument(

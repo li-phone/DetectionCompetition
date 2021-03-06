@@ -11,10 +11,10 @@ from pandas import json_normalize
 
 class Config(object):
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
-    post_process_file = "work_dirs/track/submit_testA_1000x1000_bs_r50_20e_track__thr_0.001.json"
-    save_file = "work_dirs/track/submit_testA_1000x1000_bs_r50_20e_track__thr_0.15__softnms.json"
-    # nms = dict(type='nms', iou_threshold=0.5)
-    nms = dict(type='soft_nms', iou_threshold=0.5)
+    post_process_file = "work_dirs/track/submit_testA_cut_4000x4000_bs_r50_20e_track_test_800x800.json"
+    save_file = "work_dirs/track/submit_testA_cut_4000x4000_bs_r50_20e_track_test_800x800_thr_0.15.json"
+    nms = dict(type='nms', iou_threshold=0.5)
+    # nms = dict(type='soft_nms', iou_threshold=0.5)
     # nms = dict(score_thr=0.15, nms=dict(type='soft_nms', iou_thr=0.5), max_per_img=200)
     score_thr = 0.15
 

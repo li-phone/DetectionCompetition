@@ -5,15 +5,19 @@ fp16 = dict(loss_scale=512.)
 num_classes = 4
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet50',
+    pretrained='open-mmlab://resnest101',
     backbone=dict(
-        type='ResNet',
-        depth=50,
+        type='ResNeSt',
+        stem_channels=128,
+        depth=101,
+        radix=2,
+        reduction_factor=4,
+        avg_down_stride=True,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        norm_cfg=dict(type='BN', requires_grad=True),
-        norm_eval=True,
+        # norm_cfg=norm_cfg,
+        norm_eval=False,
         style='pytorch'),
     neck=dict(
         type='FPN',
@@ -47,9 +51,11 @@ model = dict(
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=[
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                # norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=num_classes,
                 bbox_coder=dict(
@@ -64,9 +70,11 @@ model = dict(
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
                                loss_weight=1.0)),
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                # norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=num_classes,
                 bbox_coder=dict(
@@ -81,9 +89,11 @@ model = dict(
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
                                loss_weight=1.0)),
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                # norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=num_classes,
                 bbox_coder=dict(
@@ -96,7 +106,7 @@ model = dict(
                     use_sigmoid=False,
                     loss_weight=1.0),
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
-        ]))
+        ], ))
 # model training and testing settings
 train_cfg = dict(
     rpn=dict(
@@ -185,15 +195,21 @@ test_cfg = dict(
         score_thr=0.001,
         nms=dict(type='nms', iou_threshold=0.5),
         max_per_img=200))
-
 dataset_type = 'CocoDataset'
 data_root = 'data/track/'
+# # use ResNeSt img_norm
 img_norm_cfg = dict(
-    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+    mean=[123.68, 116.779, 103.939], std=[58.393, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1000, 1000), keep_ratio=True),
+    # dict(
+    #     type='Resize',
+    #     img_scale=[(1333, 640), (1333, 800)],
+    # img_scale=[(1000, 800), (1000, 1200)],
+    # multiscale_mode='range',
+    # keep_ratio=True),
+    dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
     # dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
@@ -249,7 +265,7 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     step=[16, 22])
-total_epochs = 36
+total_epochs = 24
 
 checkpoint_config = dict(interval=1)
 # yapf:disable
