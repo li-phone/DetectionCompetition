@@ -3,8 +3,8 @@ import torch
 from .builder import IOU_CALCULATORS
 
 
-def cast_tensor_type(x, scale=1., type=None):
-    if type == 'fp16':
+def cast_tensor_type(x, scale=1., dtype=None):
+    if dtype == 'fp16':
         x = (x / scale).half()
     return x
 
@@ -51,9 +51,7 @@ class BboxOverlaps2D(object):
         bboxes1 = cast_tensor_type(bboxes1, self.scale, self.dtype)
         bboxes2 = cast_tensor_type(bboxes2, self.scale, self.dtype)
 
-        ious = bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
-
-        return ious
+        return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
 
     def __repr__(self):
         """str: a string describing the module"""
