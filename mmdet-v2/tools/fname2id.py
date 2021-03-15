@@ -1,3 +1,7 @@
+cat2id = {
+    "car": 1, "head": 2, "full body": 3, "visible body": 4,
+}
+
 fname2id = {"14_OCT_Habour/IMG_14_01.jpg": 396, "14_OCT_Habour/IMG_14_11.jpg": 398, "14_OCT_Habour/IMG_14_24.jpg": 400,
             "14_OCT_Habour/IMG_14_28.jpg": 402, "14_OCT_Habour/IMG_14_16.jpg": 404, "14_OCT_Habour/IMG_14_23.jpg": 406,
             "14_OCT_Habour/IMG_14_15.jpg": 408, "14_OCT_Habour/IMG_14_20.jpg": 410, "14_OCT_Habour/IMG_14_27.jpg": 412,

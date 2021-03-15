@@ -11,12 +11,12 @@ from pandas import json_normalize
 
 class Config(object):
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
-    post_process_file = "work_dirs/track/submit_testA_cut_4000x4000_bs_r50_20e_track_test_800x800.json"
-    save_file = "work_dirs/track/submit_testA_cut_4000x4000_bs_r50_20e_track_test_800x800_thr_0.15.json"
-    nms = dict(type='nms', iou_threshold=0.5)
-    # nms = dict(type='soft_nms', iou_threshold=0.5)
+    post_process_file = "work_dirs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track-test_800x800-epoch_24.json"
+    save_file = "work_dirs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track-thr_0.002.json"
+    # nms = dict(type='nms', iou_threshold=0.5)
+    nms = dict(type='soft_nms', iou_threshold=0.5)
     # nms = dict(score_thr=0.15, nms=dict(type='soft_nms', iou_thr=0.5), max_per_img=200)
-    score_thr = 0.15
+    score_thr = 0.002
 
 
 def post_process():
@@ -38,6 +38,7 @@ def post_process():
         labels = torch.from_numpy(np.array(list(result['category_id']))).long()
         bboxes, keep = batched_nms(bboxes, scores, labels, nms_cfg=config.nms)
         labels = labels[keep]
+        assert len(bboxes) == len(labels)
         for r, label in zip(bboxes, labels):
             bbox = list(map(float, r[:4]))
             category_id, score = int(label), r[4]

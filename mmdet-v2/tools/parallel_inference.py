@@ -22,8 +22,8 @@ class Config(object):
 
     # data module
     img_dir = "data/track/panda_round1_test_202104_A/"
-    test_file = "data/track/annotations/cut_4000x4000/submit_testA.json"
-    save_file = "work_dirs/track/submit_testA_cut_4000x4000_bs_resnest101_20e_track_test_800x800.json"
+    test_file = "data/track/annotations/cut_4000x4000_overlap_70/submit_testA.json"
+    save_file = "work_dirs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track-test_800x800-epoch_24.json"
     original_coco = COCO(test_file)
     # label2name = {x['id']: x['name'] for x in original_coco.dataset['categories']}
     label2name = {1: 4, 2: 2, 3: 3, 4: 1}
@@ -31,9 +31,9 @@ class Config(object):
     fname2id = fname2id
 
     # inference module
-    device = 'cuda:1'
-    config_file = '../configs/track/bs_resnest101_20e_track.py'
-    checkpoint_file = 'work_dirs/bs_resnest101_20e_track/epoch_24.pth'
+    device = 'cuda:0'
+    config_file = '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track.py'
+    checkpoint_file = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/epoch_24.pth'
     model = init_detector(config_file, checkpoint_file, device=device)
 
 
@@ -97,16 +97,27 @@ def process(image, **kwargs):
             'bbox_height': bbox[3] - bbox[1],
             'score': float(score)
         })
-    from pandas.io.json import json_normalize
-    from mmcv.visualization.image import imshow_det_bboxes
-    df = json_normalize(save_results['result'])
-    anns = np.array(df['bbox'])
-    score = np.array(df['score'])
-    bbox = np.array([[b[0], b[1], b[2], b[3], score[i]] for i, b in enumerate(anns)])
-    img = imshow_det_bboxes(os.path.join(config.img_dir, image['file_name']), bbox, labels, show=False)
-    mkdirs(image['file_name'])
-    img = cv2.resize(img, dsize=0, fx=0.25, fy=0.25)
-    cv2.imwrite(image['file_name'], img)
+    # show test image
+    # from pandas import json_normalize
+    # from mmcv.visualization.image import imshow_det_bboxes
+    # bbox = []
+    # for v in save_results['result']:
+    #     if v['score'] > 0.3:
+    #         bbox.append(
+    #             [v['bbox_left'], v['bbox_top'],
+    #              v['bbox_left'] + v['bbox_width'], v['bbox_top'] + v['bbox_height']]
+    #         )
+    # df = json_normalize(save_results['result'])
+    # df = df[df['score'] > 0.3]
+    # bbox = np.array(bbox)
+    # labels = np.array(list(df['category_id']))
+    # score = np.array(df['score'])
+    # img = imshow_det_bboxes(os.path.join(config.img_dir, image['file_name']), bbox, labels, show=False)
+    # image['file_name'] = "__show_ing__/" + image['file_name']
+    # mkdirs(image['file_name'])
+    # img = cv2.resize(img, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_CUBIC)
+    # cv2.imwrite(image['file_name'], img)
+
     end = time.time()
     print('second/img: {:.2f}'.format(end - kwargs['time']['start']))
     kwargs['time']['start'] = end
@@ -119,7 +130,7 @@ def parallel_infer():
         os.makedirs(os.path.dirname(config.save_file))
     process_params = dict(config=config, time=dict(start=time.time()))
     settings = dict(tasks=config.original_coco.dataset['images'],
-                    process=process, collect=['result'], workers_num=1,
+                    process=process, collect=['result'], workers_num=3,
                     process_params=process_params, print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

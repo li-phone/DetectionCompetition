@@ -3,9 +3,19 @@ import torch
 from .builder import IOU_CALCULATORS
 
 
+def cast_tensor_type(x, scale=1., type=None):
+    if type == 'fp16':
+        x = (x / scale).half()
+    return x
+
+
 @IOU_CALCULATORS.register_module()
 class BboxOverlaps2D(object):
     """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
+
+    def __init__(self, dtype=None, scale=1.):
+        self.scale = scale
+        self.dtype = dtype
 
     def __call__(self, bboxes1, bboxes2, mode='iou', is_aligned=False):
         """Calculate IoU between 2D bboxes.
@@ -32,7 +42,18 @@ class BboxOverlaps2D(object):
             bboxes2 = bboxes2[..., :4]
         if bboxes1.size(-1) == 5:
             bboxes1 = bboxes1[..., :4]
-        return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+
+        if self.dtype not in ('fp16'):
+            return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+
+        # change tensor type to save cuda memory
+        assert self.dtype in ('fp16')
+        bboxes1 = cast_tensor_type(bboxes1, self.scale, self.dtype)
+        bboxes2 = cast_tensor_type(bboxes2, self.scale, self.dtype)
+
+        ious = bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+
+        return ious
 
     def __repr__(self):
         """str: a string describing the module"""
@@ -104,14 +125,14 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
 
     if rows * cols == 0:
         if is_aligned:
-            return bboxes1.new(batch_shape + (rows, ))
+            return bboxes1.new(batch_shape + (rows,))
         else:
             return bboxes1.new(batch_shape + (rows, cols))
 
     area1 = (bboxes1[..., 2] - bboxes1[..., 0]) * (
-        bboxes1[..., 3] - bboxes1[..., 1])
+            bboxes1[..., 3] - bboxes1[..., 1])
     area2 = (bboxes2[..., 2] - bboxes2[..., 0]) * (
-        bboxes2[..., 3] - bboxes2[..., 1])
+            bboxes2[..., 3] - bboxes2[..., 1])
 
     if is_aligned:
         lt = torch.max(bboxes1[..., :2], bboxes2[..., :2])  # [B, rows, 2]

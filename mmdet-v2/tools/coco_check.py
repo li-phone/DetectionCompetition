@@ -224,13 +224,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all.json",
+                        default="data/track/annotations/overlap_70_all_category/instance_overlap_70_all_category.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all-check.json",
+                        default="data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='data/track/trainval/cut_4000x4000_overlap_70/',
+                        default='data/track/trainval/overlap_70_all_category/',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()

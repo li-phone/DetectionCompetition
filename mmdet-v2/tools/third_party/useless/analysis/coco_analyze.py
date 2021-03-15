@@ -214,9 +214,9 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=[r"/home/lifeng/data/detection/track/annotations/ori_instance_all.json"],
-        save_img_dir='./track',
-        legends=['train'])
+        ann_files=[r"/home/lifeng/data/detection/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json"],
+        save_img_dir='./track-cut_4000x4000_all',
+        legends=['all'])
     data.summary()
     # garbage_ana = COCOAnalysis(
     #     ann_files=['/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'],

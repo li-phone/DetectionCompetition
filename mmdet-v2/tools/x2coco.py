@@ -133,11 +133,16 @@ def read_PANDA(path):
 
     files = glob.glob(os.path.join(path, "*.json"))
     results, ignore_labels = [], set()
-    for file in files:
+    for file in tqdm(files):
         collect_keys = {
-            "person": "person",
-            "small car": "car", "midsize car": "car", "large car": "car", "bicycle": "car", "motcycle": "car",
-            "tricycle": "car", "electric car": "car", "baby carriage": "car", "vehicles": "car", "unsure": "car"}
+            # person
+            "fake person": "visible body", "ignore": "visible body", "people": "visible body",
+            "crowd": "visible body", "person": "person",
+            # car
+            "fake": "car",
+            "small car": "car", "midsize car": "car", "large car": "car", "bicycle": "car", "motorcycle": "car",
+            "tricycle": "car", "electric car": "car", "baby carriage": "car", "vehicles": "car", "unsure": "car"
+        }
         with open(file, 'r') as fp:
             annotations = json.load(fp)
             for fname, img_obj in annotations.items():
@@ -145,6 +150,8 @@ def read_PANDA(path):
                 for obj in img_obj["objects list"]:
                     if obj['category'] in collect_keys.keys():
                         rects = {}
+                        assert ('rect' in obj.keys() and 'rects' not in obj.keys()) or (
+                                'rect' not in obj.keys() and 'rects' in obj.keys())
                         if 'rect' in obj.keys():
                             rects = {collect_keys[obj['category']]: obj['rect']}
                         elif 'rects' in obj.keys():
@@ -158,6 +165,8 @@ def read_PANDA(path):
                             result['uuid'] = uuid_str
                             result['ori_info'] = obj
                             results.append(result)
+                    else:
+                        raise Exception("No such ", obj['category'])
     results = json_normalize(results)
     print(results.groupby(by='label').count())
     return results
@@ -263,14 +272,14 @@ def help():
 def parse_args():
     help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
-    parser.add_argument('x',
-                        default=r"",
+    parser.add_argument('--x',
+                        default=r"data/track/panda_round1_train_annos_202104/",
                         help='x file/folder or original annotation file in test_img mode')
-    parser.add_argument('save_name',
-                        default=r"",
+    parser.add_argument('--save_name',
+                        default=r"data/track/annotations/ori_instance_all_category.json",
                         help='save coco filename')
-    parser.add_argument('img_dir',
-                        default=r"",
+    parser.add_argument('--img_dir',
+                        default=r"data/track/panda_round1_train_202104_part1",
                         help='img_dir, including "*" to match folder')
     parser.add_argument(
         '--options',

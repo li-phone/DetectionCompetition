@@ -5,16 +5,27 @@ fp16 = dict(loss_scale=512.)
 num_classes = 4
 model = dict(
     type='CascadeRCNN',
-    pretrained='torchvision://resnet101',
+    pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
-        type='ResNetV1d',
+        type='ResNeXt',
         depth=101,
+        groups=64,
+        base_width=4,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
         norm_cfg=dict(type='BN', requires_grad=True),
-        norm_eval=True,
         style='pytorch'),
+    # pretrained='torchvision://resnet50',
+    # backbone=dict(
+    #     type='ResNet',
+    #     depth=50,
+    #     num_stages=4,
+    #     out_indices=(0, 1, 2, 3),
+    #     frozen_stages=1,
+    #     norm_cfg=dict(type='BN', requires_grad=True),
+    #     norm_eval=True,
+    #     style='pytorch'),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -32,7 +43,9 @@ model = dict(
         bbox_coder=dict(
             type='DeltaXYWHBBoxCoder',
             target_means=[.0, .0, .0, .0],
-            target_stds=[1.0, 1.0, 1.0, 1.0]),
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False,  # 允许超出图像大小
+        ),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
         loss_bbox=dict(type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.0)),
@@ -55,7 +68,9 @@ model = dict(
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
-                    target_stds=[0.1, 0.1, 0.2, 0.2]),
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False,  # 允许超出图像大小
+                ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -72,7 +87,9 @@ model = dict(
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
-                    target_stds=[0.05, 0.05, 0.1, 0.1]),
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False,  # 允许超出图像大小
+                ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -89,7 +106,9 @@ model = dict(
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
-                    target_stds=[0.033, 0.033, 0.067, 0.067]),
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False,  # 允许超出图像大小
+                ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
                     type='CrossEntropyLoss',
@@ -109,7 +128,9 @@ train_cfg = dict(
             ignore_iof_thr=-1),
         sampler=dict(
             type='RandomSampler',
-            num=256,
+            # num=256,
+            # 增加采样 * 2
+            num=512,
             pos_fraction=0.5,
             neg_pos_ub=-1,
             add_gt_as_proposals=False),
@@ -134,7 +155,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
+                # 增加采样 * 2
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -150,7 +173,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
+                # 增加采样 * 2
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -166,7 +191,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
+                # 增加采样 * 2
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -184,7 +211,7 @@ test_cfg = dict(
     rcnn=dict(
         score_thr=0.001,
         nms=dict(type='nms', iou_threshold=0.5),
-        max_per_img=200))
+        max_per_img=1000))
 
 dataset_type = 'CocoDataset'
 data_root = 'data/track/'
@@ -193,9 +220,11 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
-    # dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
+    # dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
+    dict(type='Resize', img_scale=(800, 800), ratio_range=(0.8, 1.2), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
+    # dict(type='RandomFlip', flip_ratio=0.5, direction='horizontal'),
+    # dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
@@ -205,7 +234,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(800, 800),
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -221,26 +250,26 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/cut_4000x4000/instance_train.json',
-        img_prefix=data_root + 'trainval/cut_4000x4000',
+        ann_file=data_root + 'annotations/overlap_70_all_category/instance_train.json',
+        img_prefix=data_root + 'trainval/overlap_70_all_category',
         classes=('car', 'full body', 'head', 'visible body'),
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/cut_4000x4000/instance_val.json',
-        img_prefix=data_root + 'trainval/cut_4000x4000',
+        ann_file=data_root + 'annotations/overlap_70_all_category/instance_val.json',
+        img_prefix=data_root + 'trainval/overlap_70_all_category',
         classes=('car', 'full body', 'head', 'visible body'),
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/cut_4000x4000/instance_val.json',
-        img_prefix=data_root + 'trainval/cut_4000x4000',
+        ann_file=data_root + 'annotations/overlap_70_all_category/instance_val.json',
+        img_prefix=data_root + 'trainval/overlap_70_all_category',
         classes=('car', 'full body', 'head', 'visible body'),
         pipeline=test_pipeline),
 )
 evaluation = dict(interval=1, metric='bbox')
 # optimizer
-optimizer = dict(type='SGD', lr=0.02 / 4, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02 / 1, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=None)
 # learning policy
 lr_config = dict(

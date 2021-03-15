@@ -14,15 +14,15 @@ class Config(object):
     train_pipeline = [
         dict(type='LoadImageFromFile'),
         # dict(type='SliceROI', training=False),
-        dict(type='SliceImage', training=True, window=(4000, 4000), step=(3500, 3500), order_index=False)
+        dict(type='SliceImage', overlap=0.7, training=True, window=(4000, 4000), step=(3500, 3500), order_index=False)
     ]
     compose = Compose(train_pipeline)
 
     # data module
     img_dir = "/home/lifeng/data/detection/track/panda_round1_train_202104_part1"
-    ann_file = "/home/lifeng/data/detection/track/annotations/ori_instance_all.json"
-    save_img_dir = "/home/lifeng/data/detection/track/trainval/cut_4000x4000_overlap_70/"
-    save_ann_file = "/home/lifeng/data/detection/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all.json"
+    ann_file = "/home/lifeng/data/detection/track/annotations/ori_instance_all_category.json"
+    save_img_dir = "/home/lifeng/data/detection/track/trainval/overlap_70_all_category/"
+    save_ann_file = "/home/lifeng/data/detection/track/annotations/overlap_70_all_category/instance_overlap_70_all_category.json"
     original_coco = COCO(ann_file)
 
 
@@ -80,6 +80,9 @@ def process(image, **kwargs):
     #     img_filename = os.path.join(config.save_img_dir, id)
     #     img = imshow_bboxes(img_filename, bbox, show=False)
     #     cv2.imwrite(id, img)
+    end = time.time()
+    print('second/img: {:.2f}'.format(end - kwargs['time']['start']))
+    kwargs['time']['start'] = end
     return save_results
 
 
@@ -89,9 +92,9 @@ def parallel_slice():
         os.makedirs(config.save_img_dir)
     if not os.path.exists(os.path.dirname(config.save_ann_file)):
         os.makedirs(os.path.dirname(config.save_ann_file))
-    process_params = dict(config=config)
+    process_params = dict(config=config, time=dict(start=time.time()))
     settings = dict(tasks=config.original_coco.dataset['images'],
-                    process=process, collect=['images', 'annotations'], workers_num=1,
+                    process=process, collect=['images', 'annotations'], workers_num=4,
                     process_params=process_params, print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

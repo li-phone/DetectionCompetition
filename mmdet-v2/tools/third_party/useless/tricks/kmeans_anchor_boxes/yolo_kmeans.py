@@ -91,8 +91,9 @@ def main():
     from tqdm import tqdm
     ks, accs = [], []
     for i in tqdm(range(1, 11)):
+        print('-' * 64)
         ratios, acc, out = coco_kmeans(
-            '/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json', k=i)
+            '../../../../data/track/annotations/overlap_70_all_category/instance_val.json', k=i)
         ks.append(i)
         accs.append(acc)
     acc_df = pd.DataFrame(data={'k': ks, 'avg_iou': accs})
@@ -100,7 +101,7 @@ def main():
         x='k', y='avg_iou', marker='^',
         grid=True, xlim=(1, 10), ylim=(0., 100.))
     plt.ylabel('avg_iou')
-    save_plt('./results/garbage_huawei/k-means_cluster/k-means_cluster.jpg')
+    save_plt('./results/track/k-means_cluster/k-means_cluster.jpg')
     plt.show()
 
 

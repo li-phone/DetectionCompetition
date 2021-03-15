@@ -21,16 +21,16 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/track/bs_r101_v1d_20e_track.py',
+                        default='../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_scale2_track.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--load-from',
-        default='work_dirs/bs_r50_20e_track/latest.pth',
+        default='work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--resume-from',
-        # default='work_dirs/bs_r101_v1d_20e_track/latest.pth',
+        # default='work_dirs/bs_r50_20e_overlap_sampler_x2_mst_track/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
@@ -41,6 +41,7 @@ def parse_args():
     group_gpus.add_argument(
         '--gpus',
         type=int,
+        # default=1,
         help='number of gpus to use '
              '(only applicable to non-distributed training)')
     group_gpus.add_argument(
