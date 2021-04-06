@@ -20,10 +20,10 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='MMDet test (and eval) a model')
     parser.add_argument('--config',
-                        default='../configs/track/bs_r50_20e_overlap_sampler_x2_track.py',
+                        default='../configs/track/best_score_finetune.py',
                         help='test config file path')
     parser.add_argument('--checkpoint',
-                        default='./work_dirs/bs_r50_20e_overlap_sampler_x2_track/epoch_36.pth',
+                        default='./work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth',
                         help='checkpoint file')
     parser.add_argument('--out', help='output result file in pickle format')
     parser.add_argument(

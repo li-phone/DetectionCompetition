@@ -201,6 +201,7 @@ test_cfg = dict(
         min_bbox_size=0),
     rcnn=dict(
         score_thr=0.001,
+        # score_thr=0.05,
         # nms=dict(type='nms', iou_threshold=0.5),
         nms=dict(type='soft_nms', iou_thr=0.5),
         max_per_img=1000))
@@ -213,7 +214,7 @@ train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
     # dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
-    dict(type='Resize', img_scale=(800, 800), ratio_range=(0.8, 1.2), keep_ratio=True),
+    dict(type='Resize', img_scale=(800, 800), ratio_range=(0.75, 1.25), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='horizontal'),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
@@ -226,6 +227,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
+        # img_scale=(600, 600),
         img_scale=[(600, 600), (800, 800), (1000, 1000)],
         flip=True,
         transforms=[
@@ -242,7 +244,7 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/overlap_70_all_category/instance_train.json',
+        ann_file=data_root + 'annotations/overlap_70_all_category/overlap_70_all_category-check.json',
         img_prefix=data_root + 'trainval/overlap_70_all_category',
         classes=('car', 'full body', 'head', 'visible body'),
         pipeline=train_pipeline),
@@ -269,8 +271,10 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[16, 22])
-total_epochs = 24
+    step=[8, 11],
+    # step=[16, 22]
+)
+total_epochs = 24 // 2
 
 checkpoint_config = dict(interval=1)
 # yapf:disable

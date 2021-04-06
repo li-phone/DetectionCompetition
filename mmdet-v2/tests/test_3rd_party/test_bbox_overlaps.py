@@ -11,7 +11,10 @@ class TestBBoxOverlaps(object):
 
     @classmethod
     def setup_class(cls):
-        pass
+        cls.test_size = 20
+        cls.test_range = 1
+        cls.init_tasks = [cls.test_range for i in range(cls.test_size)]
+        cls.img_file = osp.join(osp.dirname(__file__), '../color.jpg')
 
     def test_simple_roinet(self):
         bboxes1 = torch.FloatTensor([

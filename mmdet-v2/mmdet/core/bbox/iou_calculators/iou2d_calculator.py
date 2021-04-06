@@ -5,11 +5,12 @@ from .builder import IOU_CALCULATORS
 
 def cast_tensor_type(x, scale=1., dtype=None):
     if dtype == 'fp16':
+        # scale for preventing overflows
         x = (x / scale).half()
     return x
 
 
-def __clamp__(x, min=None, max=None):
+def fp16_clamp(x, min=None, max=None):
     if not x.is_cuda and x.dtype == torch.float16:
         # clamp for cpu float16
         return x.float().clamp(min, max).half()
@@ -21,9 +22,9 @@ def __clamp__(x, min=None, max=None):
 class BboxOverlaps2D(object):
     """2D Overlaps (e.g. IoUs, GIoUs) Calculator."""
 
-    def __init__(self, dtype=None, scale=1.):
-        self.dtype = dtype
+    def __init__(self, scale=1., dtype=None):
         self.scale = scale
+        self.dtype = dtype
 
     def __call__(self, bboxes1, bboxes2, mode='iou', is_aligned=False):
         """Calculate IoU between 2D bboxes.
@@ -65,7 +66,7 @@ class BboxOverlaps2D(object):
 
     def __repr__(self):
         """str: a string describing the module"""
-        repr_str = self.__class__.__name__ + '(dtype=' + str(self.dtype) + ', scale=' + str(self.scale) + ')'
+        repr_str = self.__class__.__name__ + f'(scale={self.scale}, dtype={self.dtype})'
         return repr_str
 
 
@@ -117,7 +118,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
     """
 
     assert mode in ['iou', 'iof', 'giou'], f'Unsupported mode {mode}'
-    # Either the boxes are empty or the length of boxes's last dimenstion is 4
+    # Either the boxes are empty or the length of boxes' last dimension is 4
     assert (bboxes1.size(-1) == 4 or bboxes1.size(0) == 0)
     assert (bboxes2.size(-1) == 4 or bboxes2.size(0) == 0)
 
@@ -147,7 +148,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
         rb = torch.min(bboxes1[..., 2:], bboxes2[..., 2:])  # [B, rows, 2]
 
         # wh = (rb - lt).clamp(min=0)  # [B, rows, 2]
-        wh = __clamp__(rb - lt, min=0)
+        wh = fp16_clamp(rb - lt, min=0)
         overlap = wh[..., 0] * wh[..., 1]
 
         if mode in ['iou', 'giou']:
@@ -164,7 +165,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
                        bboxes2[..., None, :, 2:])  # [B, rows, cols, 2]
 
         # wh = (rb - lt).clamp(min=0)  # [B, rows, cols, 2]
-        wh = __clamp__(rb - lt, min=0)
+        wh = fp16_clamp(rb - lt, min=0)
         overlap = wh[..., 0] * wh[..., 1]
 
         if mode in ['iou', 'giou']:
@@ -184,7 +185,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou', is_aligned=False, eps=1e-6):
         return ious
     # calculate gious
     # enclose_wh = (enclosed_rb - enclosed_lt).clamp(min=0)
-    enclose_wh = __clamp__(enclosed_rb - enclosed_lt, min=0)
+    enclose_wh = fp16_clamp(enclosed_rb - enclosed_lt, min=0)
     enclose_area = enclose_wh[..., 0] * enclose_wh[..., 1]
     enclose_area = torch.max(enclose_area, eps)
     gious = ious - (enclose_area - union) / enclose_area

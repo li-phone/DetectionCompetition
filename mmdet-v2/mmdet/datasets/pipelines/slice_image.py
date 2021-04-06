@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import copy
 import heapq
+from mmdet.core.bbox.iou_calculators.iou2d_calculator import bbox_overlaps
 
 from ..builder import PIPELINES
 
@@ -188,84 +189,125 @@ class SliceImage(object):
             返回单个results或者若干个results [list]
     """
 
-    def __init__(self, training=True, overlap=0.7, window=(2666, 1600), step=(1333, 800), order_index=True,
-                 is_keep_none=False):
-        self.training = training
+    def __init__(self, overlap=0.7, base_win=(2666, 1600), step=(0.2, 0.2), resize=None,
+                 fx=None, fy=None, center=None, keep_none=False):
         self.overlap = overlap
-        self.window = window
+        self.base_win = base_win
         self.step = step
-        self.order_index = {} if order_index else None
-        self.is_keep_none = is_keep_none
+        self.resize = resize
+        self.fx = fx
+        self.fy = fy
+        self.center = center if center is not None else [None, None]
+        self.keep_none = keep_none
+
+    def slice(self, base_win, img_shape, step=(0., 0.), fx=None, fy=None, center=None):
+        img_h, img_w = img_shape[:2]
+        center = list(center)
+        center[0] = center[0] if center[0] is not None else base_win[0] / 2
+        center[1] = center[1] if center[1] is not None else base_win[1] / 2
+        results = []
+
+        def slice_(ctr, window, sx=1., sy=1.):
+            X, Y = ctr
+            window = [window[0], window[1]]
+            while 0 <= Y < img_h:
+                x = X
+                win = [window[0], window[1]]
+                while 0 <= x < img_w:
+                    left, top = max(0, x - win[0] / 2), max(0, Y - win[1] / 2)
+                    right, bottom = min(img_w, x + win[0] / 2), min(img_h, Y + win[1] / 2)
+                    if x - win[0] / 2 < 0:
+                        right = left + win[0]
+                    if Y - win[1] / 2 < 0:
+                        bottom = top + win[1]
+                    if x + win[0] / 2 > img_w:
+                        left = right - win[0]
+                    if Y + win[1] / 2 > img_h:
+                        top = bottom - win[1]
+                    roi = list(map(int, (left, top, right, bottom)))
+                    results.append(roi)
+                    x += win[0] * (1. - step[0]) * sx
+                    # if fx: win[0] = fx(win[0])
+                    # if fy: win[1] = fy(win[1])
+                Y += window[1] * (1. - step[1]) * sy
+                if fx: window[0] = fx(window[0])
+                if fy: window[1] = fy(window[1])
+                window = [min(10000, window[0]), min(10000, window[1])]
+
+        _win = [base_win[0], base_win[1]]
+        slice_(center, _win, 1., 1.)
+        slice_((center[0], center[1] - _win[1]), _win, 1., -1.)
+        slice_((center[0] - _win[0], center[1]), _win, -1., 1.)
+        slice_((center[0] - _win[0], center[1] - _win[1]), _win, -1., -1.)
+        return results
+
+    def slice_roi(self, results, roi):
+        result = {}
+        for k, v in results.items():
+            if isinstance(v, np.ndarray):
+                result[k] = v
+            else:
+                result[k] = copy.deepcopy(results[k])
+        left, top, right, bottom = roi
+        img_h, img_w, _ = results['img'].shape
+        result['slice_image'] = {'ori_shape': [img_h, img_w, _], 'window': tuple(roi)}
+        result['slice_image__window'] = tuple(roi)
+        if 'ann_info' in result:
+            result['ann_info']['bboxes'][:, 0] -= result['slice_image__window'][0]
+            result['ann_info']['bboxes'][:, 1] -= result['slice_image__window'][1]
+            result['ann_info']['bboxes'][:, 2] -= result['slice_image__window'][0]
+            result['ann_info']['bboxes'][:, 3] -= result['slice_image__window'][1]
+            bboxes = result['ann_info']['bboxes']
+            # 限制在指定窗口的width和height中
+            window = [0, 0, right - left, bottom - top]
+            keep_idx = [i for i in range(len(bboxes)) if box_overlap(bboxes[i], window) >= self.overlap]
+            result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
+            result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
+            if 'bbox_uuid' in result['ann_info']:
+                result['ann_info']['bbox_uuid'] = result['ann_info']['bbox_uuid'][keep_idx]
+            if 'group_uuid' in result['ann_info']:
+                result['ann_info']['group_uuid'] = result['ann_info']['group_uuid'][keep_idx]
+                # result['ann_info']['bboxes_ignore'] = result['ann_info']['bboxes_ignore'][keep_idx]
+            result['gt_bboxes'] = result['ann_info']['bboxes']
+            result['gt_labels'] = result['ann_info']['labels']
+            # result['gt_bboxes_ignore'] = result['gt_bboxes_ignore'][keep_idx]
+            if len(result['gt_bboxes']) <= 0 and len(result['gt_labels']) <= 0 and not self.keep_none:
+                return None
+        if self.keep_none or len(result['gt_bboxes']) > 0:
+            img = results['img'][top:bottom, left:right, :]
+            h2, w2 = img.shape[:2]
+            assert bottom - top == h2 and right - left == w2
+            result['img_info']['height'] = img.shape[0]
+            result['img_info']['width'] = img.shape[1]
+            result['img'] = img
+            result['img_shape'] = img.shape
+            result['ori_shape'] = img.shape
+        return result
 
     def __call__(self, results):
-        img_h, img_w, _ = results['img'].shape
-        cut_results = []
-        for i in range(0, img_h, self.step[1]):
-            for j in range(0, img_w, self.step[0]):
-                left, top, right, bottom = j, i, min(img_w, j + self.window[0]), min(img_h, i + self.window[1])
-                if j + self.window[0] > img_w:
-                    left = right - self.window[0]
-                if i + self.window[1] > img_h:
-                    top = bottom - self.window[1]
-                # result = copy.deepcopy(results)
-                result = {}
-                for k, v in results.items():
-                    if isinstance(v, np.ndarray):
-                        result[k] = v
-                    else:
-                        result[k] = copy.deepcopy(results[k])
-
-                result['slice_image'] = {'ori_shape': [img_h, img_w, _]}
-                result['slice_image']['left_top'] = (left, top, right, bottom)
-                result['slice_image__left_top'] = (left, top, right, bottom)
-                is_cut_img = True
-                if self.training:
-                    result['ann_info']['bboxes'][:, 0] -= result['slice_image__left_top'][0]
-                    result['ann_info']['bboxes'][:, 1] -= result['slice_image__left_top'][1]
-                    result['ann_info']['bboxes'][:, 2] -= result['slice_image__left_top'][0]
-                    result['ann_info']['bboxes'][:, 3] -= result['slice_image__left_top'][1]
-                    bboxes = result['ann_info']['bboxes']
-                    # 限制在指定窗口的width和height中
-                    window = [0, 0, right - left, bottom - top]
-                    keep_idx = [i for i in range(len(bboxes)) if box_overlap(bboxes[i], window) > self.overlap]
-                    result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
-                    result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
-                    # result['ann_info']['bboxes_ignore'] = result['ann_info']['bboxes_ignore'][keep_idx]
-                    result['gt_bboxes'] = result['ann_info']['bboxes']
-                    result['gt_labels'] = result['ann_info']['labels']
-                    # result['gt_bboxes_ignore'] = result['gt_bboxes_ignore'][keep_idx]
-                    if len(result['gt_bboxes']) <= 0 and len(result['gt_labels']) <= 0:
-                        is_cut_img = False
-                if self.is_keep_none or is_cut_img:
-                    img = results['img'][top:bottom, left:right, :]
-                    h2, w2, c2 = img.shape
-                    assert bottom - top == h2 and right - left == w2
-                    result['img_info']['height'] = img.shape[0]
-                    result['img_info']['width'] = img.shape[1]
-                    result['img'] = img
-                    result['img_shape'] = img.shape
-                    result['ori_shape'] = img.shape
-                    cut_results.append(result)
-                    # from mmdet.third_party.draw_box import DrawBox
-                    # import os
-                    # drawBox = DrawBox(color_num=7)
-                    # image = drawBox.draw_box(result['img'], result['gt_bboxes'], result['gt_labels'])
-                    # image = np.array(image)
-                    # cv2.imwrite("tmp/{}_i{}_j{}.jpg".format(os.path.basename(result['filename']), str(i), str(j)),
-                    #             image)
-                    # import matplotlib.pyplot as plt
-                    # plt.imshow(image)
-                    # plt.show()
-        if len(cut_results) < 1:
+        if self.resize:
+            results['img'] = cv2.resize(results['img'], None, fx=self.resize[0], fy=self.resize[1],
+                                        interpolation=cv2.INTER_CUBIC)
+            if 'ann_info' in results:
+                results['ann_info']['bboxes'][:, 0] *= self.resize[0]
+                results['ann_info']['bboxes'][:, 1] *= self.resize[1]
+                results['ann_info']['bboxes'][:, 2] *= self.resize[0]
+                results['ann_info']['bboxes'][:, 3] *= self.resize[1]
+        img_shape = results['img'].shape
+        center = [self.center[0], self.center[1]]
+        if center[0] is not None and 0 < center[0] < 1:
+            center[0] *= img_shape[1]
+        if center[1] is not None and 0 < center[1] < 1:
+            center[1] *= img_shape[0]
+        rois = self.slice(self.base_win, img_shape, self.step, self.fx, self.fy, center)
+        slice_results = []
+        for roi in rois:
+            x = self.slice_roi(results, roi)
+            if x is not None:
+                slice_results.append(x)
+        if len(slice_results) < 1:
             return None
-        if self.order_index is not None:
-            key = results['filename']
-            if key not in self.order_index:
-                self.order_index[key] = 0
-            else:
-                self.order_index[key] = (self.order_index[key] + 1) % len(cut_results)
-            return cut_results[self.order_index[key]]
-        return cut_results
+        return slice_results
 
     def __repr__(self):
         return self.__class__.__name__ + '(window={})'.format(

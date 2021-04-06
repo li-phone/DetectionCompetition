@@ -9,7 +9,13 @@ def summary(file):
     with open(file, 'r') as fp:
         o = json.load(fp)
     boxes = json_normalize(o['annotations'])
-    print('-' * 32, 'image_size=', len(set(boxes['image_id'])), '-' * 32)
+    print('-' * 32, 'image number=', len(set(boxes['image_id'])), '-' * 32)
+    if 'group_uuid' in list(boxes.columns):
+        group_uuid = set(boxes['group_uuid'])
+        print('-' * 32, 'group_uuid number=', len(group_uuid), '-' * 32)
+    if 'bbox_uuid' in list(boxes.columns):
+        group_uuid = set(boxes['bbox_uuid'])
+        print('-' * 32, 'bbox_uuid number=', len(group_uuid), '-' * 32)
     print('-' * 32, 'category_id', '-' * 32)
     print(boxes.groupby(by='category_id').count().sort_values(by='id', ascending=False).head(10))
     print('-' * 32, 'image_id', '-' * 32)
@@ -34,11 +40,10 @@ def summary(file):
     func(image_ids, 0.5)
 
 
-summary("data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json")
-summary("data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all-check.json")
-summary("data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json")
-# summary("data/track/annotations/ori_instance_all_category.json")
-# summary("data/track/annotations/ori_instance_all.json")
+# summary("data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json")
+# summary("data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all-check.json")
+# summary("data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json")
+summary("data/track/annotations/high-quality-sample/instance_mst_slice.json")
 '''
 -------------------------------- image_size= 7393 --------------------------------
 -------------------------------- category_id --------------------------------
@@ -196,6 +201,61 @@ percent,  0.5
 thr 12
 > 12 size  4362
 < 12 size  4087
+-------------------------------- image_size= 32674 --------------------------------
+-------------------------------- image number= 32674 --------------------------------
+-------------------------------- group_uuid number= 122861 --------------------------------
+-------------------------------- bbox_uuid number= 287743 --------------------------------
+-------------------------------- category_id --------------------------------
+                 id  image_id    bbox  iscrowd  ignore    area  segmentation
+category_id                                                                 
+4            457248    457248  457248   457248  457248  457248        457248
+3            389594    389594  389594   389594  389594  389594        389594
+2            368595    368595  368595   368595  368595  368595        368595
+1             89001     89001   89001    89001   89001   89001         89001
+-------------------------------- image_id --------------------------------
+                                                      id  ...  segmentation
+image_id                                                  ...              
+09_Electronic_Market/IMG_09_24__fx_0.125_fy_0.1...  1373  ...          1373
+09_Electronic_Market/IMG_09_22__fx_0.125_fy_0.1...  1271  ...          1271
+09_Electronic_Market/IMG_09_07__fx_0.125_fy_0.1...  1215  ...          1215
+09_Electronic_Market/IMG_09_11__fx_0.125_fy_0.1...  1177  ...          1177
+09_Electronic_Market/IMG_09_05__fx_0.125_fy_0.1...  1154  ...          1154
+
+[5 rows x 7 columns]
+----------------------------------------------------------------
+thr 128.0
+> 128.0 size  2615
+< 128.0 size  30059
+----------------------------------------------------------------
+percent,  0.95
+thr 184
+> 184 size  1638
+< 184 size  31036
+----------------------------------------------------------------
+percent,  0.9
+thr 107
+> 107 size  3275
+< 107 size  29399
+----------------------------------------------------------------
+percent,  0.8
+thr 49
+> 49 size  6604
+< 49 size  26070
+----------------------------------------------------------------
+percent,  0.7
+thr 26
+> 26 size  9982
+< 26 size  22692
+----------------------------------------------------------------
+percent,  0.6
+thr 16
+> 16 size  13202
+< 16 size  19472
+----------------------------------------------------------------
+percent,  0.5
+thr 10
+> 10 size  16594
+< 10 size  16080
 
 Process finished with exit code 0
 

@@ -61,11 +61,16 @@ def write_xml(o, save_name):
     tree.write(save_name, encoding='utf-8', xml_declaration=True)
 
 
-def panda2labelme(ann_file, save_dir, maxDets=500, thr=0., **kwargs):
+def panda2labelme(ann_file, save_dir, maxDets=500, thr=0., category_id=None, **kwargs):
     from fname2id import fname2id, cat2id
     id2fname = {v: k for k, v in fname2id.items()}
-    id2cat = {v: k for k, v in cat2id.items()}
-    df = pd.read_json(ann_file)
+    # id2cat = {v: k for k, v in cat2id.items()}
+    id2cat = {1: "visible body", 2: "full body", 3: "head", 4: "car"}
+    # df = pd.read_json(ann_file)
+    with open(ann_file) as fp:
+        o = json.load(fp)
+    df = json_normalize(o)
+    df = df[df['category_id'] == category_id]
     df = df[df['score'] > thr]
     for image_id in tqdm(list(np.unique(df['image_id']))):
         img_df = df[df['image_id'] == image_id]
@@ -108,10 +113,10 @@ def panda2labelme(ann_file, save_dir, maxDets=500, thr=0., **kwargs):
 def parse_args():
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default=r"work_dirs/track/submit_testA-bs_r50_all_category_overlap_sampler_x2_mst_track-thr_0.002.json",
+                        default=r"work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-score_thr-4.json",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default=r"__test_vis__",
+                        default=r"panda_round1_test_202104_A",
                         help='save coco filename')
     parser.add_argument(
         '--fmt',
@@ -124,7 +129,7 @@ def parse_args():
 def main():
     args = parse_args()
     if args.fmt == 'json':
-        panda2labelme(args.x, args.save_name)
+        panda2labelme(args.x, args.save_name, category_id=4)
 
 
 if __name__ == '__main__':

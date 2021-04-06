@@ -39,10 +39,10 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json",
+                        default="data/track/annotations/mst_slice/instance_mst_slice.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_dir',
-                        default="data/track/annotations/overlap_70_all_category/",
+                        default="data/track/annotations/mst_slice/",
                         help='save_dir')
     parser.add_argument('--rate', type=float, default=0.9, help='split rate')
     parser.add_argument('--prefix', default='instance_', help='save prefix')

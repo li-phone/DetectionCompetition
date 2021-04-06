@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG="../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py"
+CONFIG="../configs/track/best-r50-mst_slice.py"
 GPUS=2
 PORT=${PORT:-29500}
 

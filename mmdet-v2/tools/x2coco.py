@@ -129,19 +129,20 @@ def read_PANDA(path):
         y1 = obj['tl']['y'] * h
         x2 = obj['br']['x'] * w
         y2 = obj['br']['y'] * h
-        return [x1, y1, x2 - x1, y2 - y1]
+        return [x1, y1, x2, y2]
 
     files = glob.glob(os.path.join(path, "*.json"))
     results, ignore_labels = [], set()
     for file in tqdm(files):
         collect_keys = {
             # person
-            "fake person": "visible body", "ignore": "visible body", "people": "visible body",
-            "crowd": "visible body", "person": "person",
+            # "fake person": "visible body", "ignore": "visible body", "people": "visible body",
+            # "crowd": "visible body",
+            "person": "person",
             # car
-            "fake": "car",
+            # "fake": "car", "vehicles": "car",
             "small car": "car", "midsize car": "car", "large car": "car", "bicycle": "car", "motorcycle": "car",
-            "tricycle": "car", "electric car": "car", "baby carriage": "car", "vehicles": "car", "unsure": "car"
+            "tricycle": "car", "electric car": "car", "baby carriage": "car", "unsure": "car"
         }
         with open(file, 'r') as fp:
             annotations = json.load(fp)
@@ -156,18 +157,21 @@ def read_PANDA(path):
                             rects = {collect_keys[obj['category']]: obj['rect']}
                         elif 'rects' in obj.keys():
                             rects = obj['rects']
-                        uuid_str = str(uuid.uuid4()).replace('-', '')
+                        group_uuid = str(uuid.uuid4()).replace('-', '')
                         for k, v in rects.items():
                             label, bbox = k, __get_box__(v, img_w, img_h)
                             result = dict(ori_img_id=img_obj['image id'], file_name=fname)
                             result['label'] = label
                             result['bbox'] = bbox
-                            result['uuid'] = uuid_str
+                            result['bbox_uuid'] = str(uuid.uuid4()).replace('-', '')
+                            result['group_uuid'] = group_uuid
                             result['ori_info'] = obj
                             results.append(result)
                     else:
-                        raise Exception("No such ", obj['category'])
+                        # raise Exception("No such ", obj['category'])
+                        print("No such ", obj['category'])
     results = json_normalize(results)
+    print('-' * 32, 'bbox len=', len(results), '-' * 32)
     print(results.groupby(by='label').count())
     return results
 
@@ -207,7 +211,7 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
         keep_df = anns[anns['file_name'] == v]
         cats = list(keep_df['label'].unique())
         has_object = 0 if len(cats) == 0 or (len(cats) == 1 and cats[0] == bgcat) else 1
-        coco['images'].append(dict(file_name=v, id=i, width=width_, height=height_, has_object=has_object))
+        coco['images'].append(dict(file_name=v, id=v, width=width_, height=height_, has_object=has_object))
     image2id = {v['file_name']: v['id'] for i, v in enumerate(coco['images'])}
 
     # ------------------bboxes-----------------#
@@ -228,7 +232,8 @@ def convert2coco(anns, save_name, img_dir, label2cat=None, bgcat=None, supercate
             area=area
         )
         for k1, v1 in v.items():
-            ann[k1] = v1
+            if k1 not in ann:
+                ann[k1] = v1
         coco['annotations'].append(ann)
     save_name = save_name.replace('\\', '/')
     save_dir = os.path.dirname(save_name)
@@ -276,11 +281,11 @@ def parse_args():
                         default=r"data/track/panda_round1_train_annos_202104/",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default=r"data/track/annotations/ori_instance_all_category.json",
+                        default=r"data/track/annotations/high-quality-sample.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
                         default=r"data/track/panda_round1_train_202104_part1",
-                        help='img_dir, including "*" to match folder')
+                        help='img_dir')
     parser.add_argument(
         '--options',
         nargs='+', action=MultipleKVAction,

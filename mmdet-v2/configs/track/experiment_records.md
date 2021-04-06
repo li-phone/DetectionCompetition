@@ -3,7 +3,7 @@ Experiment Records
 
 #### Cascade R-CNN+ResNet50: 
 
-**best score: 0.4000**
+**best score: 0.4623**
 
     baseline: bs_r50_20e_track.py
     
@@ -100,7 +100,24 @@ Experiment Records
     + **dcn-v2**
     post_process: nms = dict(type='soft_nms', iou_threshold=0.5), score_thr = 0.002
     score: 0.4000, 0.3560, 0.4564
-           0.3943, 0.3493, 0.4527  
+           0.3943, 0.3493, 0.4527             
+           
+    --------------------------------------------------------------------------------
+    bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track.py
+    
+    + **all data train**
+    score: 0.4048
+          
+    + **mst slice test**
+    1: 4000 x 4000
+    2: 8000 x 8000
+    score: 0.4106
+
+    + **mst slice test**
+    0: 2000 x 2000
+    1: 4000 x 4000
+    2: 8000 x 8000
+    score: 0.4623
     
 
 #### Cascade R-CNN+ResNet: **bs_r101_v1d_20e_track.py**
