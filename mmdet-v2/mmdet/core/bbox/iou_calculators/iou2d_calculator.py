@@ -5,7 +5,7 @@ from .builder import IOU_CALCULATORS
 
 def cast_tensor_type(x, scale=1., dtype=None):
     if dtype == 'fp16':
-        # scale for preventing overflows
+        # scale is for preventing overflows
         x = (x / scale).half()
     return x
 
@@ -66,7 +66,8 @@ class BboxOverlaps2D(object):
 
     def __repr__(self):
         """str: a string describing the module"""
-        repr_str = self.__class__.__name__ + f'(scale={self.scale}, dtype={self.dtype})'
+        repr_str = self.__class__.__name__ + f'(' \
+            f'scale={self.scale}, dtype={self.dtype})'
         return repr_str
 
 

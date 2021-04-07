@@ -3,7 +3,7 @@ Experiment Records
 
 #### Cascade R-CNN+ResNet50: 
 
-**best score: 0.4623**
+**best score: 0.5113**
 
     baseline: bs_r50_20e_track.py
     
@@ -118,6 +118,20 @@ Experiment Records
     1: 4000 x 4000
     2: 8000 x 8000
     score: 0.4623
+    
+    --------------------------------------------------------------------------------
+    best-r50-mst_slice.py
+    
+    + **mst slice test**
+    0: 2000 x 2000
+    1: 4000 x 4000
+    2: 8000 x 8000
+    max_slice_num = np.array([300, 150, 75])
+    score: 0.4944
+    
+    + **soft-nms**
+    score: 0.5113
+    
     
 
 #### Cascade R-CNN+ResNet: **bs_r101_v1d_20e_track.py**

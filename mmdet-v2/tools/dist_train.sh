@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG="../configs/track/best-r50-mst_slice.py"
+CONFIG="../configs/track/best-x101-mst_slice.py"
 GPUS=2
 PORT=${PORT:-29500}
 

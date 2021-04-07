@@ -12,10 +12,10 @@ from pandas import json_normalize
 class Config(object):
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
     post_process_file = "work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-2.json"
-    save_file = "work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-2-score_thr-4.json"
+    save_file = "work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-2-score_thr-4-no-NMS.json"
     # nms = dict(type='nms', iou_threshold=0.5)
-    nms = dict(type='soft_nms', iou_threshold=0.5)
     # nms = dict(score_thr=0.15, nms=dict(type='soft_nms', iou_thr=0.5), max_per_img=200)
+    nms = dict(type='soft_nms', iou_threshold=0.5)
     # nms = None
     score_thr = {
         1: 0.01,  # visible body
