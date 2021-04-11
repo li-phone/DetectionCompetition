@@ -25,7 +25,7 @@ def test_bbox_overlaps_2d(eps=1e-7):
     bboxes2, _ = _construct_bbox(num_bbox)
     bboxes1 = torch.cat((bboxes1, torch.rand((num_bbox, 1))), 1)
     bboxes2 = torch.cat((bboxes2, torch.rand((num_bbox, 1))), 1)
-    gious = self(bboxes1, bboxes2, 'giou', True)
+    gious = self(bboxes1.cuda(), bboxes2.cuda(), 'giou', True)
     assert gious.size() == (num_bbox, ), gious.size()
     assert torch.all(gious >= -1) and torch.all(gious <= 1)
 

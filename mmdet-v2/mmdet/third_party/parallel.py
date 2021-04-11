@@ -36,12 +36,18 @@ class Parallel(object):
             if self.with_thread_lock:
                 with self.thread_lock:
                     if len(self.init_tasks) > 0:
-                        task = self.init_tasks.pop()
+                        if isinstance(self.init_tasks, dict):
+                            task = self.init_tasks.popitem()
+                        else:
+                            task = self.init_tasks.pop()
                     else:
                         break
             else:
                 if len(self.init_tasks) > 0:
-                    task = self.init_tasks.pop()
+                    if isinstance(self.init_tasks, dict):
+                        task = self.init_tasks.popitem()
+                    else:
+                        task = self.init_tasks.pop()
                 else:
                     break
             result = self.process(task, __results__=self.results, **self.process_params)

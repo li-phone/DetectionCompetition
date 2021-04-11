@@ -43,7 +43,7 @@ def summary(file):
 # summary("data/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json")
 # summary("data/track/annotations/cut_4000x4000_overlap_70/cut_4000x4000_all-check.json")
 # summary("data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json")
-summary("data/track/annotations/high-quality-sample/instance_mst_slice.json")
+summary("data/underwater/annotations/simple-sample-checked.json")
 '''
 -------------------------------- image_size= 7393 --------------------------------
 -------------------------------- category_id --------------------------------

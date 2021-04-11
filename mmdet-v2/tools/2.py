@@ -26,26 +26,31 @@ def get_min_max_bbox(df, rate=0.05):
 
 def plt_img(filename, img_dir="data/track/"):
     coco = COCO(filename)
-    imgIds = ["01_University_Canteen/IMG_01_01__fx_0.250_fy_0.250__005600_000800_006600_001800.jpg"]
-    image = coco.loadImgs(ids=imgIds)[0]
-    ann_ids = coco.getAnnIds(imgIds=imgIds)
-    anns = coco.loadAnns(ann_ids)
-    anns = json_normalize(anns)
-    # print(get_min_max_bbox(anns[anns['label'] == 'head']))
-    # print(get_min_max_bbox(anns[anns['label'] == 'visible body']))
-    # print(get_min_max_bbox(anns[anns['label'] == 'full body']))
-    # print(get_min_max_bbox(anns[anns['label'] == 'car']))
-    img = osp.join(img_dir, image['file_name'])
-    bboxes = np.array(list(anns['bbox']))
-    bboxes[:, 2] += bboxes[:, 0]
-    bboxes[:, 3] += bboxes[:, 1]
-    labels = np.array(list(anns['category_id']))
-    img = imshow_det_bboxes(img, bboxes, labels, show=False, thickness=5, bbox_color='blue', )
-    cv2.imwrite(os.path.basename(image['file_name']), img)
-    plt.imshow(img)
-    plt.show()
+    for imgId in coco.getImgIds():
+        imgIds = [imgId]
+        image = coco.loadImgs(ids=imgIds)[0]
+        ann_ids = coco.getAnnIds(imgIds=imgIds)
+        anns = coco.loadAnns(ann_ids)
+        anns = [x for x in anns if x['bbox'][2] > 1200 and x['bbox'][3] > 1200]
+        if len(anns) <= 0: continue
+        anns = json_normalize(anns)
+        # print(get_min_max_bbox(anns[anns['label'] == 'head']))
+        # print(get_min_max_bbox(anns[anns['label'] == 'visible body']))
+        # print(get_min_max_bbox(anns[anns['label'] == 'full body']))
+        # print(get_min_max_bbox(anns[anns['label'] == 'car']))
+        img = osp.join(img_dir, image['file_name'])
+        bboxes = np.array(list(anns['bbox']))
+        bboxes[:, 2] += bboxes[:, 0]
+        bboxes[:, 3] += bboxes[:, 1]
+        labels = np.array(list(anns['category_id']))
+        img = imshow_det_bboxes(img, bboxes, labels, show=False, thickness=5, bbox_color='blue', )
+        cv2.imwrite(os.path.basename(image['file_name']), img)
+        plt.imshow(img)
+        import pylab
+        pylab.show()
+        plt.show()
 
 
-img_dir = "data/track/trainval/mst_slice/"
-ann_file = "data/track/annotations/mst_slice/instance_mst_slice-check.json"
+img_dir = "data/underwater/train/image/"
+ann_file = "data/underwater/annotations/simple-sample-checked.json"
 plt_img(ann_file, img_dir)

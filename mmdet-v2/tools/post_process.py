@@ -11,8 +11,8 @@ from pandas import json_normalize
 
 class Config(object):
     img_dir = "/home/lifeng/undone-work/DefectNet/tools/data/tile/raw/tile_round1_testB_20210128/testB_imgs"
-    post_process_file = "work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-2.json"
-    save_file = "work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-2-score_thr-4-no-NMS.json"
+    post_process_file = "work_dirs/track/test_B-best-r50-mst_slice-scale_3-2.json"
+    save_file = "work_dirs/track/test_B-best-r50-mst_slice-mst_slice-scale_3-2-score_thr-4-no-NMS-2.json"
     # nms = dict(type='nms', iou_threshold=0.5)
     # nms = dict(score_thr=0.15, nms=dict(type='soft_nms', iou_thr=0.5), max_per_img=200)
     nms = dict(type='soft_nms', iou_threshold=0.5)
@@ -31,7 +31,7 @@ def nms(results, nms_cfg):
     for filename in tqdm(np.unique(results['image_id'])):
         result = results[results['image_id'] == filename].sort_values(by='category_id')
         result = result.sort_values(by='score', ascending=False)
-        result = result.iloc[:5000]
+        # result = result.iloc[:5000]
         bboxes = []
         for i in range(len(result)):
             x = result.iloc[i]

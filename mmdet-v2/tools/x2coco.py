@@ -75,6 +75,7 @@ def read_xml(xml_path, img_dir):
         if size is not None:
             img_w = int(size.find('width').text)
             img_h = int(size.find('height').text)
+        has_object = False
         for obj in root.iter('object'):
             difficult = obj.find('difficult')
             if difficult is not None:
@@ -93,6 +94,9 @@ def read_xml(xml_path, img_dir):
                 iscrowd=iscrowd,
             )
             anns.append(ann)
+            has_object = True
+        if not has_object:
+            print(img_path, "not targets.")
     return json_normalize(anns)
 
 
@@ -278,13 +282,13 @@ def parse_args():
     help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default=r"data/track/panda_round1_train_annos_202104/",
+                        default=r"data/underwater/train/box/",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default=r"data/track/annotations/high-quality-sample.json",
+                        default=r"data/underwater/annotations/simple-sample.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
-                        default=r"data/track/panda_round1_train_202104_part1",
+                        default=r"data/underwater/train/image/",
                         help='img_dir')
     parser.add_argument(
         '--options',
@@ -294,7 +298,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
-        default='PANDA', help='format type')
+        default='xml', help='format type')
     args = parser.parse_args()
     return args
 

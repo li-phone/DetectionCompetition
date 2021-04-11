@@ -224,13 +224,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/track/annotations/mst_slice/instance_mst_slice.json",
+                        default="data/underwater/annotations/simple-sample.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="data/track/annotations/mst_slice/instance_mst_slice-check.json",
+                        default="data/underwater/annotations/simple-sample-checked.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='data/track/trainval/mst_slice/',
+                        default='data/underwater/train/image',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()
@@ -243,7 +243,7 @@ def main():
     if 'coco' in check_type:
         args.ann_file = check_coco(args.ann_file, args.save_name, args.img_dir)
     if 'box' in check_type:
-        check_box(args.ann_file, args.save_name, args.img_dir)
+        check_box(args.ann_file, args.save_name, args.img_dir, overlap=1.)
 
 
 if __name__ == '__main__':

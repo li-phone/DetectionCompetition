@@ -121,10 +121,10 @@ class COCOAnalysis(object):
 
         ax = sns.jointplot("bbox_width", "bbox_height", data=box_df,
                            kind="reg", truncate=False,
-                           # xlim=(0, max(box_df['bbox_width']) + 1),
-                           xlim=(0, 40 + 1),
-                           # ylim=(0, max(box_df['bbox_height']) + 1),
-                           ylim=(0, 40 + 1),
+                           xlim=(0, max(box_df['bbox_width']) + 1),
+                           # xlim=(0, 40 + 1),
+                           ylim=(0, max(box_df['bbox_height']) + 1),
+                           # ylim=(0, 40 + 1),
                            color="m", height=7)
         asp = box_df['bbox_height'] / box_df['bbox_width']
         asp_quantiles = []
@@ -214,8 +214,8 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=[r"/home/lifeng/data/detection/track/annotations/cut_4000x4000/cut_4000x4000_all-check.json"],
-        save_img_dir='./track-cut_4000x4000_all',
+        ann_files=[r"/home/lifeng/undone-work/dataset/detection/underwater/annotations/simple-sample-checked.json"],
+        save_img_dir='./underwater',
         legends=['all'])
     data.summary()
     # garbage_ana = COCOAnalysis(

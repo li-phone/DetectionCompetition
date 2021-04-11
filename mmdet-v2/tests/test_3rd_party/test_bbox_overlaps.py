@@ -27,10 +27,12 @@ class TestBBoxOverlaps(object):
             [0, 10, 10, 19],
             [10, 10, 20, 20],
         ])
+        bboxes1 = torch.rand((40, 4)) * 1000
+        bboxes2 = torch.rand((400000, 4)) * 1000
 
         bbox_overlaps1 = BboxOverlaps2D()
-        bbox_overlaps2 = BboxOverlaps2D('cpu')
-        bbox_overlaps3 = BboxOverlaps2D('fp16', 512.)
+        bbox_overlaps2 = BboxOverlaps2D(dtype='cpu')
+        bbox_overlaps3 = BboxOverlaps2D(dtype='fp16', scale=512.)
 
         iou1 = bbox_overlaps1(bboxes1.cuda(), bboxes2.cuda())
         iou2 = bbox_overlaps2(bboxes1.cuda(), bboxes2.cuda())
