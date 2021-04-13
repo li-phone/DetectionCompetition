@@ -6,7 +6,7 @@ norm_cfg = dict(type='BN', requires_grad=True)
 # norm_cfg = dict(type='SyncBN', requires_grad=True)
 
 # model settings
-num_classes = 5
+num_classes = 4
 model = dict(
     type='CascadeRCNN',
     pretrained='open-mmlab://resnext101_64x4d',
@@ -19,7 +19,6 @@ model = dict(
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
         norm_cfg=norm_cfg,
-        norm_eval=True,
         dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True),
         style='pytorch'),
@@ -42,7 +41,7 @@ model = dict(
             type='DeltaXYWHBBoxCoder',
             target_means=[.0, .0, .0, .0],
             target_stds=[1.0, 1.0, 1.0, 1.0],
-            clip_border=True,  # 不允许超出图像大小
+            clip_border=False,  # 不允许超出图像大小
         ),
         loss_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
@@ -71,7 +70,7 @@ model = dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
                     target_stds=[0.1, 0.1, 0.2, 0.2],
-                    clip_border=True,  # 不允许超出图像大小
+                    clip_border=False,  # 不允许超出图像大小
                 ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
@@ -92,7 +91,7 @@ model = dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
                     target_stds=[0.05, 0.05, 0.1, 0.1],
-                    clip_border=True,  # 不允许超出图像大小
+                    clip_border=False,  # 不允许超出图像大小
                 ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
@@ -113,7 +112,7 @@ model = dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
                     target_stds=[0.033, 0.033, 0.067, 0.067],
-                    clip_border=True,  # 不允许超出图像大小
+                    clip_border=False,  # 不允许超出图像大小
                 ),
                 reg_class_agnostic=True,
                 loss_cls=dict(
@@ -140,9 +139,9 @@ train_cfg = dict(
             ignore_iof_thr=-1),
         sampler=dict(
             type='RandomSampler',
-            num=256,
+            # num=256,
             # 增加采样 * 2
-            # num=512,
+            num=512,
             pos_fraction=0.5,
             neg_pos_ub=-1,
             add_gt_as_proposals=False),
@@ -173,9 +172,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
                 # 增加采样 * 2
-                # num=1024,
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -197,9 +196,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
                 # 增加采样 * 2
-                # num=1024,
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -221,9 +220,9 @@ train_cfg = dict(
                 ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
-                num=512,
+                # num=512,
                 # 增加采样 * 2
-                # num=1024,
+                num=1024,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
                 add_gt_as_proposals=True),
@@ -245,15 +244,14 @@ test_cfg = dict(
         max_per_img=1000))
 
 dataset_type = 'CocoDataset'
-data_root = 'data/underwater/'
+data_root = 'data/track/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
     # dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
-    dict(type='Resize', img_scale=(1333, 800), ratio_range=(0.8, 1.2), keep_ratio=True),
-    # dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
+    dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='horizontal'),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
@@ -267,8 +265,7 @@ test_pipeline = [
     dict(
         type='MultiScaleFlipAug',
         # img_scale=[(600, 600), (800, 800), (1000, 1000)],
-        # img_scale=[(800, 800), (1000, 1000), (1200, 1200), ],
-        img_scale=[(1066, 800), (1333, 800), (1600, 800), ],
+        img_scale=[(800, 800), (1000, 1000), (1200, 1200), ],
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -284,21 +281,21 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/simple-sample-checked.json',
-        img_prefix=data_root + 'train/image',
-        classes=('echinus', 'holothurian', 'scallop', 'starfish', 'waterweeds'),
+        ann_file=data_root + 'annotations/mst_slice/instance_mst_slice-check.json',
+        img_prefix=data_root + 'trainval/mst_slice',
+        classes=('car', 'full body', 'head', 'visible body'),
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instance_val.json',
-        img_prefix=data_root + 'train/image',
-        classes=('echinus', 'holothurian', 'scallop', 'starfish', 'waterweeds'),
+        ann_file=data_root + 'annotations/mst_slice/instance_val.json',
+        img_prefix=data_root + 'trainval/mst_slice',
+        classes=('car', 'full body', 'head', 'visible body'),
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instance_val.json',
-        img_prefix=data_root + 'train/image',
-        classes=('echinus', 'holothurian', 'scallop', 'starfish', 'waterweeds'),
+        ann_file=data_root + 'annotations/mst_slice/instance_val.json',
+        img_prefix=data_root + 'trainval/mst_slice',
+        classes=('car', 'full body', 'head', 'visible body'),
         pipeline=test_pipeline),
 )
 evaluation = dict(interval=1, metric='bbox')
@@ -311,11 +308,11 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    # step=[8, 11],
-    step=[16, 19],
+    step=[8, 11],
+    # step=[16, 19],
     # step=[16, 22]
 )
-total_epochs = 20
+total_epochs = 12
 
 checkpoint_config = dict(interval=1)
 # yapf:disable

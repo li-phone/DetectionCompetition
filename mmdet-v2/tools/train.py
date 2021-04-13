@@ -21,7 +21,7 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/underwater/best-r50-mst_slice.py',
+                        default='../configs/underwater/best-x101-mst_slice.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
