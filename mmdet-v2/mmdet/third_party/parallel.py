@@ -1,3 +1,4 @@
+import sys
 import threading
 
 
@@ -35,12 +36,18 @@ class Parallel(object):
             if self.with_thread_lock:
                 with self.thread_lock:
                     if len(self.init_tasks) > 0:
-                        task = self.init_tasks.pop()
+                        if isinstance(self.init_tasks, dict):
+                            task = self.init_tasks.popitem()
+                        else:
+                            task = self.init_tasks.pop()
                     else:
                         break
             else:
                 if len(self.init_tasks) > 0:
-                    task = self.init_tasks.pop()
+                    if isinstance(self.init_tasks, dict):
+                        task = self.init_tasks.popitem()
+                    else:
+                        task = self.init_tasks.pop()
                 else:
                     break
             result = self.process(task, __results__=self.results, **self.process_params)
@@ -53,7 +60,7 @@ class Parallel(object):
                     self.results[k].extend(v)
             if self.print_process is not None and ((self.task_size - len(self.init_tasks)) % self.print_process == 0
                                                    or len(self.init_tasks) == 0):
-                print('process {}/{}...'.format(self.task_size - len(self.init_tasks), self.task_size))
+                print('process {}/{}...'.format(self.task_size - len(self.init_tasks), self.task_size), flush=True)
 
     def __call__(self, **kwargs):
         threads = [threading.Thread(target=self.do_work)

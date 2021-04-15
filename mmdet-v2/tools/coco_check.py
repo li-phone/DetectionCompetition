@@ -2,6 +2,7 @@ import os
 import json
 import cv2 as cv
 import numpy as np
+from PIL import Image
 from tqdm import tqdm
 
 try:
@@ -40,7 +41,7 @@ def check_coco(src, dst, img_dir=None, replace=True):
     imgs = json_normalize(coco['images'])
     if 'image_id' in list(imgs.columns):
         imgs = imgs.rename(columns={'image_id': 'id'})
-    imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
+    # imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
     imgs = imgs.sort_values(by='id')
     coco['images'] = imgs.to_dict('records')
 
@@ -63,8 +64,8 @@ def check_coco(src, dst, img_dir=None, replace=True):
     if img_dir is not None:
         for i, v in tqdm(enumerate(coco['images'])):
             if os.path.exists(os.path.join(img_dir, v['file_name'])):
-                img_ = cv.imread(os.path.join(img_dir, v['file_name']))
-                height_, width_, _ = img_.shape
+                img_ = Image.open(os.path.join(img_dir, v['file_name']))
+                height_, width_, _ = img_.height, img_.width, 3
             else:
                 row = coco['images'][i]
                 height_, width_, _ = int(row['height']), int(row['width']), 3
@@ -76,7 +77,7 @@ def check_coco(src, dst, img_dir=None, replace=True):
     return dst
 
 
-def check_box(coco, save_name, img_dir):
+def check_box(coco, save_name, img_dir, overlap=0.7):
     if isinstance(coco, str):
         coco = load_dict(coco)
     images = {v['id']: v for v in coco['images']}
@@ -87,8 +88,10 @@ def check_box(coco, save_name, img_dir):
         b = v['bbox']
         image = images[v['image_id']]
         assert image is not None and image['width'] is not None
-        if not (0 <= b[0] <= image['width'] and 0 <= b[1] <= image['height'] and b[2] > 0 and b[3] > 0 \
-                and 0 <= b[0] + b[2] <= image['width'] and 0 <= b[1] + b[3] <= image['height']):
+        from mmdet.datasets.pipelines.slice_image import box_overlap
+        # if not (0 <= b[0] <= image['width'] and 0 <= b[1] <= image['height'] and b[2] > 0 and b[3] > 0 \
+        #         and 0 <= b[0] + b[2] <= image['width'] and 0 <= b[1] + b[3] <= image['height']):
+        if box_overlap([b[0], b[1], b[0] + b[2], b[1] + b[3]], [0, 0, image['width'], image['height']]) < overlap:
             error_boxes.append(v['id'])
     from third_party.useless.cocoutils.draw_box import DrawBox
     draw = DrawBox(len(cat2label))
@@ -123,7 +126,7 @@ def check_box(coco, save_name, img_dir):
                 break
             elif key == 56:
                 try:
-                    s = float(input('please input number: '))
+                    s = float(input('please input stride number: '))
                     stride = s
                     print('stride', stride)
                 except:
@@ -169,17 +172,65 @@ def check_box(coco, save_name, img_dir):
     print('check_box done!')
 
 
+def view_coco(src, dst, img_dir=None, replace=True):
+    if not replace:
+        print('There is an existed {}.'.format(dst))
+        return
+    coco = load_dict(src)
+    cats = json_normalize(coco['categories'])
+    cats = cats.sort_values(by='id')
+    coco['categories'] = cats.to_dict('records')
+
+    imgs = json_normalize(coco['images'])
+    if 'image_id' in list(imgs.columns):
+        imgs = imgs.rename(columns={'image_id': 'id'})
+    # imgs['file_name'] = imgs['file_name'].apply(lambda x: os.path.basename(x))
+    imgs = imgs.sort_values(by='id')
+    coco['images'] = imgs.to_dict('records')
+
+    if 'annotations' in coco:
+        anns = json_normalize(coco['annotations'])
+    else:
+        ann_fakes = [
+            {"area": 100, "iscrowd": 0, "image_id": image['id'], "bbox": [0, 0, 10, 10], "category_id": 1, "id": 1}
+            for image in coco['images']
+        ]
+        anns = json_normalize(ann_fakes)
+    anns['id'] = list(range(anns.shape[0]))
+    anns = anns.to_dict('records')
+    for v in anns:
+        if 'segmentation' not in v:
+            seg = get_segmentation(v['bbox'])
+            v['segmentation'] = [[float(_) for _ in seg]]
+    coco['annotations'] = anns
+    # check image shape
+    if img_dir is not None:
+        for i, v in tqdm(enumerate(coco['images'])):
+            if os.path.exists(os.path.join(img_dir, v['file_name'])):
+                img_ = Image.open(os.path.join(img_dir, v['file_name']))
+                height_, width_, _ = img_.height, img_.width, 3
+            else:
+                row = coco['images'][i]
+                height_, width_, _ = int(row['height']), int(row['width']), 3
+            assert height_ is not None and width_ is not None
+            v['width'] = width_
+            v['height'] = height_
+    save_dict(dst, coco)
+    print('check_coco done!')
+    return dst
+
+
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all.json",
+                        default="data/ultrasonic/annotations/simple-sample.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all-check.json",
+                        default="data/ultrasonic/annotations/simple-sample-checked.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='"/home/lifeng/undone-work/dataset/detection/tile/tile_round1_train_20201231/train_imgs/"',
+                        default='data/ultrasonic/train/image',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()
@@ -192,7 +243,7 @@ def main():
     if 'coco' in check_type:
         args.ann_file = check_coco(args.ann_file, args.save_name, args.img_dir)
     if 'box' in check_type:
-        check_box(args.ann_file, args.save_name, args.img_dir)
+        check_box(args.ann_file, args.save_name, args.img_dir, overlap=1.)
 
 
 if __name__ == '__main__':

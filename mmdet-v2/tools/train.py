@@ -21,11 +21,17 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/tile/cascade_rcnn/cascade_rcnn_x101_32x4d_fpn_20e_cut_1000x1000.py',
+                        default='../configs/ultrasonic/best-r50-mst_slice-ultrasonic.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
-        '--resume-from', help='the checkpoint file to resume from')
+        '--load-from',
+        # default='work_dirs/best-x101-mst_slice/latest.pth',
+        help='the checkpoint file to resume from')
+    parser.add_argument(
+        '--resume-from',
+        # default='work_dirs/best-x101-mst_slice/latest.pth',
+        help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
         action='store_true',
@@ -35,12 +41,13 @@ def parse_args():
     group_gpus.add_argument(
         '--gpus',
         type=int,
+        # default=1,
         help='number of gpus to use '
              '(only applicable to non-distributed training)')
     group_gpus.add_argument(
         '--gpu-ids',
         type=int,
-        default=[0],
+        default=[1],
         nargs='+',
         help='ids of gpus to use '
              '(only applicable to non-distributed training)')
@@ -109,6 +116,8 @@ def main():
         # use config filename as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
+    if args.load_from is not None:
+        cfg.load_from = args.load_from
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
     if args.gpu_ids is not None:

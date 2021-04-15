@@ -1,0 +1,586 @@
+
+=======================report=======================
+multiscale(img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')+dcn+global_context: 0.45206264
+multiscale(img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')+dcn+global_context+anchor_cluster: 0.44649215
+multiscale(img_scale=[(1920, 1080), (1333, 800)], multiscale_mode='value')+dcn+global_context+anchor_cluster+soft_nms: 0.45073548+(0.00424333)
+aquatic_baseline+mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True: 0.45151362()[+vertical_flip+soft_nms]
+
+
+===================================================================report===================================================================
+(img_scale=[(1920, 1080), (1333, 800)],multiscale_mode='value')+test_scale=(img_scale=(1920, 1080))+dcn+global_context: 0.45206264
+
+(img_scale=[(1920, 864), (1920, 1296)],multiscale_mode='range')+test_scale=(img_scale=(1920, 1080))+dcn+global_context: 0.45197501
+
+(img_scale=[(1920, 1080), (1333, 800)],multiscale_mode='value')+test_scale=(img_scale=(1920, 1080))+dcn+global_context+BalancedL1Loss: 0.45015873
+
+aquatic_strong_baseline+multiscale+soft-nms: 0.45993518
+
+aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters: 0.46000774
+
+aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn: 0.46218754
+
+aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn+flipmixup: 0.46252733
+
+
+==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.568
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.646
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.537
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.206
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.595
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.445
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.631
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.696
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 30.471 | echinus  | 52.417 | holothurian | 55.008 |
+| scallop    | 59.458 | starfish | 60.182 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2540921519327321
+
+defect_fps:
+0.2540933389602507
+
+normal_fps:
+0.2531671183449881
+
+
+==================================== aquatic_baseline,mode=joint_train, uid: mode=joint_train, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.568
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.646
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.537
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.206
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.595
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.445
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.631
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.696
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 30.471 | echinus  | 52.417 | holothurian | 55.008 |
+| scallop    | 59.458 | starfish | 60.182 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.25737616855205087
+
+defect_fps:
+0.25737440666946987
+
+normal_fps:
+0.258749178477696
+
+
+==================================== aquatic_baseline,mode=joint_train+anchor_cluster, uid: mode=joint_train+anchor_cluster, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.561
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.898
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.640
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.293
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.529
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.627
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.205
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.588
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.637
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.423
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.616
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.691
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 0.000  | echinus  | 51.597 | holothurian | 55.134 |
+| scallop    | 58.248 | starfish | 59.551 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       1.00      0.29      0.44         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       1.00      0.64      0.72      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.20607286829164465
+
+defect_fps:
+0.20605610996949136
+
+normal_fps:
+0.2191323893410819
+
+
+==================================== aquatic_baseline+mode=joint_train+anchor_cluster, uid: mode=joint_train+anchor_cluster, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.164
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.324
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.148
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.034
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.150
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.194
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.110
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.194
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.195
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.059
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.182
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.220
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 0.000  | echinus  | 16.178 | holothurian | 14.584 |
+| scallop    | 10.914 | starfish | 24.075 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.02      0.86      0.03         7
+           1       1.00      0.93      0.97      5455
+
+    accuracy                           0.93      5462
+   macro avg       0.51      0.90      0.50      5462
+weighted avg       1.00      0.93      0.96      5462
+
+
+fps:
+0.2604111790089588
+
+defect_fps:
+0.26041286680044984
+
+normal_fps:
+0.2590959072113037
+
+
+==================================== aquatic_baseline+mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True, uid: mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.531
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.874
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.593
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.269
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.500
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.591
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.194
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.577
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.449
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.681
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 0.000  | echinus  | 52.192 | holothurian | 49.104 |
+| scallop    | 53.638 | starfish | 57.456 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       1.00      0.14      0.25         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       1.00      0.57      0.62      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2629265063675888
+
+defect_fps:
+0.262931731291368
+
+normal_fps:
+0.258854797908238
+
+
+==================================== aquatic_baseline+mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True, uid: mode=joint_train+multiscale=True+dcn=True+global_context=True+anchor_cluster=False+data_augment=True+soft_nms=True, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.531
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.874
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.593
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.269
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.500
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.591
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.194
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.577
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.449
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.630
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.681
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 0.000  | echinus  | 52.192 | holothurian | 49.104 |
+| scallop    | 53.638 | starfish | 57.456 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       1.00      0.14      0.25         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       1.00      0.57      0.62      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2645966752637921
+
+defect_fps:
+0.2645997162372229
+
+normal_fps:
+0.26222688811165945
+
+
+==================================== aquatic_baseline+multiscale+dcn+global_context, uid: multiscale+dcn+global_context, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.586
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.919
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.677
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.325
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.556
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.648
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.211
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.609
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.662
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.465
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.643
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.710
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 28.493 | echinus  | 53.517 | holothurian | 57.761 |
+| scallop    | 61.512 | starfish | 61.760 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.50      0.14      0.22         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.75      0.57      0.61      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.2565215307904093
+
+defect_fps:
+0.2565221049171539
+
+normal_fps:
+0.2560741220201765
+
+
+==================================== aquatic_baseline+multiscale+dcn+global_context+BalancedL1Loss, uid: multiscale+dcn+global_context+BalancedL1Loss, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.573
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.902
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.655
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.295
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.540
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.208
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.603
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.657
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.454
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.638
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.706
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 27.812 | echinus  | 52.869 | holothurian | 55.920 |
+| scallop    | 59.754 | starfish | 60.541 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       1.00      0.14      0.25         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       1.00      0.57      0.62      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.25743721230743305
+
+defect_fps:
+0.25743629388258504
+
+normal_fps:
+0.25815292767116
+
+
+==================================== aquatic_strong_baseline+multiscale+soft-nms, uid: multiscale+soft-nms, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.575
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.911
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.661
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.300
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.544
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.205
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.616
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.705
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.547
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.692
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.738
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 34.213 | echinus  | 53.876 | holothurian | 55.969 |
+| scallop    | 59.767 | starfish | 60.530 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.1695109917889668
+
+defect_fps:
+0.16947716534629423
+
+normal_fps:
+0.1958714553288051
+
+
+==================================== aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters, uid: multiscale+soft-nms+anchor_clusters, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.573
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.657
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.302
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.539
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.636
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.204
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.612
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.697
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.550
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.682
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.731
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 38.666 | echinus  | 53.637 | holothurian | 56.005 |
+| scallop    | 59.362 | starfish | 60.192 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00         7
+           1       1.00      1.00      1.00      5455
+
+    accuracy                           1.00      5462
+   macro avg       0.50      0.50      0.50      5462
+weighted avg       1.00      1.00      1.00      5462
+
+
+fps:
+0.1426486411141808
+
+defect_fps:
+0.14261952875733486
+
+normal_fps:
+0.16533548491341726
+
+
+==================================== aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn, uid: multiscale+soft-nms+anchor_clusters+dcn, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.584
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.916
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.673
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.320
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.553
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.207
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.619
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.703
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.567
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.689
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.736
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 48.364 | echinus  | 54.552 | holothurian | 57.935 |
+| scallop    | 60.335 | starfish | 60.882 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0      0.000     0.000     0.000         7
+           1      0.999     1.000     0.999      5455
+
+    accuracy                          0.999      5462
+   macro avg      0.499     0.500     0.500      5462
+weighted avg      0.997     0.999     0.998      5462
+
+
+fps:
+0.16036042679102594
+
+defect_fps:
+0.16034594150336917
+
+normal_fps:
+0.17164860452924455
+
+
+==================================== aquatic_strong_baseline+multiscale+soft-nms+anchor_clusters+dcn+flipmixup, uid: multiscale+soft-nms+anchor_clusters+dcn+flipmixup, mode: val ====================================
+bbox:
+log:
+
+coco_eval:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.562
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.898
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.640
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.288
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.527
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.626
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.203
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.605
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.688
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.544
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.671
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.722
+
+classwise:
++------------+--------+----------+--------+-------------+--------+
+| category   | AP     | category | AP     | category    | AP     |
++------------+--------+----------+--------+-------------+--------+
+| waterweeds | 38.011 | echinus  | 53.425 | holothurian | 54.544 |
+| scallop    | 57.603 | starfish | 59.409 | None        | None   |
++------------+--------+----------+--------+-------------+--------+
+
+find_ability:
+              precision    recall  f1-score   support
+
+           0      0.000     0.000     0.000         7
+           1      0.999     1.000     0.999      5455
+
+    accuracy                          0.999      5462
+   macro avg      0.499     0.500     0.500      5462
+weighted avg      0.997     0.999     0.998      5462
+
+
+fps:
+0.15875520674748458
+
+defect_fps:
+0.1587310575542922
+
+normal_fps:
+0.17757432801382883

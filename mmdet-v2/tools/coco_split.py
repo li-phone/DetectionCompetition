@@ -39,13 +39,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/cut_1000x1000_all-check.json",
+                        default="data/ultrasonic/annotations/simple-sample-checked.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_dir',
-                        default="/home/lifeng/undone-work/dataset/detection/tile/annotations/cut_1000x1000/",
+                        default="data/ultrasonic/annotations/",
                         help='save_dir')
     parser.add_argument('--rate', type=float, default=0.9, help='split rate')
-    parser.add_argument('--prefix', default='cut_1000x1000_', help='save prefix')
+    parser.add_argument('--prefix', default='instance_', help='save prefix')
     parser.add_argument('--random_state', type=int, default=666, help='random_state')
     args = parser.parse_args()
     return args

@@ -121,10 +121,10 @@ class COCOAnalysis(object):
 
         ax = sns.jointplot("bbox_width", "bbox_height", data=box_df,
                            kind="reg", truncate=False,
-                           # xlim=(0, max(box_df['bbox_width']) + 1),
-                           xlim=(0, 2000 + 1),
-                           # ylim=(0, max(box_df['bbox_height']) + 1),
+                           xlim=(0, max(box_df['bbox_width']) + 1),
+                           # xlim=(0, 40 + 1),
                            ylim=(0, max(box_df['bbox_height']) + 1),
+                           # ylim=(0, 40 + 1),
                            color="m", height=7)
         asp = box_df['bbox_height'] / box_df['bbox_width']
         asp_quantiles = []
@@ -139,8 +139,8 @@ class COCOAnalysis(object):
         asp_copy = list(map(lambda x: round(x, 6), asp_quantiles['value']))
         print('copy:', asp_copy)
         save_plt(os.path.join(self.save_img_dir, 'bbox_distribution_{}.jpg'.format(str(legend))))
-        plt.xlim(0, 2000)
-        plt.ylim(0, 2000)
+        # plt.xlim(0, 2000)
+        # plt.ylim(0, 2000)
         plt.show()
 
     def summary(self):
@@ -214,9 +214,9 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=["/home/lifeng/undone-work/dataset/detection/tile/annotations/instance_all-check.json"],
-        save_img_dir='./tile',
-        legends=['train'])
+        ann_files=[r"/home/lifeng/undone-work/dataset/detection/ultrasonic/annotations/simple-sample-checked.json"],
+        save_img_dir='./ultrasonic',
+        legends=['all'])
     data.summary()
     # garbage_ana = COCOAnalysis(
     #     ann_files=['/home/liphone/undone-work/data/detection/garbage/train/instance_train.json'],

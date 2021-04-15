@@ -1,0 +1,2937 @@
+loading annotations into memory...
+loading annotations into memory...
+Done (t=4.82s)
+creating index...
+index created!
+Done (t=4.92s)
+creating index...
+loading annotations into memory...
+index created!
+loading annotations into memory...
+Done (t=1.06s)
+creating index...
+index created!
+Done (t=1.04s)
+creating index...
+index created!
+loading annotations into memory...loading annotations into memory...
+
+Done (t=0.42s)
+creating index...
+Done (t=0.42s)
+creating index...
+index created!
+index created!
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 00:20:08,977 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 00:20:10,442 - mmdet - INFO - Distributed training: True
+2021-03-15 00:20:12,009 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[1.54794247, 2.13700273, 1.91252347, 1.30469075],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 2)
+
+2021-03-15 00:20:12,956 - mmdet - INFO - load model from: torchvision://resnet50
+2021-03-15 00:20:16,941 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+missing keys in source state_dict: layer2.0.conv2.conv_offset.weight, layer2.0.conv2.conv_offset.bias, layer2.1.conv2.conv_offset.weight, layer2.1.conv2.conv_offset.bias, layer2.2.conv2.conv_offset.weight, layer2.2.conv2.conv_offset.bias, layer2.3.conv2.conv_offset.weight, layer2.3.conv2.conv_offset.bias, layer3.0.conv2.conv_offset.weight, layer3.0.conv2.conv_offset.bias, layer3.1.conv2.conv_offset.weight, layer3.1.conv2.conv_offset.bias, layer3.2.conv2.conv_offset.weight, layer3.2.conv2.conv_offset.bias, layer3.3.conv2.conv_offset.weight, layer3.3.conv2.conv_offset.bias, layer3.4.conv2.conv_offset.weight, layer3.4.conv2.conv_offset.bias, layer3.5.conv2.conv_offset.weight, layer3.5.conv2.conv_offset.bias, layer4.0.conv2.conv_offset.weight, layer4.0.conv2.conv_offset.bias, layer4.1.conv2.conv_offset.weight, layer4.1.conv2.conv_offset.bias, layer4.2.conv2.conv_offset.weight, layer4.2.conv2.conv_offset.bias
+
+loading annotations into memory...
+loading annotations into memory...
+Done (t=4.82s)
+creating index...
+Done (t=4.85s)
+creating index...
+index created!
+loading annotations into memory...
+index created!
+loading annotations into memory...
+Done (t=1.07s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+Done (t=1.03s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+loading annotations into memory...loading annotations into memory...
+
+Done (t=0.42s)
+creating index...
+Done (t=0.43s)
+creating index...
+index created!
+2021-03-15 00:20:24,551 - mmdet - INFO - load checkpoint from work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth
+index created!
+2021-03-15 00:20:25,407 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for rpn_head.rpn_cls.weight: copying a param with shape torch.Size([3, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([4, 256, 1, 1]).
+size mismatch for rpn_head.rpn_cls.bias: copying a param with shape torch.Size([3]) from checkpoint, the shape in current model is torch.Size([4]).
+size mismatch for rpn_head.rpn_reg.weight: copying a param with shape torch.Size([12, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([16, 256, 1, 1]).
+size mismatch for rpn_head.rpn_reg.bias: copying a param with shape torch.Size([12]) from checkpoint, the shape in current model is torch.Size([16]).
+unexpected key in source state_dict: neck.lateral_convs.0.conv.bias, neck.lateral_convs.1.conv.bias, neck.lateral_convs.2.conv.bias, neck.lateral_convs.3.conv.bias, neck.fpn_convs.0.conv.bias, neck.fpn_convs.1.conv.bias, neck.fpn_convs.2.conv.bias, neck.fpn_convs.3.conv.bias
+
+missing keys in source state_dict: neck.lateral_convs.0.bn.weight, neck.lateral_convs.0.bn.bias, neck.lateral_convs.0.bn.running_mean, neck.lateral_convs.0.bn.running_var, neck.lateral_convs.1.bn.weight, neck.lateral_convs.1.bn.bias, neck.lateral_convs.1.bn.running_mean, neck.lateral_convs.1.bn.running_var, neck.lateral_convs.2.bn.weight, neck.lateral_convs.2.bn.bias, neck.lateral_convs.2.bn.running_mean, neck.lateral_convs.2.bn.running_var, neck.lateral_convs.3.bn.weight, neck.lateral_convs.3.bn.bias, neck.lateral_convs.3.bn.running_mean, neck.lateral_convs.3.bn.running_var, neck.fpn_convs.0.bn.weight, neck.fpn_convs.0.bn.bias, neck.fpn_convs.0.bn.running_mean, neck.fpn_convs.0.bn.running_var, neck.fpn_convs.1.bn.weight, neck.fpn_convs.1.bn.bias, neck.fpn_convs.1.bn.running_mean, neck.fpn_convs.1.bn.running_var, neck.fpn_convs.2.bn.weight, neck.fpn_convs.2.bn.bias, neck.fpn_convs.2.bn.running_mean, neck.fpn_convs.2.bn.running_var, neck.fpn_convs.3.bn.weight, neck.fpn_convs.3.bn.bias, neck.fpn_convs.3.bn.running_mean, neck.fpn_convs.3.bn.running_var
+
+2021-03-15 00:20:25,433 - mmdet - INFO - Start running, host: lifeng@ubuntu-Precision-7920-Tower, work_dir: /home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track
+2021-03-15 00:20:25,434 - mmdet - INFO - workflow: [('train', 1), ('val', 1)], max: 12 epochs
+2021-03-15 00:20:57,071 - mmdet - INFO - Epoch [1][50/3802]	lr: 1.978e-03, eta: 7:59:57, time: 0.632, data_time: 0.347, memory: 4088, loss_rpn_cls: 0.5383, loss_rpn_bbox: 0.0851, s0.loss_cls: 0.1063, s0.acc: 95.8740, s0.loss_bbox: 0.0372, s1.loss_cls: 0.0515, s1.acc: 95.6464, s1.loss_bbox: 0.0525, s2.loss_cls: 0.0266, s2.acc: 95.3200, s2.loss_bbox: 0.0390, loss: 0.9366
+2021-03-15 00:21:26,591 - mmdet - INFO - Epoch [1][100/3802]	lr: 3.976e-03, eta: 7:43:40, time: 0.590, data_time: 0.299, memory: 4381, loss_rpn_cls: 0.1806, loss_rpn_bbox: 0.0548, s0.loss_cls: 0.1286, s0.acc: 94.6562, s0.loss_bbox: 0.0566, s1.loss_cls: 0.0623, s1.acc: 94.4747, s1.loss_bbox: 0.0725, s2.loss_cls: 0.0332, s2.acc: 94.0591, s2.loss_bbox: 0.0494, loss: 0.6380
+2021-03-15 00:21:56,818 - mmdet - INFO - Epoch [1][150/3802]	lr: 5.974e-03, eta: 7:41:30, time: 0.605, data_time: 0.309, memory: 5697, loss_rpn_cls: 0.0646, loss_rpn_bbox: 0.0506, s0.loss_cls: 0.1434, s0.acc: 93.7021, s0.loss_bbox: 0.0653, s1.loss_cls: 0.0715, s1.acc: 93.6623, s1.loss_bbox: 0.0758, s2.loss_cls: 0.0366, s2.acc: 93.2249, s2.loss_bbox: 0.0522, loss: 0.5599
+2021-03-15 00:22:26,202 - mmdet - INFO - Epoch [1][200/3802]	lr: 7.972e-03, eta: 7:36:58, time: 0.588, data_time: 0.299, memory: 5697, loss_rpn_cls: 0.0425, loss_rpn_bbox: 0.0559, s0.loss_cls: 0.1195, s0.acc: 94.6611, s0.loss_bbox: 0.0578, s1.loss_cls: 0.0585, s1.acc: 94.5614, s1.loss_bbox: 0.0723, s2.loss_cls: 0.0308, s2.acc: 94.1876, s2.loss_bbox: 0.0499, loss: 0.4873
+2021-03-15 00:22:57,385 - mmdet - INFO - Epoch [1][250/3802]	lr: 9.970e-03, eta: 7:39:30, time: 0.624, data_time: 0.324, memory: 8256, loss_rpn_cls: 0.0388, loss_rpn_bbox: 0.0580, s0.loss_cls: 0.1213, s0.acc: 94.5312, s0.loss_bbox: 0.0611, s1.loss_cls: 0.0598, s1.acc: 94.5372, s1.loss_bbox: 0.0693, s2.loss_cls: 0.0309, s2.acc: 94.3099, s2.loss_bbox: 0.0457, loss: 0.4851
+2021-03-15 00:23:28,325 - mmdet - INFO - Epoch [1][300/3802]	lr: 1.197e-02, eta: 7:40:24, time: 0.619, data_time: 0.324, memory: 8256, loss_rpn_cls: 0.0293, loss_rpn_bbox: 0.0463, s0.loss_cls: 0.1029, s0.acc: 95.2578, s0.loss_bbox: 0.0471, s1.loss_cls: 0.0481, s1.acc: 95.4047, s1.loss_bbox: 0.0568, s2.loss_cls: 0.0248, s2.acc: 95.2248, s2.loss_bbox: 0.0381, loss: 0.3933
+2021-03-15 00:23:59,567 - mmdet - INFO - Epoch [1][350/3802]	lr: 1.397e-02, eta: 7:41:33, time: 0.625, data_time: 0.321, memory: 8256, loss_rpn_cls: 0.0356, loss_rpn_bbox: 0.0615, s0.loss_cls: 0.1437, s0.acc: 93.4971, s0.loss_bbox: 0.0741, s1.loss_cls: 0.0675, s1.acc: 93.7586, s1.loss_bbox: 0.0844, s2.loss_cls: 0.0344, s2.acc: 93.7018, s2.loss_bbox: 0.0538, loss: 0.5549
+2021-03-15 00:24:29,571 - mmdet - INFO - Epoch [1][400/3802]	lr: 1.596e-02, eta: 7:39:56, time: 0.600, data_time: 0.309, memory: 8256, loss_rpn_cls: 0.0292, loss_rpn_bbox: 0.0531, s0.loss_cls: 0.1194, s0.acc: 94.5869, s0.loss_bbox: 0.0609, s1.loss_cls: 0.0573, s1.acc: 94.6523, s1.loss_bbox: 0.0738, s2.loss_cls: 0.0300, s2.acc: 94.2742, s2.loss_bbox: 0.0497, loss: 0.4733
+2021-03-15 00:24:59,741 - mmdet - INFO - Epoch [1][450/3802]	lr: 1.796e-02, eta: 7:38:52, time: 0.603, data_time: 0.311, memory: 8256, loss_rpn_cls: 0.0385, loss_rpn_bbox: 0.0589, s0.loss_cls: 0.1295, s0.acc: 94.2148, s0.loss_bbox: 0.0654, s1.loss_cls: 0.0614, s1.acc: 94.3281, s1.loss_bbox: 0.0738, s2.loss_cls: 0.0319, s2.acc: 94.1424, s2.loss_bbox: 0.0459, loss: 0.5052
+2021-03-15 00:25:30,022 - mmdet - INFO - Epoch [1][500/3802]	lr: 1.996e-02, eta: 7:38:04, time: 0.606, data_time: 0.313, memory: 8256, loss_rpn_cls: 0.0322, loss_rpn_bbox: 0.0440, s0.loss_cls: 0.1284, s0.acc: 94.1650, s0.loss_bbox: 0.0661, s1.loss_cls: 0.0622, s1.acc: 94.2854, s1.loss_bbox: 0.0733, s2.loss_cls: 0.0313, s2.acc: 94.2594, s2.loss_bbox: 0.0496, loss: 0.4872
+2021-03-15 00:25:59,825 - mmdet - INFO - Epoch [1][550/3802]	lr: 2.000e-02, eta: 7:36:40, time: 0.596, data_time: 0.307, memory: 8256, loss_rpn_cls: 0.0280, loss_rpn_bbox: 0.0377, s0.loss_cls: 0.1180, s0.acc: 94.5518, s0.loss_bbox: 0.0635, s1.loss_cls: 0.0567, s1.acc: 94.6041, s1.loss_bbox: 0.0712, s2.loss_cls: 0.0294, s2.acc: 94.3193, s2.loss_bbox: 0.0469, loss: 0.4516
+2021-03-15 00:26:30,073 - mmdet - INFO - Epoch [1][600/3802]	lr: 2.000e-02, eta: 7:35:58, time: 0.605, data_time: 0.310, memory: 8256, loss_rpn_cls: 0.0304, loss_rpn_bbox: 0.0565, s0.loss_cls: 0.1406, s0.acc: 93.7773, s0.loss_bbox: 0.0751, s1.loss_cls: 0.0671, s1.acc: 93.9005, s1.loss_bbox: 0.0881, s2.loss_cls: 0.0357, s2.acc: 93.3212, s2.loss_bbox: 0.0560, loss: 0.5496
+2021-03-15 00:27:00,435 - mmdet - INFO - Epoch [1][650/3802]	lr: 2.000e-02, eta: 7:35:27, time: 0.607, data_time: 0.305, memory: 8256, loss_rpn_cls: 0.0253, loss_rpn_bbox: 0.0510, s0.loss_cls: 0.1329, s0.acc: 93.9316, s0.loss_bbox: 0.0694, s1.loss_cls: 0.0625, s1.acc: 93.9800, s1.loss_bbox: 0.0783, s2.loss_cls: 0.0325, s2.acc: 93.7949, s2.loss_bbox: 0.0493, loss: 0.5012
+2021-03-15 00:27:30,328 - mmdet - INFO - Epoch [1][700/3802]	lr: 2.000e-02, eta: 7:34:25, time: 0.598, data_time: 0.307, memory: 8256, loss_rpn_cls: 0.0285, loss_rpn_bbox: 0.0393, s0.loss_cls: 0.1146, s0.acc: 94.8682, s0.loss_bbox: 0.0631, s1.loss_cls: 0.0526, s1.acc: 95.2295, s1.loss_bbox: 0.0717, s2.loss_cls: 0.0271, s2.acc: 95.0389, s2.loss_bbox: 0.0475, loss: 0.4444
+2021-03-15 00:28:00,391 - mmdet - INFO - Epoch [1][750/3802]	lr: 2.000e-02, eta: 7:33:38, time: 0.601, data_time: 0.307, memory: 8256, loss_rpn_cls: 0.0412, loss_rpn_bbox: 0.0542, s0.loss_cls: 0.1484, s0.acc: 93.5039, s0.loss_bbox: 0.0833, s1.loss_cls: 0.0717, s1.acc: 93.7620, s1.loss_bbox: 0.0906, s2.loss_cls: 0.0375, s2.acc: 93.2837, s2.loss_bbox: 0.0546, loss: 0.5814
+2021-03-15 00:28:30,730 - mmdet - INFO - Epoch [1][800/3802]	lr: 2.000e-02, eta: 7:33:08, time: 0.607, data_time: 0.313, memory: 8256, loss_rpn_cls: 0.0296, loss_rpn_bbox: 0.0442, s0.loss_cls: 0.1285, s0.acc: 94.2842, s0.loss_bbox: 0.0722, s1.loss_cls: 0.0601, s1.acc: 94.5372, s1.loss_bbox: 0.0813, s2.loss_cls: 0.0311, s2.acc: 94.1923, s2.loss_bbox: 0.0520, loss: 0.4988
+2021-03-15 00:29:00,838 - mmdet - INFO - Epoch [1][850/3802]	lr: 2.000e-02, eta: 7:32:26, time: 0.602, data_time: 0.311, memory: 8256, loss_rpn_cls: 0.0369, loss_rpn_bbox: 0.0459, s0.loss_cls: 0.1422, s0.acc: 93.7412, s0.loss_bbox: 0.0771, s1.loss_cls: 0.0684, s1.acc: 93.8072, s1.loss_bbox: 0.0839, s2.loss_cls: 0.0361, s2.acc: 93.2865, s2.loss_bbox: 0.0523, loss: 0.5427
+2021-03-15 00:29:31,108 - mmdet - INFO - Epoch [1][900/3802]	lr: 2.000e-02, eta: 7:31:53, time: 0.605, data_time: 0.308, memory: 8256, loss_rpn_cls: 0.0332, loss_rpn_bbox: 0.0400, s0.loss_cls: 0.1427, s0.acc: 93.6426, s0.loss_bbox: 0.0680, s1.loss_cls: 0.0679, s1.acc: 93.7183, s1.loss_bbox: 0.0774, s2.loss_cls: 0.0343, s2.acc: 93.5160, s2.loss_bbox: 0.0507, loss: 0.5142
+2021-03-15 00:30:01,305 - mmdet - INFO - Epoch [1][950/3802]	lr: 2.000e-02, eta: 7:31:18, time: 0.604, data_time: 0.313, memory: 8256, loss_rpn_cls: 0.0321, loss_rpn_bbox: 0.0387, s0.loss_cls: 0.1248, s0.acc: 94.2734, s0.loss_bbox: 0.0683, s1.loss_cls: 0.0593, s1.acc: 94.4766, s1.loss_bbox: 0.0760, s2.loss_cls: 0.0307, s2.acc: 94.2450, s2.loss_bbox: 0.0474, loss: 0.4772
+2021-03-15 00:30:31,366 - mmdet - INFO - Exp name: bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py
+2021-03-15 00:30:31,367 - mmdet - INFO - Epoch [1][1000/3802]	lr: 2.000e-02, eta: 7:30:36, time: 0.601, data_time: 0.307, memory: 8621, loss_rpn_cls: 0.0231, loss_rpn_bbox: 0.0369, s0.loss_cls: 0.1193, s0.acc: 94.5967, s0.loss_bbox: 0.0621, s1.loss_cls: 0.0570, s1.acc: 94.6139, s1.loss_bbox: 0.0691, s2.loss_cls: 0.0297, s2.acc: 94.3513, s2.loss_bbox: 0.0456, loss: 0.4427
+2021-03-15 00:31:00,603 - mmdet - INFO - Epoch [1][1050/3802]	lr: 2.000e-02, eta: 7:29:21, time: 0.585, data_time: 0.297, memory: 8621, loss_rpn_cls: 0.0233, loss_rpn_bbox: 0.0331, s0.loss_cls: 0.1248, s0.acc: 94.3926, s0.loss_bbox: 0.0641, s1.loss_cls: 0.0606, s1.acc: 94.3597, s1.loss_bbox: 0.0704, s2.loss_cls: 0.0313, s2.acc: 94.2205, s2.loss_bbox: 0.0470, loss: 0.4547
+2021-03-15 00:31:30,866 - mmdet - INFO - Epoch [1][1100/3802]	lr: 2.000e-02, eta: 7:28:52, time: 0.605, data_time: 0.308, memory: 8621, loss_rpn_cls: 0.0332, loss_rpn_bbox: 0.0477, s0.loss_cls: 0.1555, s0.acc: 93.0107, s0.loss_bbox: 0.0853, s1.loss_cls: 0.0763, s1.acc: 92.9897, s1.loss_bbox: 0.0914, s2.loss_cls: 0.0391, s2.acc: 92.7252, s2.loss_bbox: 0.0559, loss: 0.5844
+2021-03-15 00:32:00,623 - mmdet - INFO - Epoch [1][1150/3802]	lr: 2.000e-02, eta: 7:28:03, time: 0.595, data_time: 0.301, memory: 8621, loss_rpn_cls: 0.0359, loss_rpn_bbox: 0.0339, s0.loss_cls: 0.1188, s0.acc: 94.7568, s0.loss_bbox: 0.0602, s1.loss_cls: 0.0574, s1.acc: 94.7761, s1.loss_bbox: 0.0700, s2.loss_cls: 0.0300, s2.acc: 94.4270, s2.loss_bbox: 0.0454, loss: 0.4516
+2021-03-15 00:32:30,461 - mmdet - INFO - Epoch [1][1200/3802]	lr: 2.000e-02, eta: 7:27:18, time: 0.597, data_time: 0.306, memory: 8621, loss_rpn_cls: 0.0300, loss_rpn_bbox: 0.0395, s0.loss_cls: 0.1340, s0.acc: 94.0273, s0.loss_bbox: 0.0753, s1.loss_cls: 0.0642, s1.acc: 94.2204, s1.loss_bbox: 0.0865, s2.loss_cls: 0.0334, s2.acc: 94.1440, s2.loss_bbox: 0.0522, loss: 0.5151
+2021-03-15 00:33:00,352 - mmdet - INFO - Epoch [1][1250/3802]	lr: 2.000e-02, eta: 7:26:37, time: 0.598, data_time: 0.307, memory: 8621, loss_rpn_cls: 0.0299, loss_rpn_bbox: 0.0418, s0.loss_cls: 0.1336, s0.acc: 94.1289, s0.loss_bbox: 0.0742, s1.loss_cls: 0.0631, s1.acc: 94.2703, s1.loss_bbox: 0.0888, s2.loss_cls: 0.0326, s2.acc: 93.9435, s2.loss_bbox: 0.0571, loss: 0.5211
+2021-03-15 00:33:30,814 - mmdet - INFO - Epoch [1][1300/3802]	lr: 2.000e-02, eta: 7:26:16, time: 0.609, data_time: 0.323, memory: 8621, loss_rpn_cls: 0.0275, loss_rpn_bbox: 0.0344, s0.loss_cls: 0.1249, s0.acc: 94.3877, s0.loss_bbox: 0.0691, s1.loss_cls: 0.0600, s1.acc: 94.3900, s1.loss_bbox: 0.0797, s2.loss_cls: 0.0317, s2.acc: 94.1781, s2.loss_bbox: 0.0543, loss: 0.4815
+2021-03-15 00:34:01,893 - mmdet - INFO - Epoch [1][1350/3802]	lr: 2.000e-02, eta: 7:26:14, time: 0.622, data_time: 0.333, memory: 8621, loss_rpn_cls: 0.0355, loss_rpn_bbox: 0.0447, s0.loss_cls: 0.1412, s0.acc: 93.6484, s0.loss_bbox: 0.0713, s1.loss_cls: 0.0685, s1.acc: 93.5889, s1.loss_bbox: 0.0766, s2.loss_cls: 0.0348, s2.acc: 93.4332, s2.loss_bbox: 0.0469, loss: 0.5194
+2021-03-15 00:34:33,229 - mmdet - INFO - Epoch [1][1400/3802]	lr: 2.000e-02, eta: 7:26:18, time: 0.627, data_time: 0.337, memory: 8621, loss_rpn_cls: 0.0368, loss_rpn_bbox: 0.0469, s0.loss_cls: 0.1468, s0.acc: 93.4365, s0.loss_bbox: 0.0812, s1.loss_cls: 0.0714, s1.acc: 93.3516, s1.loss_bbox: 0.0907, s2.loss_cls: 0.0376, s2.acc: 92.9729, s2.loss_bbox: 0.0555, loss: 0.5669
+2021-03-15 00:35:04,579 - mmdet - INFO - Epoch [1][1450/3802]	lr: 2.000e-02, eta: 7:26:21, time: 0.627, data_time: 0.334, memory: 8621, loss_rpn_cls: 0.0348, loss_rpn_bbox: 0.0469, s0.loss_cls: 0.1557, s0.acc: 92.9385, s0.loss_bbox: 0.0798, s1.loss_cls: 0.0748, s1.acc: 93.1130, s1.loss_bbox: 0.0862, s2.loss_cls: 0.0385, s2.acc: 92.8316, s2.loss_bbox: 0.0546, loss: 0.5712
+2021-03-15 00:35:36,565 - mmdet - INFO - Epoch [1][1500/3802]	lr: 2.000e-02, eta: 7:26:40, time: 0.640, data_time: 0.341, memory: 8621, loss_rpn_cls: 0.0267, loss_rpn_bbox: 0.0432, s0.loss_cls: 0.1444, s0.acc: 93.5244, s0.loss_bbox: 0.0728, s1.loss_cls: 0.0694, s1.acc: 93.7094, s1.loss_bbox: 0.0789, s2.loss_cls: 0.0351, s2.acc: 93.4349, s2.loss_bbox: 0.0491, loss: 0.5196
+2021-03-15 00:36:07,970 - mmdet - INFO - Epoch [1][1550/3802]	lr: 2.000e-02, eta: 7:26:39, time: 0.628, data_time: 0.328, memory: 8621, loss_rpn_cls: 0.0327, loss_rpn_bbox: 0.0434, s0.loss_cls: 0.1458, s0.acc: 93.4785, s0.loss_bbox: 0.0802, s1.loss_cls: 0.0694, s1.acc: 93.6324, s1.loss_bbox: 0.0908, s2.loss_cls: 0.0362, s2.acc: 93.0014, s2.loss_bbox: 0.0570, loss: 0.5555
+2021-03-15 00:36:38,915 - mmdet - INFO - Epoch [1][1600/3802]	lr: 2.000e-02, eta: 7:26:23, time: 0.619, data_time: 0.326, memory: 8621, loss_rpn_cls: 0.0306, loss_rpn_bbox: 0.0366, s0.loss_cls: 0.1413, s0.acc: 93.5713, s0.loss_bbox: 0.0726, s1.loss_cls: 0.0680, s1.acc: 93.7283, s1.loss_bbox: 0.0821, s2.loss_cls: 0.0352, s2.acc: 93.4953, s2.loss_bbox: 0.0541, loss: 0.5205
+2021-03-15 00:37:10,109 - mmdet - INFO - Epoch [1][1650/3802]	lr: 2.000e-02, eta: 7:26:13, time: 0.624, data_time: 0.331, memory: 8621, loss_rpn_cls: 0.0263, loss_rpn_bbox: 0.0406, s0.loss_cls: 0.1397, s0.acc: 93.8594, s0.loss_bbox: 0.0785, s1.loss_cls: 0.0645, s1.acc: 94.1075, s1.loss_bbox: 0.0846, s2.loss_cls: 0.0333, s2.acc: 93.9328, s2.loss_bbox: 0.0546, loss: 0.5221
+2021-03-15 00:37:40,856 - mmdet - INFO - Epoch [1][1700/3802]	lr: 2.000e-02, eta: 7:25:51, time: 0.615, data_time: 0.328, memory: 8621, loss_rpn_cls: 0.0256, loss_rpn_bbox: 0.0364, s0.loss_cls: 0.1236, s0.acc: 94.4121, s0.loss_bbox: 0.0663, s1.loss_cls: 0.0578, s1.acc: 94.6378, s1.loss_bbox: 0.0734, s2.loss_cls: 0.0295, s2.acc: 94.6503, s2.loss_bbox: 0.0487, loss: 0.4613
+2021-03-15 00:38:12,432 - mmdet - INFO - Epoch [1][1750/3802]	lr: 2.000e-02, eta: 7:25:49, time: 0.631, data_time: 0.335, memory: 8621, loss_rpn_cls: 0.0314, loss_rpn_bbox: 0.0501, s0.loss_cls: 0.1448, s0.acc: 93.4590, s0.loss_bbox: 0.0784, s1.loss_cls: 0.0688, s1.acc: 93.7641, s1.loss_bbox: 0.0834, s2.loss_cls: 0.0356, s2.acc: 93.3419, s2.loss_bbox: 0.0525, loss: 0.5450
+2021-03-15 00:38:43,181 - mmdet - INFO - Epoch [1][1800/3802]	lr: 2.000e-02, eta: 7:25:25, time: 0.615, data_time: 0.327, memory: 8621, loss_rpn_cls: 0.0269, loss_rpn_bbox: 0.0335, s0.loss_cls: 0.1363, s0.acc: 93.9902, s0.loss_bbox: 0.0717, s1.loss_cls: 0.0656, s1.acc: 93.9968, s1.loss_bbox: 0.0807, s2.loss_cls: 0.0337, s2.acc: 93.7280, s2.loss_bbox: 0.0511, loss: 0.4996
+2021-03-15 00:39:14,322 - mmdet - INFO - Epoch [1][1850/3802]	lr: 2.000e-02, eta: 7:25:09, time: 0.623, data_time: 0.335, memory: 8621, loss_rpn_cls: 0.0258, loss_rpn_bbox: 0.0404, s0.loss_cls: 0.1418, s0.acc: 93.5254, s0.loss_bbox: 0.0791, s1.loss_cls: 0.0673, s1.acc: 93.7828, s1.loss_bbox: 0.0890, s2.loss_cls: 0.0349, s2.acc: 93.5245, s2.loss_bbox: 0.0531, loss: 0.5313
+2021-03-15 00:39:45,509 - mmdet - INFO - Epoch [1][1900/3802]	lr: 2.000e-02, eta: 7:24:55, time: 0.624, data_time: 0.336, memory: 8621, loss_rpn_cls: 0.0303, loss_rpn_bbox: 0.0372, s0.loss_cls: 0.1352, s0.acc: 93.9961, s0.loss_bbox: 0.0768, s1.loss_cls: 0.0647, s1.acc: 94.2011, s1.loss_bbox: 0.0892, s2.loss_cls: 0.0330, s2.acc: 94.1625, s2.loss_bbox: 0.0563, loss: 0.5227
+2021-03-15 00:40:16,812 - mmdet - INFO - Epoch [1][1950/3802]	lr: 2.000e-02, eta: 7:24:41, time: 0.626, data_time: 0.336, memory: 8998, loss_rpn_cls: 0.0351, loss_rpn_bbox: 0.0332, s0.loss_cls: 0.1254, s0.acc: 94.3623, s0.loss_bbox: 0.0669, s1.loss_cls: 0.0606, s1.acc: 94.4259, s1.loss_bbox: 0.0755, s2.loss_cls: 0.0305, s2.acc: 94.4220, s2.loss_bbox: 0.0494, loss: 0.4767
+2021-03-15 00:40:48,154 - mmdet - INFO - Exp name: bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py
+2021-03-15 00:40:48,155 - mmdet - INFO - Epoch [1][2000/3802]	lr: 2.000e-02, eta: 7:24:28, time: 0.627, data_time: 0.338, memory: 8998, loss_rpn_cls: 0.0394, loss_rpn_bbox: 0.0386, s0.loss_cls: 0.1392, s0.acc: 93.8848, s0.loss_bbox: 0.0749, s1.loss_cls: 0.0652, s1.acc: 94.1680, s1.loss_bbox: 0.0854, s2.loss_cls: 0.0336, s2.acc: 93.8271, s2.loss_bbox: 0.0532, loss: 0.5296
+2021-03-15 00:41:18,976 - mmdet - INFO - Epoch [1][2050/3802]	lr: 2.000e-02, eta: 7:24:03, time: 0.616, data_time: 0.329, memory: 8998, loss_rpn_cls: 0.0440, loss_rpn_bbox: 0.0491, s0.loss_cls: 0.1458, s0.acc: 93.6338, s0.loss_bbox: 0.0787, s1.loss_cls: 0.0689, s1.acc: 93.7260, s1.loss_bbox: 0.0883, s2.loss_cls: 0.0355, s2.acc: 93.5428, s2.loss_bbox: 0.0567, loss: 0.5671
+2021-03-15 00:41:50,454 - mmdet - INFO - Epoch [1][2100/3802]	lr: 2.000e-02, eta: 7:23:51, time: 0.630, data_time: 0.338, memory: 8998, loss_rpn_cls: 0.0412, loss_rpn_bbox: 0.0439, s0.loss_cls: 0.1357, s0.acc: 94.0205, s0.loss_bbox: 0.0739, s1.loss_cls: 0.0648, s1.acc: 94.0651, s1.loss_bbox: 0.0826, s2.loss_cls: 0.0335, s2.acc: 93.7983, s2.loss_bbox: 0.0538, loss: 0.5292
+2021-03-15 00:42:21,632 - mmdet - INFO - Epoch [1][2150/3802]	lr: 2.000e-02, eta: 7:23:32, time: 0.624, data_time: 0.340, memory: 8998, loss_rpn_cls: 0.0282, loss_rpn_bbox: 0.0361, s0.loss_cls: 0.1201, s0.acc: 94.5273, s0.loss_bbox: 0.0706, s1.loss_cls: 0.0560, s1.acc: 94.6404, s1.loss_bbox: 0.0770, s2.loss_cls: 0.0289, s2.acc: 94.4348, s2.loss_bbox: 0.0484, loss: 0.4653
+2021-03-15 00:42:52,426 - mmdet - INFO - Epoch [1][2200/3802]	lr: 2.000e-02, eta: 7:23:05, time: 0.616, data_time: 0.328, memory: 8998, loss_rpn_cls: 0.0301, loss_rpn_bbox: 0.0409, s0.loss_cls: 0.1316, s0.acc: 94.0254, s0.loss_bbox: 0.0721, s1.loss_cls: 0.0616, s1.acc: 94.0882, s1.loss_bbox: 0.0788, s2.loss_cls: 0.0332, s2.acc: 93.6056, s2.loss_bbox: 0.0504, loss: 0.4987
+2021-03-15 00:43:23,535 - mmdet - INFO - Epoch [1][2250/3802]	lr: 2.000e-02, eta: 7:22:44, time: 0.622, data_time: 0.333, memory: 8998, loss_rpn_cls: 0.0208, loss_rpn_bbox: 0.0343, s0.loss_cls: 0.1212, s0.acc: 94.4570, s0.loss_bbox: 0.0679, s1.loss_cls: 0.0575, s1.acc: 94.5850, s1.loss_bbox: 0.0766, s2.loss_cls: 0.0302, s2.acc: 94.4536, s2.loss_bbox: 0.0482, loss: 0.4567
+2021-03-15 00:43:54,775 - mmdet - INFO - Epoch [1][2300/3802]	lr: 2.000e-02, eta: 7:22:25, time: 0.625, data_time: 0.333, memory: 8998, loss_rpn_cls: 0.0246, loss_rpn_bbox: 0.0422, s0.loss_cls: 0.1427, s0.acc: 93.4893, s0.loss_bbox: 0.0836, s1.loss_cls: 0.0681, s1.acc: 93.7231, s1.loss_bbox: 0.0946, s2.loss_cls: 0.0357, s2.acc: 93.4770, s2.loss_bbox: 0.0603, loss: 0.5517
+2021-03-15 00:44:25,841 - mmdet - INFO - Epoch [1][2350/3802]	lr: 2.000e-02, eta: 7:22:03, time: 0.621, data_time: 0.333, memory: 8998, loss_rpn_cls: 0.0264, loss_rpn_bbox: 0.0405, s0.loss_cls: 0.1398, s0.acc: 93.7139, s0.loss_bbox: 0.0737, s1.loss_cls: 0.0661, s1.acc: 93.9418, s1.loss_bbox: 0.0849, s2.loss_cls: 0.0344, s2.acc: 93.4968, s2.loss_bbox: 0.0550, loss: 0.5208
+2021-03-15 00:44:57,478 - mmdet - INFO - Epoch [1][2400/3802]	lr: 2.000e-02, eta: 7:21:50, time: 0.633, data_time: 0.336, memory: 9459, loss_rpn_cls: 0.0324, loss_rpn_bbox: 0.0445, s0.loss_cls: 0.1496, s0.acc: 93.3164, s0.loss_bbox: 0.0780, s1.loss_cls: 0.0709, s1.acc: 93.5517, s1.loss_bbox: 0.0830, s2.loss_cls: 0.0365, s2.acc: 93.2661, s2.loss_bbox: 0.0523, loss: 0.5473
+2021-03-15 00:45:28,259 - mmdet - INFO - Epoch [1][2450/3802]	lr: 2.000e-02, eta: 7:21:21, time: 0.616, data_time: 0.319, memory: 9459, loss_rpn_cls: 0.0240, loss_rpn_bbox: 0.0387, s0.loss_cls: 0.1407, s0.acc: 93.6338, s0.loss_bbox: 0.0776, s1.loss_cls: 0.0682, s1.acc: 93.6632, s1.loss_bbox: 0.0851, s2.loss_cls: 0.0350, s2.acc: 93.5659, s2.loss_bbox: 0.0533, loss: 0.5226
+2021-03-15 00:45:59,908 - mmdet - INFO - Epoch [1][2500/3802]	lr: 2.000e-02, eta: 7:21:07, time: 0.633, data_time: 0.335, memory: 9459, loss_rpn_cls: 0.0339, loss_rpn_bbox: 0.0470, s0.loss_cls: 0.1397, s0.acc: 93.9463, s0.loss_bbox: 0.0782, s1.loss_cls: 0.0641, s1.acc: 94.2293, s1.loss_bbox: 0.0869, s2.loss_cls: 0.0334, s2.acc: 94.0834, s2.loss_bbox: 0.0541, loss: 0.5373
+2021-03-15 00:46:30,965 - mmdet - INFO - Epoch [1][2550/3802]	lr: 2.000e-02, eta: 7:20:43, time: 0.621, data_time: 0.335, memory: 9459, loss_rpn_cls: 0.0231, loss_rpn_bbox: 0.0349, s0.loss_cls: 0.1114, s0.acc: 94.8906, s0.loss_bbox: 0.0568, s1.loss_cls: 0.0523, s1.acc: 95.0721, s1.loss_bbox: 0.0646, s2.loss_cls: 0.0266, s2.acc: 95.0952, s2.loss_bbox: 0.0410, loss: 0.4107
+2021-03-15 00:47:01,237 - mmdet - INFO - Epoch [1][2600/3802]	lr: 2.000e-02, eta: 7:20:05, time: 0.605, data_time: 0.313, memory: 9459, loss_rpn_cls: 0.0285, loss_rpn_bbox: 0.0370, s0.loss_cls: 0.1274, s0.acc: 94.3330, s0.loss_bbox: 0.0754, s1.loss_cls: 0.0580, s1.acc: 94.6156, s1.loss_bbox: 0.0820, s2.loss_cls: 0.0303, s2.acc: 94.2444, s2.loss_bbox: 0.0498, loss: 0.4884
+2021-03-15 00:47:32,175 - mmdet - INFO - Epoch [1][2650/3802]	lr: 2.000e-02, eta: 7:19:39, time: 0.619, data_time: 0.326, memory: 9459, loss_rpn_cls: 0.0266, loss_rpn_bbox: 0.0318, s0.loss_cls: 0.1281, s0.acc: 94.3857, s0.loss_bbox: 0.0669, s1.loss_cls: 0.0591, s1.acc: 94.6040, s1.loss_bbox: 0.0772, s2.loss_cls: 0.0311, s2.acc: 94.2649, s2.loss_bbox: 0.0509, loss: 0.4717
+2021-03-15 00:48:03,087 - mmdet - INFO - Epoch [1][2700/3802]	lr: 2.000e-02, eta: 7:19:11, time: 0.618, data_time: 0.330, memory: 9459, loss_rpn_cls: 0.0313, loss_rpn_bbox: 0.0371, s0.loss_cls: 0.1316, s0.acc: 94.0029, s0.loss_bbox: 0.0721, s1.loss_cls: 0.0622, s1.acc: 94.1183, s1.loss_bbox: 0.0810, s2.loss_cls: 0.0322, s2.acc: 93.9628, s2.loss_bbox: 0.0531, loss: 0.5005
+2021-03-15 00:48:34,177 - mmdet - INFO - Epoch [1][2750/3802]	lr: 2.000e-02, eta: 7:18:47, time: 0.622, data_time: 0.331, memory: 9459, loss_rpn_cls: 0.0269, loss_rpn_bbox: 0.0409, s0.loss_cls: 0.1431, s0.acc: 93.4541, s0.loss_bbox: 0.0768, s1.loss_cls: 0.0659, s1.acc: 93.7314, s1.loss_bbox: 0.0855, s2.loss_cls: 0.0343, s2.acc: 93.4441, s2.loss_bbox: 0.0543, loss: 0.5276
+2021-03-15 00:49:05,065 - mmdet - INFO - Epoch [1][2800/3802]	lr: 2.000e-02, eta: 7:18:19, time: 0.618, data_time: 0.324, memory: 9459, loss_rpn_cls: 0.0216, loss_rpn_bbox: 0.0356, s0.loss_cls: 0.1125, s0.acc: 94.8984, s0.loss_bbox: 0.0646, s1.loss_cls: 0.0539, s1.acc: 94.9909, s1.loss_bbox: 0.0712, s2.loss_cls: 0.0273, s2.acc: 94.8958, s2.loss_bbox: 0.0423, loss: 0.4289
+2021-03-15 00:49:36,142 - mmdet - INFO - Epoch [1][2850/3802]	lr: 2.000e-02, eta: 7:17:54, time: 0.622, data_time: 0.329, memory: 9459, loss_rpn_cls: 0.0276, loss_rpn_bbox: 0.0378, s0.loss_cls: 0.1312, s0.acc: 94.1436, s0.loss_bbox: 0.0741, s1.loss_cls: 0.0623, s1.acc: 94.3688, s1.loss_bbox: 0.0832, s2.loss_cls: 0.0319, s2.acc: 94.1364, s2.loss_bbox: 0.0536, loss: 0.5016
+2021-03-15 00:50:06,936 - mmdet - INFO - Epoch [1][2900/3802]	lr: 2.000e-02, eta: 7:17:24, time: 0.616, data_time: 0.332, memory: 9459, loss_rpn_cls: 0.0267, loss_rpn_bbox: 0.0371, s0.loss_cls: 0.1397, s0.acc: 93.7324, s0.loss_bbox: 0.0788, s1.loss_cls: 0.0666, s1.acc: 93.9361, s1.loss_bbox: 0.0882, s2.loss_cls: 0.0341, s2.acc: 93.7753, s2.loss_bbox: 0.0542, loss: 0.5255
+2021-03-15 00:50:38,507 - mmdet - INFO - Epoch [1][2950/3802]	lr: 2.000e-02, eta: 7:17:06, time: 0.631, data_time: 0.336, memory: 9459, loss_rpn_cls: 0.0298, loss_rpn_bbox: 0.0342, s0.loss_cls: 0.1232, s0.acc: 94.5771, s0.loss_bbox: 0.0637, s1.loss_cls: 0.0595, s1.acc: 94.3543, s1.loss_bbox: 0.0721, s2.loss_cls: 0.0308, s2.acc: 94.0445, s2.loss_bbox: 0.0478, loss: 0.4611
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    main()
+  File "./train.py", line 187, in main
+    train_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    outputs = self.model.train_step(data_batch, self.optimizer,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    return self.forward_train(img, img_metas, **kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 150, in forward_train
+    rpn_losses, proposal_list = self.rpn_head.forward_train(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/base_dense_head.py", line 54, in forward_train
+    losses = self.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/rpn_head.py", line 68, in loss
+    losses = super(RPNHead, self).loss(
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 189, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 454, in loss
+    cls_reg_targets = self.get_targets(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 337, in get_targets
+    results = multi_apply(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/utils/misc.py", line 26, in multi_apply
+    return tuple(map(list, zip(*map_results)))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 219, in _get_targets_single
+    assign_result = self.assigner.assign(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/assigners/max_iou_assigner.py", line 105, in assign
+    overlaps = self.iou_calculator(gt_bboxes, bboxes)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 35, in __call__
+    return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 140, in bbox_overlaps
+    union = area1[..., None] + area2[..., None, :] - overlap
+RuntimeError: CUDA out of memory. Tried to allocate 872.00 MiB (GPU 0; 10.76 GiB total capacity; 8.78 GiB already allocated; 533.44 MiB free; 9.26 GiB reserved in total by PyTorch)
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=1', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' returned non-zero exit status 1.
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 01:03:47,697 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 01:03:49,184 - mmdet - INFO - Distributed training: True
+2021-03-15 01:03:50,653 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[1, 2, 4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 2)
+
+2021-03-15 01:03:51,602 - mmdet - INFO - load model from: torchvision://resnet50
+2021-03-15 01:03:55,681 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+missing keys in source state_dict: layer2.0.conv2.conv_offset.weight, layer2.0.conv2.conv_offset.bias, layer2.1.conv2.conv_offset.weight, layer2.1.conv2.conv_offset.bias, layer2.2.conv2.conv_offset.weight, layer2.2.conv2.conv_offset.bias, layer2.3.conv2.conv_offset.weight, layer2.3.conv2.conv_offset.bias, layer3.0.conv2.conv_offset.weight, layer3.0.conv2.conv_offset.bias, layer3.1.conv2.conv_offset.weight, layer3.1.conv2.conv_offset.bias, layer3.2.conv2.conv_offset.weight, layer3.2.conv2.conv_offset.bias, layer3.3.conv2.conv_offset.weight, layer3.3.conv2.conv_offset.bias, layer3.4.conv2.conv_offset.weight, layer3.4.conv2.conv_offset.bias, layer3.5.conv2.conv_offset.weight, layer3.5.conv2.conv_offset.bias, layer4.0.conv2.conv_offset.weight, layer4.0.conv2.conv_offset.bias, layer4.1.conv2.conv_offset.weight, layer4.1.conv2.conv_offset.bias, layer4.2.conv2.conv_offset.weight, layer4.2.conv2.conv_offset.bias
+
+loading annotations into memory...
+loading annotations into memory...
+Done (t=5.02s)
+creating index...
+Done (t=4.93s)
+creating index...
+index created!
+loading annotations into memory...
+index created!
+loading annotations into memory...
+Done (t=1.09s)
+creating index...
+index created!
+Done (t=1.05s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+loading annotations into memory...loading annotations into memory...
+
+Done (t=0.42s)
+creating index...
+Done (t=0.42s)
+creating index...
+index created!
+index created!
+2021-03-15 01:04:03,411 - mmdet - INFO - load checkpoint from work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth
+2021-03-15 01:04:03,906 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: neck.lateral_convs.0.conv.bias, neck.lateral_convs.1.conv.bias, neck.lateral_convs.2.conv.bias, neck.lateral_convs.3.conv.bias, neck.fpn_convs.0.conv.bias, neck.fpn_convs.1.conv.bias, neck.fpn_convs.2.conv.bias, neck.fpn_convs.3.conv.bias
+
+missing keys in source state_dict: neck.lateral_convs.0.bn.weight, neck.lateral_convs.0.bn.bias, neck.lateral_convs.0.bn.running_mean, neck.lateral_convs.0.bn.running_var, neck.lateral_convs.1.bn.weight, neck.lateral_convs.1.bn.bias, neck.lateral_convs.1.bn.running_mean, neck.lateral_convs.1.bn.running_var, neck.lateral_convs.2.bn.weight, neck.lateral_convs.2.bn.bias, neck.lateral_convs.2.bn.running_mean, neck.lateral_convs.2.bn.running_var, neck.lateral_convs.3.bn.weight, neck.lateral_convs.3.bn.bias, neck.lateral_convs.3.bn.running_mean, neck.lateral_convs.3.bn.running_var, neck.fpn_convs.0.bn.weight, neck.fpn_convs.0.bn.bias, neck.fpn_convs.0.bn.running_mean, neck.fpn_convs.0.bn.running_var, neck.fpn_convs.1.bn.weight, neck.fpn_convs.1.bn.bias, neck.fpn_convs.1.bn.running_mean, neck.fpn_convs.1.bn.running_var, neck.fpn_convs.2.bn.weight, neck.fpn_convs.2.bn.bias, neck.fpn_convs.2.bn.running_mean, neck.fpn_convs.2.bn.running_var, neck.fpn_convs.3.bn.weight, neck.fpn_convs.3.bn.bias, neck.fpn_convs.3.bn.running_mean, neck.fpn_convs.3.bn.running_var
+
+2021-03-15 01:04:03,917 - mmdet - INFO - Start running, host: lifeng@ubuntu-Precision-7920-Tower, work_dir: /home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track
+2021-03-15 01:04:03,918 - mmdet - INFO - workflow: [('train', 1), ('val', 1)], max: 12 epochs
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    Traceback (most recent call last):
+main()  File "./train.py", line 198, in <module>
+
+  File "./train.py", line 187, in main
+    train_detector(
+      File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+main()
+  File "./train.py", line 187, in main
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    train_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+    epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    epoch_runner(data_loaders[i], **kwargs)    
+outputs = self.model.train_step(data_batch, self.optimizer,  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    self.run_iter(data_batch, train_mode=True)
+      File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    outputs = self.model.train_step(data_batch, self.optimizer,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+        return self.forward_train(img, img_metas, **kwargs)output = old_func(*new_args, **new_kwargs)
+
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 150, in forward_train
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+        rpn_losses, proposal_list = self.rpn_head.forward_train(return self.forward_train(img, img_metas, **kwargs)
+
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/base_dense_head.py", line 54, in forward_train
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 150, in forward_train
+    losses = self.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/rpn_head.py", line 68, in loss
+    rpn_losses, proposal_list = self.rpn_head.forward_train(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/base_dense_head.py", line 54, in forward_train
+    losses = super(RPNHead, self).loss(
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 189, in new_func
+    losses = self.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/rpn_head.py", line 68, in loss
+    losses = super(RPNHead, self).loss(
+      File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 189, in new_func
+output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 447, in loss
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 447, in loss
+    assert len(featmap_sizes) == self.anchor_generator.num_levels
+AssertionError
+    assert len(featmap_sizes) == self.anchor_generator.num_levels
+AssertionError
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=1', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' returned non-zero exit status 1.
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 01:05:46,075 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 01:05:47,566 - mmdet - INFO - Distributed training: True
+2021-03-15 01:05:49,016 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[2, 8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 2)
+
+2021-03-15 01:05:49,965 - mmdet - INFO - load model from: torchvision://resnet50
+2021-03-15 01:05:53,937 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+missing keys in source state_dict: layer2.0.conv2.conv_offset.weight, layer2.0.conv2.conv_offset.bias, layer2.1.conv2.conv_offset.weight, layer2.1.conv2.conv_offset.bias, layer2.2.conv2.conv_offset.weight, layer2.2.conv2.conv_offset.bias, layer2.3.conv2.conv_offset.weight, layer2.3.conv2.conv_offset.bias, layer3.0.conv2.conv_offset.weight, layer3.0.conv2.conv_offset.bias, layer3.1.conv2.conv_offset.weight, layer3.1.conv2.conv_offset.bias, layer3.2.conv2.conv_offset.weight, layer3.2.conv2.conv_offset.bias, layer3.3.conv2.conv_offset.weight, layer3.3.conv2.conv_offset.bias, layer3.4.conv2.conv_offset.weight, layer3.4.conv2.conv_offset.bias, layer3.5.conv2.conv_offset.weight, layer3.5.conv2.conv_offset.bias, layer4.0.conv2.conv_offset.weight, layer4.0.conv2.conv_offset.bias, layer4.1.conv2.conv_offset.weight, layer4.1.conv2.conv_offset.bias, layer4.2.conv2.conv_offset.weight, layer4.2.conv2.conv_offset.bias
+
+loading annotations into memory...
+loading annotations into memory...
+Done (t=4.95s)
+creating index...
+Done (t=4.95s)
+creating index...
+index created!
+loading annotations into memory...
+index created!
+loading annotations into memory...
+Done (t=0.46s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+Done (t=0.44s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+loading annotations into memory...loading annotations into memory...
+
+Done (t=1.12s)
+creating index...
+Done (t=1.13s)
+creating index...
+index created!
+2021-03-15 01:06:01,760 - mmdet - INFO - load checkpoint from work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth
+index created!
+2021-03-15 01:06:02,262 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for rpn_head.rpn_cls.weight: copying a param with shape torch.Size([3, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([6, 256, 1, 1]).
+size mismatch for rpn_head.rpn_cls.bias: copying a param with shape torch.Size([3]) from checkpoint, the shape in current model is torch.Size([6]).
+size mismatch for rpn_head.rpn_reg.weight: copying a param with shape torch.Size([12, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([24, 256, 1, 1]).
+size mismatch for rpn_head.rpn_reg.bias: copying a param with shape torch.Size([12]) from checkpoint, the shape in current model is torch.Size([24]).
+unexpected key in source state_dict: neck.lateral_convs.0.conv.bias, neck.lateral_convs.1.conv.bias, neck.lateral_convs.2.conv.bias, neck.lateral_convs.3.conv.bias, neck.fpn_convs.0.conv.bias, neck.fpn_convs.1.conv.bias, neck.fpn_convs.2.conv.bias, neck.fpn_convs.3.conv.bias
+
+missing keys in source state_dict: neck.lateral_convs.0.bn.weight, neck.lateral_convs.0.bn.bias, neck.lateral_convs.0.bn.running_mean, neck.lateral_convs.0.bn.running_var, neck.lateral_convs.1.bn.weight, neck.lateral_convs.1.bn.bias, neck.lateral_convs.1.bn.running_mean, neck.lateral_convs.1.bn.running_var, neck.lateral_convs.2.bn.weight, neck.lateral_convs.2.bn.bias, neck.lateral_convs.2.bn.running_mean, neck.lateral_convs.2.bn.running_var, neck.lateral_convs.3.bn.weight, neck.lateral_convs.3.bn.bias, neck.lateral_convs.3.bn.running_mean, neck.lateral_convs.3.bn.running_var, neck.fpn_convs.0.bn.weight, neck.fpn_convs.0.bn.bias, neck.fpn_convs.0.bn.running_mean, neck.fpn_convs.0.bn.running_var, neck.fpn_convs.1.bn.weight, neck.fpn_convs.1.bn.bias, neck.fpn_convs.1.bn.running_mean, neck.fpn_convs.1.bn.running_var, neck.fpn_convs.2.bn.weight, neck.fpn_convs.2.bn.bias, neck.fpn_convs.2.bn.running_mean, neck.fpn_convs.2.bn.running_var, neck.fpn_convs.3.bn.weight, neck.fpn_convs.3.bn.bias, neck.fpn_convs.3.bn.running_mean, neck.fpn_convs.3.bn.running_var
+
+2021-03-15 01:06:02,273 - mmdet - INFO - Start running, host: lifeng@ubuntu-Precision-7920-Tower, work_dir: /home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track
+2021-03-15 01:06:02,274 - mmdet - INFO - workflow: [('train', 1), ('val', 1)], max: 12 epochs
+2021-03-15 01:06:32,935 - mmdet - INFO - Epoch [1][50/3802]	lr: 1.978e-03, eta: 7:45:07, time: 0.612, data_time: 0.313, memory: 5910, loss_rpn_cls: 0.5606, loss_rpn_bbox: 0.0593, s0.loss_cls: 0.1561, s0.acc: 95.5771, s0.loss_bbox: 0.0297, s1.loss_cls: 0.0776, s1.acc: 95.6271, s1.loss_bbox: 0.0330, s2.loss_cls: 0.0382, s2.acc: 95.4587, s2.loss_bbox: 0.0254, loss: 0.9800
+2021-03-15 01:07:02,024 - mmdet - INFO - Epoch [1][100/3802]	lr: 3.976e-03, eta: 7:33:00, time: 0.582, data_time: 0.276, memory: 6123, loss_rpn_cls: 0.2161, loss_rpn_bbox: 0.0432, s0.loss_cls: 0.1273, s0.acc: 94.7842, s0.loss_bbox: 0.0555, s1.loss_cls: 0.0681, s1.acc: 94.2505, s1.loss_bbox: 0.0685, s2.loss_cls: 0.0368, s2.acc: 93.5845, s2.loss_bbox: 0.0469, loss: 0.6623
+2021-03-15 01:07:31,336 - mmdet - INFO - Epoch [1][150/3802]	lr: 5.974e-03, eta: 7:29:46, time: 0.586, data_time: 0.283, memory: 7287, loss_rpn_cls: 0.1062, loss_rpn_bbox: 0.0453, s0.loss_cls: 0.1379, s0.acc: 94.1748, s0.loss_bbox: 0.0593, s1.loss_cls: 0.0724, s1.acc: 93.7742, s1.loss_bbox: 0.0729, s2.loss_cls: 0.0384, s2.acc: 93.1531, s2.loss_bbox: 0.0504, loss: 0.5828
+2021-03-15 01:08:00,380 - mmdet - INFO - Epoch [1][200/3802]	lr: 7.972e-03, eta: 7:26:54, time: 0.581, data_time: 0.278, memory: 7740, loss_rpn_cls: 0.0636, loss_rpn_bbox: 0.0507, s0.loss_cls: 0.1248, s0.acc: 94.6377, s0.loss_bbox: 0.0559, s1.loss_cls: 0.0653, s1.acc: 94.1851, s1.loss_bbox: 0.0756, s2.loss_cls: 0.0361, s2.acc: 93.6207, s2.loss_bbox: 0.0505, loss: 0.5225
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    main()
+  File "./train.py", line 187, in main
+    train_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    outputs = self.model.train_step(data_batch, self.optimizer,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    return self.forward_train(img, img_metas, **kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 150, in forward_train
+    rpn_losses, proposal_list = self.rpn_head.forward_train(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/base_dense_head.py", line 54, in forward_train
+    losses = self.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/rpn_head.py", line 68, in loss
+    losses = super(RPNHead, self).loss(
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 189, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 454, in loss
+    cls_reg_targets = self.get_targets(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 337, in get_targets
+    results = multi_apply(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/utils/misc.py", line 26, in multi_apply
+    return tuple(map(list, zip(*map_results)))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 219, in _get_targets_single
+    assign_result = self.assigner.assign(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/assigners/max_iou_assigner.py", line 105, in assign
+    overlaps = self.iou_calculator(gt_bboxes, bboxes)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 35, in __call__
+    return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 140, in bbox_overlaps
+    union = area1[..., None] + area2[..., None, :] - overlap
+RuntimeError: CUDA out of memory. Tried to allocate 894.00 MiB (GPU 1; 10.76 GiB total capacity; 8.84 GiB already allocated; 634.94 MiB free; 9.16 GiB reserved in total by PyTorch)
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=1', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' died with <Signals.SIGKILL: 9>.
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 01:09:05,911 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 01:09:07,375 - mmdet - INFO - Distributed training: True
+2021-03-15 01:09:08,821 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[2, 8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='Shared2FCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 1)
+
+2021-03-15 01:09:09,768 - mmdet - INFO - load model from: torchvision://resnet50
+2021-03-15 01:09:10,016 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+missing keys in source state_dict: layer2.0.conv2.conv_offset.weight, layer2.0.conv2.conv_offset.bias, layer2.1.conv2.conv_offset.weight, layer2.1.conv2.conv_offset.bias, layer2.2.conv2.conv_offset.weight, layer2.2.conv2.conv_offset.bias, layer2.3.conv2.conv_offset.weight, layer2.3.conv2.conv_offset.bias, layer3.0.conv2.conv_offset.weight, layer3.0.conv2.conv_offset.bias, layer3.1.conv2.conv_offset.weight, layer3.1.conv2.conv_offset.bias, layer3.2.conv2.conv_offset.weight, layer3.2.conv2.conv_offset.bias, layer3.3.conv2.conv_offset.weight, layer3.3.conv2.conv_offset.bias, layer3.4.conv2.conv_offset.weight, layer3.4.conv2.conv_offset.bias, layer3.5.conv2.conv_offset.weight, layer3.5.conv2.conv_offset.bias, layer4.0.conv2.conv_offset.weight, layer4.0.conv2.conv_offset.bias, layer4.1.conv2.conv_offset.weight, layer4.1.conv2.conv_offset.bias, layer4.2.conv2.conv_offset.weight, layer4.2.conv2.conv_offset.bias
+
+loading annotations into memory...
+Done (t=4.92s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.46s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+loading annotations into memory...
+Done (t=1.06s)
+creating index...
+index created!
+2021-03-15 01:09:21,156 - mmdet - INFO - load checkpoint from work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth
+2021-03-15 01:09:21,553 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for rpn_head.rpn_cls.weight: copying a param with shape torch.Size([3, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([6, 256, 1, 1]).
+size mismatch for rpn_head.rpn_cls.bias: copying a param with shape torch.Size([3]) from checkpoint, the shape in current model is torch.Size([6]).
+size mismatch for rpn_head.rpn_reg.weight: copying a param with shape torch.Size([12, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([24, 256, 1, 1]).
+size mismatch for rpn_head.rpn_reg.bias: copying a param with shape torch.Size([12]) from checkpoint, the shape in current model is torch.Size([24]).
+unexpected key in source state_dict: neck.lateral_convs.0.conv.bias, neck.lateral_convs.1.conv.bias, neck.lateral_convs.2.conv.bias, neck.lateral_convs.3.conv.bias, neck.fpn_convs.0.conv.bias, neck.fpn_convs.1.conv.bias, neck.fpn_convs.2.conv.bias, neck.fpn_convs.3.conv.bias
+
+missing keys in source state_dict: neck.lateral_convs.0.bn.weight, neck.lateral_convs.0.bn.bias, neck.lateral_convs.0.bn.running_mean, neck.lateral_convs.0.bn.running_var, neck.lateral_convs.1.bn.weight, neck.lateral_convs.1.bn.bias, neck.lateral_convs.1.bn.running_mean, neck.lateral_convs.1.bn.running_var, neck.lateral_convs.2.bn.weight, neck.lateral_convs.2.bn.bias, neck.lateral_convs.2.bn.running_mean, neck.lateral_convs.2.bn.running_var, neck.lateral_convs.3.bn.weight, neck.lateral_convs.3.bn.bias, neck.lateral_convs.3.bn.running_mean, neck.lateral_convs.3.bn.running_var, neck.fpn_convs.0.bn.weight, neck.fpn_convs.0.bn.bias, neck.fpn_convs.0.bn.running_mean, neck.fpn_convs.0.bn.running_var, neck.fpn_convs.1.bn.weight, neck.fpn_convs.1.bn.bias, neck.fpn_convs.1.bn.running_mean, neck.fpn_convs.1.bn.running_var, neck.fpn_convs.2.bn.weight, neck.fpn_convs.2.bn.bias, neck.fpn_convs.2.bn.running_mean, neck.fpn_convs.2.bn.running_var, neck.fpn_convs.3.bn.weight, neck.fpn_convs.3.bn.bias, neck.fpn_convs.3.bn.running_mean, neck.fpn_convs.3.bn.running_var
+
+2021-03-15 01:09:21,577 - mmdet - INFO - Start running, host: lifeng@ubuntu-Precision-7920-Tower, work_dir: /home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track
+2021-03-15 01:09:21,577 - mmdet - INFO - workflow: [('train', 1), ('val', 1)], max: 12 epochs
+2021-03-15 01:09:49,296 - mmdet - INFO - Epoch [1][50/7604]	lr: 1.978e-03, eta: 14:01:18, time: 0.554, data_time: 0.343, memory: 5212, loss_rpn_cls: 0.5721, loss_rpn_bbox: 0.0623, s0.loss_cls: 0.2109, s0.acc: 94.6641, s0.loss_bbox: 0.0224, s1.loss_cls: 0.0920, s1.acc: 94.8539, s1.loss_bbox: 0.0258, s2.loss_cls: 0.0419, s2.acc: 94.9177, s2.loss_bbox: 0.0192, loss: 1.0466
+2021-03-15 01:10:15,130 - mmdet - INFO - Epoch [1][100/7604]	lr: 3.976e-03, eta: 13:32:52, time: 0.517, data_time: 0.304, memory: 7005, loss_rpn_cls: 0.2286, loss_rpn_bbox: 0.0427, s0.loss_cls: 0.1188, s0.acc: 95.0508, s0.loss_bbox: 0.0522, s1.loss_cls: 0.0631, s1.acc: 94.6243, s1.loss_bbox: 0.0670, s2.loss_cls: 0.0347, s2.acc: 93.9469, s2.loss_bbox: 0.0455, loss: 0.6527
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    main()
+  File "./train.py", line 187, in main
+    train_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    outputs = self.model.train_step(data_batch, self.optimizer,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    return self.forward_train(img, img_metas, **kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 150, in forward_train
+    rpn_losses, proposal_list = self.rpn_head.forward_train(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/base_dense_head.py", line 54, in forward_train
+    losses = self.loss(*loss_inputs, gt_bboxes_ignore=gt_bboxes_ignore)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/rpn_head.py", line 68, in loss
+    losses = super(RPNHead, self).loss(
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 189, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 454, in loss
+    cls_reg_targets = self.get_targets(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 337, in get_targets
+    results = multi_apply(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/utils/misc.py", line 26, in multi_apply
+    return tuple(map(list, zip(*map_results)))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/dense_heads/anchor_head.py", line 219, in _get_targets_single
+    assign_result = self.assigner.assign(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/assigners/max_iou_assigner.py", line 105, in assign
+    overlaps = self.iou_calculator(gt_bboxes, bboxes)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 35, in __call__
+    return bbox_overlaps(bboxes1, bboxes2, mode, is_aligned)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/core/bbox/iou_calculators/iou2d_calculator.py", line 136, in bbox_overlaps
+    wh = (rb - lt).clamp(min=0)  # [B, rows, cols, 2]
+RuntimeError: CUDA out of memory. Tried to allocate 1.96 GiB (GPU 0; 10.76 GiB total capacity; 7.86 GiB already allocated; 1.40 GiB free; 8.38 GiB reserved in total by PyTorch)
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=0', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' returned non-zero exit status 1.
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 01:22:46,644 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 01:22:48,114 - mmdet - INFO - Distributed training: True
+2021-03-15 01:22:49,573 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 2)
+
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    main()
+  File "./train.py", line 171, in main
+    model = build_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 73, in build_detector
+    return build(cfg, DETECTORS, dict(train_cfg=train_cfg, test_cfg=test_cfg))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/cascade_rcnn.py", line 18, in __init__
+    super(CascadeRCNN, self).__init__(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 43, in __init__
+    self.roi_head = build_head(roi_head)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 63, in build_head
+    return build(cfg, HEADS)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 35, in __init__
+    super(CascadeRoIHead, self).__init__(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/base_roi_head.py", line 26, in __init__
+    self.init_bbox_head(bbox_roi_extractor, bbox_head)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 62, in init_bbox_head
+    self.bbox_head.append(build_head(head))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 63, in build_head
+    return build(cfg, HEADS)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/bbox_heads/double_bbox_head.py", line 97, in __init__
+    assert num_convs > 0
+AssertionError
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    main()
+  File "./train.py", line 171, in main
+    model = build_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 73, in build_detector
+    return build(cfg, DETECTORS, dict(train_cfg=train_cfg, test_cfg=test_cfg))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/cascade_rcnn.py", line 18, in __init__
+    super(CascadeRCNN, self).__init__(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 43, in __init__
+    self.roi_head = build_head(roi_head)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 63, in build_head
+    return build(cfg, HEADS)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 35, in __init__
+    super(CascadeRoIHead, self).__init__(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/base_roi_head.py", line 26, in __init__
+    self.init_bbox_head(bbox_roi_extractor, bbox_head)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 62, in init_bbox_head
+    self.bbox_head.append(build_head(head))
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 63, in build_head
+    return build(cfg, HEADS)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/builder.py", line 33, in build
+    return build_from_cfg(cfg, registry, default_args)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/utils/registry.py", line 171, in build_from_cfg
+    return obj_cls(**args)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/bbox_heads/double_bbox_head.py", line 97, in __init__
+    assert num_convs > 0
+AssertionError
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=1', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' returned non-zero exit status 1.
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+2021-03-15 01:25:09,466 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.5 (default, Sep  4 2020, 07:30:14) [GCC 7.3.0]
+CUDA available: True
+GPU 0,1: GeForce RTX 2080 Ti
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 10.1, V10.1.168
+GCC: gcc (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+PyTorch: 1.6.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) Math Kernel Library Version 2019.0.5 Product Build 20190808 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.5.0 (Git Hash e2ac1fac44c5078ca927cb9b90e1b3066a0b2ed0)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 10.2
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75
+  - CuDNN 7.6.5
+  - Magma 2.5.2
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DUSE_VULKAN_WRAPPER -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_STATIC_DISPATCH=OFF, 
+
+TorchVision: 0.7.0
+OpenCV: 4.4.0
+MMCV: 1.2.5
+MMCV Compiler: GCC 7.3
+MMCV CUDA Compiler: 10.2
+MMDetection: 2.8.0+
+------------------------------------------------------------
+
+2021-03-15 01:25:10,937 - mmdet - INFO - Distributed training: True
+2021-03-15 01:25:12,396 - mmdet - INFO - Config:
+fp16 = dict(loss_scale=512.0)
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+num_classes = 4
+model = dict(
+    type='CascadeRCNN',
+    pretrained='torchvision://resnet50',
+    backbone=dict(
+        type='ResNet',
+        depth=50,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        norm_eval=True,
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True),
+        style='pytorch'),
+    neck=dict(
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
+        out_channels=256,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0],
+            clip_border=False),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(
+            type='SmoothL1Loss', beta=0.1111111111111111, loss_weight=1.0)),
+    roi_head=dict(
+        type='CascadeRoIHead',
+        num_stages=3,
+        stage_loss_weights=[1, 0.5, 0.25],
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=[
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.1, 0.1, 0.2, 0.2],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.05, 0.05, 0.1, 0.1],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
+                               loss_weight=1.0)),
+            dict(
+                type='DoubleConvFCBBoxHead',
+                norm_cfg=dict(type='SyncBN', requires_grad=True),
+                in_channels=256,
+                fc_out_channels=1024,
+                roi_feat_size=7,
+                num_classes=4,
+                bbox_coder=dict(
+                    type='DeltaXYWHBBoxCoder',
+                    target_means=[0.0, 0.0, 0.0, 0.0],
+                    target_stds=[0.033, 0.033, 0.067, 0.067],
+                    clip_border=False),
+                reg_class_agnostic=True,
+                loss_cls=dict(
+                    type='CrossEntropyLoss',
+                    use_sigmoid=False,
+                    loss_weight=1.0),
+                loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))
+        ]))
+train_cfg = dict(
+    rpn=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.7,
+            neg_iou_thr=0.3,
+            min_pos_iou=0.3,
+            match_low_quality=True,
+            ignore_iof_thr=-1),
+        sampler=dict(
+            type='RandomSampler',
+            num=512,
+            pos_fraction=0.5,
+            neg_pos_ub=-1,
+            add_gt_as_proposals=False),
+        allowed_border=0,
+        pos_weight=-1,
+        debug=False),
+    rpn_proposal=dict(
+        nms_across_levels=False,
+        nms_pre=2000,
+        nms_post=2000,
+        max_num=2000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=[
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.6,
+                neg_iou_thr=0.6,
+                min_pos_iou=0.6,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False),
+        dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.7,
+                min_pos_iou=0.7,
+                match_low_quality=False,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=1024,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            pos_weight=-1,
+            debug=False)
+    ])
+test_cfg = dict(
+    rpn=dict(
+        nms_across_levels=False,
+        nms_pre=1000,
+        nms_post=1000,
+        max_num=1000,
+        nms_thr=0.7,
+        min_bbox_size=0),
+    rcnn=dict(
+        score_thr=0.001,
+        nms=dict(type='soft_nms', iou_thr=0.5),
+        max_per_img=1000))
+dataset_type = 'CocoDataset'
+data_root = 'data/track/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='Resize',
+        img_scale=(800, 800),
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=[(600, 600), (800, 800), (1000, 1000)],
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=0,
+    train=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_train.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(
+                type='Resize',
+                img_scale=(800, 800),
+                ratio_range=(0.8, 1.2),
+                keep_ratio=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file=
+        'data/track/annotations/overlap_70_all_category/instance_val.json',
+        img_prefix='data/track/trainval/overlap_70_all_category',
+        classes=('car', 'full body', 'head', 'visible body'),
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=[(600, 600), (800, 800), (1000, 1000)],
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[16, 22])
+total_epochs = 12
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = 'work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth'
+resume_from = None
+workflow = [('train', 1), ('val', 1)]
+work_dir = './work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track'
+gpu_ids = range(0, 2)
+
+2021-03-15 01:25:13,440 - mmdet - INFO - load model from: torchvision://resnet50
+2021-03-15 01:25:17,437 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+missing keys in source state_dict: layer2.0.conv2.conv_offset.weight, layer2.0.conv2.conv_offset.bias, layer2.1.conv2.conv_offset.weight, layer2.1.conv2.conv_offset.bias, layer2.2.conv2.conv_offset.weight, layer2.2.conv2.conv_offset.bias, layer2.3.conv2.conv_offset.weight, layer2.3.conv2.conv_offset.bias, layer3.0.conv2.conv_offset.weight, layer3.0.conv2.conv_offset.bias, layer3.1.conv2.conv_offset.weight, layer3.1.conv2.conv_offset.bias, layer3.2.conv2.conv_offset.weight, layer3.2.conv2.conv_offset.bias, layer3.3.conv2.conv_offset.weight, layer3.3.conv2.conv_offset.bias, layer3.4.conv2.conv_offset.weight, layer3.4.conv2.conv_offset.bias, layer3.5.conv2.conv_offset.weight, layer3.5.conv2.conv_offset.bias, layer4.0.conv2.conv_offset.weight, layer4.0.conv2.conv_offset.bias, layer4.1.conv2.conv_offset.weight, layer4.1.conv2.conv_offset.bias, layer4.2.conv2.conv_offset.weight, layer4.2.conv2.conv_offset.bias
+
+loading annotations into memory...
+loading annotations into memory...
+Done (t=4.98s)
+creating index...
+Done (t=4.97s)
+creating index...
+index created!
+loading annotations into memory...
+index created!
+loading annotations into memory...
+Done (t=0.46s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+Done (t=0.45s)
+creating index...
+index created!
+fatal: not a git repository (or any of the parent directories): .git
+loading annotations into memory...loading annotations into memory...
+
+Done (t=1.12s)
+creating index...
+Done (t=1.12s)
+creating index...
+index created!
+2021-03-15 01:25:25,272 - mmdet - INFO - load checkpoint from work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth
+index created!
+2021-03-15 01:25:25,638 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: neck.lateral_convs.0.conv.bias, neck.lateral_convs.1.conv.bias, neck.lateral_convs.2.conv.bias, neck.lateral_convs.3.conv.bias, neck.fpn_convs.0.conv.bias, neck.fpn_convs.1.conv.bias, neck.fpn_convs.2.conv.bias, neck.fpn_convs.3.conv.bias, roi_head.bbox_head.0.shared_fcs.0.weight, roi_head.bbox_head.0.shared_fcs.0.bias, roi_head.bbox_head.0.shared_fcs.1.weight, roi_head.bbox_head.0.shared_fcs.1.bias, roi_head.bbox_head.1.shared_fcs.0.weight, roi_head.bbox_head.1.shared_fcs.0.bias, roi_head.bbox_head.1.shared_fcs.1.weight, roi_head.bbox_head.1.shared_fcs.1.bias, roi_head.bbox_head.2.shared_fcs.0.weight, roi_head.bbox_head.2.shared_fcs.0.bias, roi_head.bbox_head.2.shared_fcs.1.weight, roi_head.bbox_head.2.shared_fcs.1.bias
+
+missing keys in source state_dict: neck.lateral_convs.0.bn.weight, neck.lateral_convs.0.bn.bias, neck.lateral_convs.0.bn.running_mean, neck.lateral_convs.0.bn.running_var, neck.lateral_convs.1.bn.weight, neck.lateral_convs.1.bn.bias, neck.lateral_convs.1.bn.running_mean, neck.lateral_convs.1.bn.running_var, neck.lateral_convs.2.bn.weight, neck.lateral_convs.2.bn.bias, neck.lateral_convs.2.bn.running_mean, neck.lateral_convs.2.bn.running_var, neck.lateral_convs.3.bn.weight, neck.lateral_convs.3.bn.bias, neck.lateral_convs.3.bn.running_mean, neck.lateral_convs.3.bn.running_var, neck.fpn_convs.0.bn.weight, neck.fpn_convs.0.bn.bias, neck.fpn_convs.0.bn.running_mean, neck.fpn_convs.0.bn.running_var, neck.fpn_convs.1.bn.weight, neck.fpn_convs.1.bn.bias, neck.fpn_convs.1.bn.running_mean, neck.fpn_convs.1.bn.running_var, neck.fpn_convs.2.bn.weight, neck.fpn_convs.2.bn.bias, neck.fpn_convs.2.bn.running_mean, neck.fpn_convs.2.bn.running_var, neck.fpn_convs.3.bn.weight, neck.fpn_convs.3.bn.bias, neck.fpn_convs.3.bn.running_mean, neck.fpn_convs.3.bn.running_var, roi_head.bbox_head.0.res_block.conv1.conv.weight, roi_head.bbox_head.0.res_block.conv1.bn.weight, roi_head.bbox_head.0.res_block.conv1.bn.bias, roi_head.bbox_head.0.res_block.conv1.bn.running_mean, roi_head.bbox_head.0.res_block.conv1.bn.running_var, roi_head.bbox_head.0.res_block.conv2.conv.weight, roi_head.bbox_head.0.res_block.conv2.bn.weight, roi_head.bbox_head.0.res_block.conv2.bn.bias, roi_head.bbox_head.0.res_block.conv2.bn.running_mean, roi_head.bbox_head.0.res_block.conv2.bn.running_var, roi_head.bbox_head.0.res_block.conv_identity.conv.weight, roi_head.bbox_head.0.res_block.conv_identity.bn.weight, roi_head.bbox_head.0.res_block.conv_identity.bn.bias, roi_head.bbox_head.0.res_block.conv_identity.bn.running_mean, roi_head.bbox_head.0.res_block.conv_identity.bn.running_var, roi_head.bbox_head.0.conv_branch.0.conv1.weight, roi_head.bbox_head.0.conv_branch.0.bn1.weight, roi_head.bbox_head.0.conv_branch.0.bn1.bias, roi_head.bbox_head.0.conv_branch.0.bn1.running_mean, roi_head.bbox_head.0.conv_branch.0.bn1.running_var, roi_head.bbox_head.0.conv_branch.0.conv2.weight, roi_head.bbox_head.0.conv_branch.0.bn2.weight, roi_head.bbox_head.0.conv_branch.0.bn2.bias, roi_head.bbox_head.0.conv_branch.0.bn2.running_mean, roi_head.bbox_head.0.conv_branch.0.bn2.running_var, roi_head.bbox_head.0.conv_branch.0.conv3.weight, roi_head.bbox_head.0.conv_branch.0.bn3.weight, roi_head.bbox_head.0.conv_branch.0.bn3.bias, roi_head.bbox_head.0.conv_branch.0.bn3.running_mean, roi_head.bbox_head.0.conv_branch.0.bn3.running_var, roi_head.bbox_head.0.fc_branch.0.weight, roi_head.bbox_head.0.fc_branch.0.bias, roi_head.bbox_head.1.res_block.conv1.conv.weight, roi_head.bbox_head.1.res_block.conv1.bn.weight, roi_head.bbox_head.1.res_block.conv1.bn.bias, roi_head.bbox_head.1.res_block.conv1.bn.running_mean, roi_head.bbox_head.1.res_block.conv1.bn.running_var, roi_head.bbox_head.1.res_block.conv2.conv.weight, roi_head.bbox_head.1.res_block.conv2.bn.weight, roi_head.bbox_head.1.res_block.conv2.bn.bias, roi_head.bbox_head.1.res_block.conv2.bn.running_mean, roi_head.bbox_head.1.res_block.conv2.bn.running_var, roi_head.bbox_head.1.res_block.conv_identity.conv.weight, roi_head.bbox_head.1.res_block.conv_identity.bn.weight, roi_head.bbox_head.1.res_block.conv_identity.bn.bias, roi_head.bbox_head.1.res_block.conv_identity.bn.running_mean, roi_head.bbox_head.1.res_block.conv_identity.bn.running_var, roi_head.bbox_head.1.conv_branch.0.conv1.weight, roi_head.bbox_head.1.conv_branch.0.bn1.weight, roi_head.bbox_head.1.conv_branch.0.bn1.bias, roi_head.bbox_head.1.conv_branch.0.bn1.running_mean, roi_head.bbox_head.1.conv_branch.0.bn1.running_var, roi_head.bbox_head.1.conv_branch.0.conv2.weight, roi_head.bbox_head.1.conv_branch.0.bn2.weight, roi_head.bbox_head.1.conv_branch.0.bn2.bias, roi_head.bbox_head.1.conv_branch.0.bn2.running_mean, roi_head.bbox_head.1.conv_branch.0.bn2.running_var, roi_head.bbox_head.1.conv_branch.0.conv3.weight, roi_head.bbox_head.1.conv_branch.0.bn3.weight, roi_head.bbox_head.1.conv_branch.0.bn3.bias, roi_head.bbox_head.1.conv_branch.0.bn3.running_mean, roi_head.bbox_head.1.conv_branch.0.bn3.running_var, roi_head.bbox_head.1.fc_branch.0.weight, roi_head.bbox_head.1.fc_branch.0.bias, roi_head.bbox_head.2.res_block.conv1.conv.weight, roi_head.bbox_head.2.res_block.conv1.bn.weight, roi_head.bbox_head.2.res_block.conv1.bn.bias, roi_head.bbox_head.2.res_block.conv1.bn.running_mean, roi_head.bbox_head.2.res_block.conv1.bn.running_var, roi_head.bbox_head.2.res_block.conv2.conv.weight, roi_head.bbox_head.2.res_block.conv2.bn.weight, roi_head.bbox_head.2.res_block.conv2.bn.bias, roi_head.bbox_head.2.res_block.conv2.bn.running_mean, roi_head.bbox_head.2.res_block.conv2.bn.running_var, roi_head.bbox_head.2.res_block.conv_identity.conv.weight, roi_head.bbox_head.2.res_block.conv_identity.bn.weight, roi_head.bbox_head.2.res_block.conv_identity.bn.bias, roi_head.bbox_head.2.res_block.conv_identity.bn.running_mean, roi_head.bbox_head.2.res_block.conv_identity.bn.running_var, roi_head.bbox_head.2.conv_branch.0.conv1.weight, roi_head.bbox_head.2.conv_branch.0.bn1.weight, roi_head.bbox_head.2.conv_branch.0.bn1.bias, roi_head.bbox_head.2.conv_branch.0.bn1.running_mean, roi_head.bbox_head.2.conv_branch.0.bn1.running_var, roi_head.bbox_head.2.conv_branch.0.conv2.weight, roi_head.bbox_head.2.conv_branch.0.bn2.weight, roi_head.bbox_head.2.conv_branch.0.bn2.bias, roi_head.bbox_head.2.conv_branch.0.bn2.running_mean, roi_head.bbox_head.2.conv_branch.0.bn2.running_var, roi_head.bbox_head.2.conv_branch.0.conv3.weight, roi_head.bbox_head.2.conv_branch.0.bn3.weight, roi_head.bbox_head.2.conv_branch.0.bn3.bias, roi_head.bbox_head.2.conv_branch.0.bn3.running_mean, roi_head.bbox_head.2.conv_branch.0.bn3.running_var, roi_head.bbox_head.2.fc_branch.0.weight, roi_head.bbox_head.2.fc_branch.0.bias
+
+2021-03-15 01:25:25,663 - mmdet - INFO - Start running, host: lifeng@ubuntu-Precision-7920-Tower, work_dir: /home/lifeng/undone-work/DetCompetition/mmdet-v2/tools/work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track
+2021-03-15 01:25:25,664 - mmdet - INFO - workflow: [('train', 1), ('val', 1)], max: 12 epochs
+Traceback (most recent call last):
+  File "./train.py", line 198, in <module>
+    Traceback (most recent call last):
+main()  File "./train.py", line 198, in <module>
+
+  File "./train.py", line 187, in main
+    train_detector(
+      File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+main()
+  File "./train.py", line 187, in main
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    train_detector(
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/apis/train.py", line 150, in train_detector
+    epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    runner.run(data_loaders, cfg.workflow, cfg.total_epochs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 125, in run
+    self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    outputs = self.model.train_step(data_batch, self.optimizer,
+      File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+epoch_runner(data_loaders[i], **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 50, in train
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+      File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+self.run_iter(data_batch, train_mode=True)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/epoch_based_runner.py", line 29, in run_iter
+    outputs = self.model.train_step(data_batch, self.optimizer,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/parallel/distributed.py", line 46, in train_step
+    output = self.module.train_step(*inputs[0], **kwargs[0])
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 247, in train_step
+    losses = self(**data)
+    losses = self(**data)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    result = self.forward(*input, **kwargs)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/mmcv/runner/fp16_utils.py", line 110, in new_func
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    output = old_func(*new_args, **new_kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/base.py", line 181, in forward
+    return self.forward_train(img, img_metas, **kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 161, in forward_train
+    return self.forward_train(img, img_metas, **kwargs)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/detectors/two_stage.py", line 161, in forward_train
+    roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 257, in forward_train
+    roi_losses = self.roi_head.forward_train(x, img_metas, proposal_list,
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 257, in forward_train
+    bbox_results = self._bbox_forward_train(i, x, sampling_results,
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 157, in _bbox_forward_train
+    bbox_results = self._bbox_forward_train(i, x, sampling_results,
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 157, in _bbox_forward_train
+    bbox_results = self._bbox_forward(stage, x, rois)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 147, in _bbox_forward
+    bbox_results = self._bbox_forward(stage, x, rois)
+  File "/home/lifeng/undone-work/DetCompetition/mmdet-v2/mmdet/models/roi_heads/cascade_roi_head.py", line 147, in _bbox_forward
+    cls_score, bbox_pred = bbox_head(bbox_feats)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    cls_score, bbox_pred = bbox_head(bbox_feats)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/nn/modules/module.py", line 722, in _call_impl
+    result = self.forward(*input, **kwargs)
+TypeError: forward() missing 1 required positional argument: 'x_reg'
+    result = self.forward(*input, **kwargs)
+TypeError: forward() missing 1 required positional argument: 'x_reg'
+Traceback (most recent call last):
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 261, in <module>
+    main()
+  File "/home/lifeng/anaconda3/envs/detcomp/lib/python3.8/site-packages/torch/distributed/launch.py", line 256, in main
+    raise subprocess.CalledProcessError(returncode=process.returncode,
+subprocess.CalledProcessError: Command '['/home/lifeng/anaconda3/envs/detcomp/bin/python', '-u', './train.py', '--local_rank=1', '../configs/track/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_anchor_k9_track.py', '--launcher', 'pytorch']' returned non-zero exit status 1.
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
