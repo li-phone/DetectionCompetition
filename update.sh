@@ -3,6 +3,6 @@
 git add .
 time_str=$(date "+%Y-%m-%d %H:%M:%S")
 git commit -m "${1} commit in ${time_str} by `whoami`"
-git push gitee master
-git push github master
+git push -f gitee master
+git push -f github master
 exit
