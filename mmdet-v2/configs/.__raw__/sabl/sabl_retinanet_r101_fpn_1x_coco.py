@@ -5,8 +5,10 @@ _base_ = [
 ]
 # model settings
 model = dict(
-    pretrained='torchvision://resnet101',
-    backbone=dict(depth=101),
+    backbone=dict(
+        depth=101,
+        init_cfg=dict(type='Pretrained',
+                      checkpoint='torchvision://resnet101')),
     bbox_head=dict(
         _delete_=True,
         type='SABLRetinaHead',
@@ -36,17 +38,17 @@ model = dict(
         loss_bbox_cls=dict(
             type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.5),
         loss_bbox_reg=dict(
-            type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.5)))
-# training and testing settings
-train_cfg = dict(
-    assigner=dict(
-        type='ApproxMaxIoUAssigner',
-        pos_iou_thr=0.5,
-        neg_iou_thr=0.4,
-        min_pos_iou=0.0,
-        ignore_iof_thr=-1),
-    allowed_border=-1,
-    pos_weight=-1,
-    debug=False)
+            type='SmoothL1Loss', beta=1.0 / 9.0, loss_weight=1.5)),
+    # training and testing settings
+    train_cfg=dict(
+        assigner=dict(
+            type='ApproxMaxIoUAssigner',
+            pos_iou_thr=0.5,
+            neg_iou_thr=0.4,
+            min_pos_iou=0.0,
+            ignore_iof_thr=-1),
+        allowed_border=-1,
+        pos_weight=-1,
+        debug=False))
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)

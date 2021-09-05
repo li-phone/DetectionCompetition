@@ -14,28 +14,28 @@ class Config(object):
     # 2000 x 2000
     train_pipeline1 = [
         dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(2000, 2000), step=(0.2, 0.2), resize=(1, 1),
+        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.5, 0.5), resize=(1, 1),
              keep_none=False),
     ]
-    # # 4000 x 4000
-    # train_pipeline2 = [
-    #     dict(type='LoadImageFromFile'),
-    #     dict(type='SliceImage', overlap=1, base_win=(2000, 2000), step=(0.2, 0.2), resize=(1 / 2, 1 / 2),
-    #          keep_none=False),
-    # ]
+    # 4000 x 4000
+    train_pipeline2 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1, 1),
+             keep_none=False),
+    ]
     # # 8000 x 8000
     # train_pipeline3 = [
     #     dict(type='LoadImageFromFile'),
     #     dict(type='SliceImage', overlap=1, base_win=(2000, 2000), step=(0.2, 0.2), resize=(1 / 4, 1 / 4),
     #          keep_none=False),
     # ]
-    composes = [Compose(train_pipeline1)]
+    composes = [Compose(train_pipeline1), Compose(train_pipeline2)]
 
     # data module
-    img_dir = "data/track/panda_round1_train_202104_part1"
-    ann_file = "data/track/annotations/high-quality-sample.json"
-    save_img_dir = "data/track/trainval/high-quality-sample/"
-    save_ann_file = "data/track/annotations/high-quality-sample/instance_mst_slice.json"
+    img_dir = "data/orange2/train/images"
+    ann_file = "data/orange2/annotations/instance-train-checked.json"
+    save_img_dir = "data/orange2/slice_800x800_1000x1000-overlap_0.5/"
+    save_ann_file = "data/orange2/annotations/slice_800x800_1000x1000-overlap_0.5-train.json"
     original_coco = COCO(ann_file)
 
 
@@ -66,30 +66,38 @@ def process(image, **kwargs):
         bboxes = np.array([x['bbox'] for x in anns])
         bboxes[:, 2:] += bboxes[:, :2]
         labels = np.array([x['category_id'] for x in anns])
-        bbox_uuids = np.array([x['bbox_uuid'] for x in anns])
-        group_uuids = np.array([x['group_uuid'] for x in anns])
+        if 'bbox_uuid' in anns[0]:
+            bbox_uuids = np.array([x['bbox_uuid'] for x in anns])
+        else:
+            bbox_uuids = np.array([x['id'] for x in anns])
+        if 'group_uuid' in anns[0]:
+            group_uuids = np.array([x['group_uuid'] for x in anns])
+        else:
+            group_uuids = np.array([x['image_id'] for x in anns])
         results = {
             'img_prefix': config.img_dir, 'img_info': image,
             'ann_info': {'bboxes': bboxes, 'labels': labels, 'bbox_uuid': bbox_uuids, 'group_uuid': group_uuids}}
         results = compose(results)
         if results is None: return save_results
+        if not isinstance(results, (list, tuple)): results = [results]
         for i, result in enumerate(results):
             tmp_img = {k: v for k, v in image.items()}
-            x1, y1, x2, y2 = result['slice_image']['window']
-            tmp_img['file_name'] = "{}__fx_{:.3f}_fy_{:.3f}__{:06d}_{:06d}_{:06d}_{:06d}.jpg".format(
-                tmp_img['file_name'][:-4],
-                compose.transforms[1].resize[0],
-                compose.transforms[1].resize[1],
-                x1, y1, x2, y2, )
-            tmp_img['height'] = result['img'].shape[0]
-            tmp_img['width'] = result['img'].shape[1]
+            if 'slice_image' in result:
+                x1, y1, x2, y2 = result['slice_image']['window']
+                tmp_img['file_name'] = "{}__fx_{:.3f}_fy_{:.3f}__{:06d}_{:06d}_{:06d}_{:06d}.jpg".format(
+                    tmp_img['file_name'][:-4],
+                    compose.transforms[1].resize[0],
+                    compose.transforms[1].resize[1],
+                    x1, y1, x2, y2, )
+                tmp_img['height'] = result['img'].shape[0]
+                tmp_img['width'] = result['img'].shape[1]
+                tmp_img['id'] = tmp_img['file_name']
             save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
             if not os.path.exists(os.path.dirname(save_name)):
                 os.makedirs(os.path.dirname(save_name))
             if not os.path.exists(save_name):
                 # print(save_name)
                 cv2.imwrite(save_name, result['img'])
-            tmp_img['id'] = tmp_img['file_name']
             kwargs['__results__']['images'].append(tmp_img)
             for idx, bbox, label in zip(range(len(result['gt_bboxes'])), result['gt_bboxes'], result['gt_labels']):
                 area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])

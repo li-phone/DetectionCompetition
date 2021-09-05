@@ -21,21 +21,22 @@ from mmdet.utils import collect_env, get_root_logger
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('--config',
-                        default='../configs/ultrasonic/best-r50-mst_slice-ultrasonic.py',
+                        # default='../configs/goods/cas_r50-MST.py',
                         help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
         '--load-from',
-        # default='work_dirs/best-x101-mst_slice/latest.pth',
+        # default='work_dirs/cascade_rcnn_r50_fpn_1x_coco_20200316-3dc56deb.pth',
+        # default='work_dirs/cas_r50-best-finetune_data/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--resume-from',
-        # default='work_dirs/best-x101-mst_slice/latest.pth',
+        # default='work_dirs/cas_r50-best/latest.pth',
         help='the checkpoint file to resume from')
     parser.add_argument(
         '--no-validate',
         action='store_true',
-        default=False,
+        default=True,
         help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()
     group_gpus.add_argument(
@@ -94,10 +95,12 @@ def parse_args():
     return args
 
 
-def main():
+def main(config=None):
     args = parse_args()
+    if config is not None:
+        args.config = config if isinstance(config, str) else config.filename
 
-    cfg = Config.fromfile(args.config)
+    cfg = Config.fromfile(args.config) if isinstance(config, str) else config
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.
@@ -169,7 +172,10 @@ def main():
     meta['exp_name'] = osp.basename(args.config)
 
     model = build_detector(
-        cfg.model, train_cfg=cfg.train_cfg, test_cfg=cfg.test_cfg)
+        cfg.model,
+        train_cfg=cfg.get('train_cfg'),
+        test_cfg=cfg.get('test_cfg'))
+    model.init_weights()
 
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:

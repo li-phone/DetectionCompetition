@@ -1,11 +1,5 @@
 from tqdm import tqdm
-import glob
-import xml.etree.ElementTree as ET
 import os
-import json
-import numpy as np
-import random
-import pandas as pd
 
 try:
     from pandas import json_normalize
@@ -36,6 +30,7 @@ def coco2yolo(ann_file, img_dir, save_dir):
     img_ids = coco.getImgIds()
     targets = []
     for img_id in tqdm(img_ids):
+        img_id = [img_id]
         image_info = coco.loadImgs(img_id)[0]
         ann_ids = coco.getAnnIds(imgIds=img_id)
         annotations = coco.loadAnns(ann_ids)
@@ -66,13 +61,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='coco2yolo')
     parser.add_argument('--coco',
-                        default='/home/liphone/undone-work/data/detection/garbage_huawei/annotations/instance_train.json',
+                        default='/home/lifeng/undone-work/dataset/detection/orange/annotations/instance-train-pseudo_label.json',
                         help='coco')
-    parser.add_argument('--img_dir', default='/home/liphone/undone-work/data/detection/garbage_huawei/images',
+    parser.add_argument('--img_dir', default='/home/lifeng/undone-work/dataset/detection/orange/train/pseudo_label-images',
                         help='img_dir')
-    parser.add_argument('--save_dir', default='/home/liphone/undone-work/data/detection/garbage_huawei/yolo',
+    parser.add_argument('--save_dir', default='/home/lifeng/undone-work/dataset/detection/orange/annotations/yolo2-pseudo_label',
                         help='save_dir')
-    parser.add_argument('--frac', default=0.8, type=float, help='frac')
+    parser.add_argument('--frac', default=0.9, type=float, help='frac')
     parser.add_argument('--random_state', default=666, help='random_state')
     args = parser.parse_args()
     return args

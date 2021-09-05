@@ -43,7 +43,7 @@ def bbox2fields():
 
 
 @PIPELINES.register_module()
-class AutoAugment(object):
+class AutoAugment:
     """Auto augmentation.
 
     This data augmentation is proposed in `Learning Data Augmentation
@@ -109,7 +109,7 @@ class AutoAugment(object):
 
 
 @PIPELINES.register_module()
-class Shear(object):
+class Shear:
     """Apply Shear Transformation to image (and its corresponding bbox, mask,
     segmentation).
 
@@ -155,7 +155,7 @@ class Shear(object):
             raise ValueError(
                 'img_fill_val must be float or tuple with 3 elements.')
         assert np.all([0 <= val <= 255 for val in img_fill_val]), 'all ' \
-            'elements of img_fill_val should between range [0,255].' \
+                                                                  'elements of img_fill_val should between range [0,255].' \
             f'got {img_fill_val}.'
         assert 0 <= prob <= 1.0, 'The probability of shear should be in ' \
             f'range [0,1]. got {prob}.'
@@ -164,7 +164,7 @@ class Shear(object):
         assert isinstance(max_shear_magnitude, float), 'max_shear_magnitude ' \
             f'should be type float. got {type(max_shear_magnitude)}.'
         assert 0. <= max_shear_magnitude <= 1., 'Defaultly ' \
-            'max_shear_magnitude should be in range [0,1]. ' \
+                                                'max_shear_magnitude should be in range [0,1]. ' \
             f'got {max_shear_magnitude}.'
         self.level = level
         self.magnitude = level_to_value(level, max_shear_magnitude)
@@ -326,7 +326,7 @@ class Shear(object):
 
 
 @PIPELINES.register_module()
-class Rotate(object):
+class Rotate:
     """Apply Rotate Transformation to image (and its corresponding bbox, mask,
     segmentation).
 
@@ -370,26 +370,26 @@ class Rotate(object):
         if isinstance(center, (int, float)):
             center = (center, center)
         elif isinstance(center, tuple):
-            assert len(center) == 2, 'center with type tuple must have '\
+            assert len(center) == 2, 'center with type tuple must have ' \
                 f'2 elements. got {len(center)} elements.'
         else:
-            assert center is None, 'center must be None or type int, '\
+            assert center is None, 'center must be None or type int, ' \
                 f'float or tuple, got type {type(center)}.'
         if isinstance(img_fill_val, (float, int)):
             img_fill_val = tuple([float(img_fill_val)] * 3)
         elif isinstance(img_fill_val, tuple):
-            assert len(img_fill_val) == 3, 'img_fill_val as tuple must '\
+            assert len(img_fill_val) == 3, 'img_fill_val as tuple must ' \
                 f'have 3 elements. got {len(img_fill_val)}.'
             img_fill_val = tuple([float(val) for val in img_fill_val])
         else:
             raise ValueError(
                 'img_fill_val must be float or tuple with 3 elements.')
         assert np.all([0 <= val <= 255 for val in img_fill_val]), \
-            'all elements of img_fill_val should between range [0,255]. '\
-            f'got {img_fill_val}.'
-        assert 0 <= prob <= 1.0, 'The probability should be in range [0,1]. '\
-            'got {prob}.'
-        assert isinstance(max_rotate_angle, (int, float)), 'max_rotate_angle '\
+            'all elements of img_fill_val should between range [0,255]. ' \
+                f'got {img_fill_val}.'
+        assert 0 <= prob <= 1.0, 'The probability should be in range [0,1]. ' \
+                                 'got {prob}.'
+        assert isinstance(max_rotate_angle, (int, float)), 'max_rotate_angle ' \
             f'should be type int or float. got type {type(max_rotate_angle)}.'
         self.level = level
         self.scale = scale
@@ -443,16 +443,16 @@ class Rotate(object):
             rotated_coords = rotated_coords[..., 0]  # [nb_bbox, 4, 2]
             min_x, min_y = np.min(
                 rotated_coords[:, :, 0], axis=1), np.min(
-                    rotated_coords[:, :, 1], axis=1)
+                rotated_coords[:, :, 1], axis=1)
             max_x, max_y = np.max(
                 rotated_coords[:, :, 0], axis=1), np.max(
-                    rotated_coords[:, :, 1], axis=1)
+                rotated_coords[:, :, 1], axis=1)
             min_x, min_y = np.clip(
                 min_x, a_min=0, a_max=w), np.clip(
-                    min_y, a_min=0, a_max=h)
+                min_y, a_min=0, a_max=h)
             max_x, max_y = np.clip(
                 max_x, a_min=min_x, a_max=w), np.clip(
-                    max_y, a_min=min_y, a_max=h)
+                max_y, a_min=min_y, a_max=h)
             results[key] = np.stack([min_x, min_y, max_x, max_y],
                                     axis=-1).astype(results[key].dtype)
 
@@ -540,7 +540,7 @@ class Rotate(object):
 
 
 @PIPELINES.register_module()
-class Translate(object):
+class Translate:
     """Translate the images, bboxes, masks and segmentation maps horizontally
     or vertically.
 
@@ -634,7 +634,7 @@ class Translate(object):
                 min_y = np.maximum(0, min_y + offset)
                 max_y = np.minimum(h, max_y + offset)
 
-            # the boxs translated outside of image will be filtered along with
+            # the boxes translated outside of image will be filtered along with
             # the corresponding masks, by invoking ``_filter_invalid``.
             results[key] = np.concatenate([min_x, min_y, max_x, max_y],
                                           axis=-1)
@@ -706,7 +706,7 @@ class Translate(object):
 
 
 @PIPELINES.register_module()
-class ColorTransform(object):
+class ColorTransform:
     """Apply Color transformation to image. The bboxes, masks, and
     segmentations are not modified.
 
@@ -755,7 +755,7 @@ class ColorTransform(object):
 
 
 @PIPELINES.register_module()
-class EqualizeTransform(object):
+class EqualizeTransform:
     """Apply Equalize transformation to image. The bboxes, masks and
     segmentations are not modified.
 
@@ -794,7 +794,7 @@ class EqualizeTransform(object):
 
 
 @PIPELINES.register_module()
-class BrightnessTransform(object):
+class BrightnessTransform:
     """Apply Brightness transformation to image. The bboxes, masks and
     segmentations are not modified.
 
@@ -843,7 +843,7 @@ class BrightnessTransform(object):
 
 
 @PIPELINES.register_module()
-class ContrastTransform(object):
+class ContrastTransform:
     """Apply Contrast transformation to image. The bboxes, masks and
     segmentations are not modified.
 

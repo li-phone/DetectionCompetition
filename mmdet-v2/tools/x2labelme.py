@@ -71,14 +71,12 @@ def panda2labelme(ann_file, save_dir, maxDets=500, thr=0., category_id=None, **k
         o = json.load(fp)
     df = json_normalize(o)
     df = df[df['category_id'] == category_id]
-    df = df[df['score'] > thr]
     for image_id in tqdm(list(np.unique(df['image_id']))):
         img_df = df[df['image_id'] == image_id]
         keep_df = pd.DataFrame()
         for catid in list(np.unique(img_df['category_id'])):
             cat_df = img_df[img_df['category_id'] == catid]
-            cat_df = cat_df.sort_values(by='score', ascending=False, inplace=False)
-            cat_df = cat_df[:maxDets]
+            cat_df = cat_df.sort_values(by='category_id', ascending=False, inplace=False)
             keep_df = pd.concat([keep_df, cat_df])
         filename = os.path.basename(id2fname[image_id])
         obj = dict(
@@ -110,18 +108,79 @@ def panda2labelme(ann_file, save_dir, maxDets=500, thr=0., category_id=None, **k
         write_xml(obj, save_name)
 
 
+def x2labelme(ann_file, img_dir, save_dir):
+    with open(ann_file) as fp:
+        o = json.load(fp)
+    id2cat = {v['id']: v['name'] for v in o['categories']}
+    # id2cat = {1: "visible body", 2: "full body", 3: "head", 4: "car"}
+    # df = pd.read_json(ann_file)
+    df = json_normalize(o['annotations'])
+    for image_id in tqdm(list(np.unique(df['image_id']))):
+        img_df = df[df['image_id'] == image_id]
+        keep_df = img_df
+        # for catid in list(np.unique(img_df['category_id'])):
+        #     cat_df = img_df[img_df['category_id'] == catid]
+        #     cat_df = cat_df.sort_values(by='category_id', ascending=False, inplace=False)
+        #     keep_df = pd.concat([keep_df, cat_df])
+        filename = os.path.basename(image_id)
+        from PIL import Image
+        img = Image.open(os.path.join(img_dir, image_id))
+        if not img:
+            continue
+        obj = dict(
+            folder=".",
+            filename=filename,
+            path=filename,
+            source=dict(database="Unknown"),
+            size=dict(width=img.width, height=img.height, depth=3, ),
+            segmented=0,
+            object=[],
+        )
+        for i in range(len(keep_df)):
+            row = keep_df.iloc[i]
+            if 'bbox' in row:
+                xmin = int(row['bbox'][0])
+                ymin = int(row['bbox'][1])
+                xmax = int(row['bbox'][2]) + xmin
+                ymax = int(row['bbox'][3]) + ymin
+            else:
+                xmin = int(row['xmin'])
+                ymin = int(row['ymin'])
+                xmax = int(row['xmax'])
+                ymax = int(row['ymax'])
+            obj['object'].append(dict(
+                name=id2cat[row['category_id']],
+                pose="Unspecified",
+                truncated=0,
+                difficult=0,
+                # score=row['score'],
+                bndbox=dict(
+                    xmin=xmin,
+                    ymin=ymin,
+                    xmax=xmax,
+                    ymax=ymax,
+                ),
+            ))
+        save_name = os.path.join(save_dir, os.path.basename(filename))[:-3] + "xml"
+        mkdirs(save_name)
+        write_xml(obj, save_name)
+
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default=r"work_dirs/track/best-r50-mst_slice-mst_slice-scale_3-score_thr-4.json",
+                        default=r"/home/lifeng/undone-work/dataset/detection/orange2/annotations/slice_1000x1000_train.json",
                         help='x file/folder or original annotation file in test_img mode')
+    parser.add_argument('--img_dir',
+                        default=r"/home/lifeng/undone-work/dataset/detection/orange2/slice_1000x1000",
+                        help='save coco filename')
     parser.add_argument('--save_name',
-                        default=r"panda_round1_test_202104_A",
+                        default=r"orange2/slice_1000x1000-labelme",
                         help='save coco filename')
     parser.add_argument(
         '--fmt',
-        choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
-        default='json', help='format type')
+        choices=['json', 'labelme', 'xml', 'test_dir', 'csv', 'PANDA'],
+        default='labelme', help='format type')
     args = parser.parse_args()
     return args
 
@@ -130,6 +189,8 @@ def main():
     args = parse_args()
     if args.fmt == 'json':
         panda2labelme(args.x, args.save_name, category_id=4)
+    elif args.fmt == 'labelme':
+        x2labelme(args.x, args.img_dir, args.save_name)
 
 
 if __name__ == '__main__':

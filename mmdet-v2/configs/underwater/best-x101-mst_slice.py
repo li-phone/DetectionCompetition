@@ -251,12 +251,15 @@ img_norm_cfg = dict(
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
-    # dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
+    # dict(type='RandomCrop', crop_size=(1333, 800)),
     dict(type='Resize', img_scale=(1333, 800), ratio_range=(0.8, 1.2), keep_ratio=True),
+    # dict(type='Resize', img_scale=(800, 800), keep_ratio=True),
+    # dict(type='Resize', img_scale=(1333, 800), ratio_range=(0.8, 1.2), keep_ratio=True),
     # dict(type='Resize', img_scale=(1000, 1000), ratio_range=(0.8, 1.2), keep_ratio=True),
     dict(type='RandomFlip', flip_ratio=0.5),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='horizontal'),
     # dict(type='RandomFlip', flip_ratio=0.5, direction='vertical'),
+    # dict(type='CutOut', n_holes=2),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
     dict(type='DefaultFormatBundle'),
@@ -268,7 +271,9 @@ test_pipeline = [
         type='MultiScaleFlipAug',
         # img_scale=[(600, 600), (800, 800), (1000, 1000)],
         # img_scale=[(800, 800), (1000, 1000), (1200, 1200), ],
-        img_scale=[(1066, 800), (1333, 800), (1600, 800), ],
+        # img_scale=[(1066, 800), (1333, 800), (1600, 800), ],
+        img_scale=[(1066, 640), (1333, 800), (1600, 960)],
+        # img_scale=[0.5, 1.0, 1.5],
         flip=True,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -312,10 +317,11 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.001,
     # step=[8, 11],
-    step=[16, 19],
-    # step=[16, 22]
+    # step=[16, 19],
+    # step=[16, 22],
+    step=[22, 25]
 )
-total_epochs = 20
+total_epochs = 26
 
 checkpoint_config = dict(interval=1)
 # yapf:disable

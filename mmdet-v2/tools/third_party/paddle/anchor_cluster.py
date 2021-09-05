@@ -303,10 +303,10 @@ def main():
     parser = argparse.ArgumentParser(description='anchor cluster for a detector')
     parser.add_argument(
         '--dataset',
-        default="../../data/track/annotations/overlap_70_all_category/overlap_70_all_category-check.json",
+        default="../../data/orange/annotations/instance-train-best-iou_0.7_score_0.8_iter_1.json",
         action='store_true', help='whether use cache')
     parser.add_argument(
-        '--n', '-n', default=4, type=int, help='num of clusters')
+        '--n', '-n', default=7, type=int, help='num of clusters')
     parser.add_argument(
         '--iters',
         '-i',

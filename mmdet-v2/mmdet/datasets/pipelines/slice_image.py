@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import copy
 import heapq
-from mmdet.core.bbox.iou_calculators.iou2d_calculator import bbox_overlaps
 
 from ..builder import PIPELINES
 
@@ -287,6 +286,13 @@ class SliceImage(object):
         return result
 
     def __call__(self, results):
+        if results['img'].shape[0] <= self.base_win[1] or results['img'].shape[1] <= self.base_win[0]:
+            results['is_slice'] = False
+            if 'ann_info' in results:
+                results['gt_bboxes'] = results['ann_info']['bboxes']
+                results['gt_labels'] = results['ann_info']['labels']
+            return results
+        results['is_slice'] = True
         if self.resize:
             results['img'] = cv2.resize(results['img'], None, fx=self.resize[0], fy=self.resize[1],
                                         interpolation=cv2.INTER_CUBIC)
@@ -314,3 +320,92 @@ class SliceImage(object):
     def __repr__(self):
         return self.__class__.__name__ + '(window={})'.format(
             self.window)
+
+
+@PIPELINES.register_module()
+class Concat(object):
+    """CutOut operation.
+
+    Randomly drop some regions of image used in
+    `Cutout <https://arxiv.org/abs/1708.04552>`_.
+
+    Args:
+        n_holes (int | tuple[int, int]): Number of regions to be dropped.
+            If it is given as a list, number of holes will be randomly
+            selected from the closed interval [`n_holes[0]`, `n_holes[1]`].
+        cutout_shape (tuple[int, int] | list[tuple[int, int]]): The candidate
+            shape of dropped regions. It can be `tuple[int, int]` to use a
+            fixed cutout shape, or `list[tuple[int, int]]` to randomly choose
+            shape from the list.
+        cutout_ratio (tuple[float, float] | list[tuple[float, float]]): The
+            candidate ratio of dropped regions. It can be `tuple[float, float]`
+            to use a fixed ratio or `list[tuple[float, float]]` to randomly
+            choose ratio from the list. Please note that `cutout_shape`
+            and `cutout_ratio` cannot be both given at the same time.
+        fill_in (tuple[float, float, float] | tuple[int, int, int]): The value
+            of pixel to fill in the dropped regions. Default: (0, 0, 0).
+    """
+
+    def __init__(self, suspend=True, concat_ratio=0.7, interval=(0.4, 0.6), overlap=0.8):
+        self.suspend = suspend
+        self.concat_ratio = concat_ratio
+        self.interval = interval
+        self.overlap = overlap
+
+    def split_img(self, results, interval):
+        img_h, img_w, _ = results['img'].shape
+        left = np.random.randint(img_w - interval)
+        results['img'] = results['img'][:, left:left + interval, :]
+        results['gt_bboxes'][:, 0] -= left
+        results['gt_bboxes'][:, 2] -= left
+        from .slice_image import box_overlap
+        bboxes = results['gt_bboxes']
+        window = [0, 0, interval, img_h]
+        keep_idx = [i for i in range(len(bboxes)) if box_overlap(bboxes[i], window) >= self.overlap]
+        results['gt_bboxes'] = results['gt_bboxes'][keep_idx]
+        results['gt_labels'] = results['gt_labels'][keep_idx]
+        results['ann_info']['bboxes'] = results['gt_bboxes']
+        results['ann_info']['labels'] = results['gt_labels']
+        return results
+
+    def __call__(self, multi_results):
+        """Call function to drop some regions of image."""
+        if isinstance(multi_results, dict):
+            if 'scale' in multi_results:
+                multi_results.pop('scale')
+            if 'scale_factor' in multi_results:
+                multi_results.pop('scale_factor')
+            return multi_results
+        assert isinstance(multi_results, (list, tuple))
+        if len(multi_results) == 1:
+            return multi_results[0]
+        assert len(multi_results) == 2
+        results = multi_results[0]
+        results.pop('scale')
+        results.pop('scale_factor')
+        has_concat = True if np.random.random() < self.concat_ratio else False
+        if has_concat:
+            results['has_concat'] = has_concat
+            img_w = results['img'].shape[1]
+            low, high = img_w * self.interval[0], img_w * self.interval[1]
+            interval = np.random.randint(low, high)
+            # plt_bbox(multi_results[1])
+            multi_results[1] = self.split_img(multi_results[1], img_w - interval)
+            # plt_bbox(multi_results[1])
+            if len(multi_results[1]['gt_bboxes']) <= 0:
+                return results
+            results = self.split_img(results, interval)
+            # plt_bbox(results)
+            multi_results[1]['ann_info']['bboxes'][:, 0] += interval
+            multi_results[1]['ann_info']['bboxes'][:, 2] += interval
+            assert results['img'].shape[0] == multi_results[1]['img'].shape[0]
+            results['img'] = np.concatenate([results['img'], multi_results[1]['img']], axis=1)
+            results['ann_info']['bboxes'] = np.concatenate([results['ann_info']['bboxes'],
+                                                            multi_results[1]['ann_info']['bboxes']], axis=0)
+            results['ann_info']['labels'] = np.concatenate([results['ann_info']['labels'],
+                                                            multi_results[1]['ann_info']['labels']], axis=0)
+            results['gt_bboxes'] = results['ann_info']['bboxes']
+            results['gt_labels'] = results['ann_info']['labels']
+            # plt_bbox(results)
+
+        return results

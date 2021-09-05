@@ -19,7 +19,7 @@ class Config(object):
     label2name = {0: 'echinus', 1: 'holothurian', 2: 'scallop', 3: 'starfish', 4: 'waterweeds'}
     name2label = {'echinus': 0, 'holothurian': 1, 'scallop': 2, 'starfish': 3, 'waterweeds': 4}
     # nms = None
-    score_thr = 0.01
+    score_thr = 0.05
     # score_thr = {
     #     1: 0.01,  # visible body
     #     2: 0.01,  # full body
@@ -80,7 +80,7 @@ def post_process():
     config = Config()
     save_results = pd.read_csv(config.post_process_file)
     save_results['name'] = save_results['name'].apply(lambda x: config.name2label[x])
-    # save_results = save_results[save_results['confidence'] > config.score_thr]
+    save_results = save_results[save_results['confidence'] > config.score_thr]
     if config.nms is not None:
         save_results = nms(save_results, config.nms)
     results = json_normalize(save_results)

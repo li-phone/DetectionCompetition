@@ -1,5 +1,7 @@
 import argparse
 import os
+import os.path as osp
+import time
 import warnings
 
 import mmcv
@@ -20,30 +22,35 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='MMDet test (and eval) a model')
     parser.add_argument('--config',
-                        default='../configs/track/best_score_finetune.py',
+                        default='../configs/orange2/cas_r50-best.py',
                         help='test config file path')
-    parser.add_argument('--checkpoint',
-                        default='./work_dirs/bs_r50_all_cat_ovlap_samp_x2_mst_dcn_track/latest.pth',
-                        help='checkpoint file')
+    parser.add_argument(
+        '--checkpoint',
+        # default='work_dirs/cascade_rcnn_r50_fpn_1x_coco_20200316-3dc56deb.pth',
+        default='work_dirs/cas_r50-best/latest.pth',
+        help='checkpoint file')
+    parser.add_argument(
+        '--work-dir',
+        help='the directory to save the file containing evaluation metrics')
     parser.add_argument('--out', help='output result file in pickle format')
     parser.add_argument(
         '--fuse-conv-bn',
         action='store_true',
         help='Whether to fuse conv and bn, this will slightly increase'
-             'the inference speed')
+        'the inference speed')
     parser.add_argument(
         '--format-only',
         action='store_true',
         help='Format the output results without perform evaluation. It is'
-             'useful when you want to format the result to a specific format and '
-             'submit it to the test server')
+        'useful when you want to format the result to a specific format and '
+        'submit it to the test server')
     parser.add_argument(
         '--eval',
         type=str,
-        default=['bbox'],
         nargs='+',
+        default=['bbox'],
         help='evaluation metrics, which depends on the dataset, e.g., "bbox",'
-             ' "segm", "proposal" for COCO, and "mAP", "recall" for PASCAL VOC')
+        ' "segm", "proposal" for COCO, and "mAP", "recall" for PASCAL VOC')
     parser.add_argument('--show', action='store_true', help='show results')
     parser.add_argument(
         '--show-dir', help='directory where painted images will be saved')
@@ -59,30 +66,30 @@ def parse_args():
     parser.add_argument(
         '--tmpdir',
         help='tmp directory used for collecting results from multiple '
-             'workers, available when gpu-collect is not specified')
+        'workers, available when gpu-collect is not specified')
     parser.add_argument(
         '--cfg-options',
         nargs='+',
         action=DictAction,
         help='override some settings in the used config, the key-value pair '
-             'in xxx=yyy format will be merged into config file. If the value to '
-             'be overwritten is a list, it should be like key="[a,b]" or key=a,b '
-             'It also allows nested list/tuple values, e.g. key="[(a,b),(c,d)]" '
-             'Note that the quotation marks are necessary and that no white space '
-             'is allowed.')
+        'in xxx=yyy format will be merged into config file. If the value to '
+        'be overwritten is a list, it should be like key="[a,b]" or key=a,b '
+        'It also allows nested list/tuple values, e.g. key="[(a,b),(c,d)]" '
+        'Note that the quotation marks are necessary and that no white space '
+        'is allowed.')
     parser.add_argument(
         '--options',
         nargs='+',
         action=DictAction,
         help='custom options for evaluation, the key-value pair in xxx=yyy '
-             'format will be kwargs for dataset.evaluate() function (deprecate), '
-             'change to --eval-options instead.')
+        'format will be kwargs for dataset.evaluate() function (deprecate), '
+        'change to --eval-options instead.')
     parser.add_argument(
         '--eval-options',
         nargs='+',
         action=DictAction,
         help='custom options for evaluation, the key-value pair in xxx=yyy '
-             'format will be kwargs for dataset.evaluate() function')
+        'format will be kwargs for dataset.evaluate() function')
     parser.add_argument(
         '--launcher',
         choices=['none', 'pytorch', 'slurm', 'mpi'],
@@ -107,7 +114,7 @@ def main():
     args = parse_args()
 
     assert args.out or args.eval or args.format_only or args.show \
-           or args.show_dir, \
+        or args.show_dir, \
         ('Please specify at least one operation (save/eval/format/show the '
          'results / save the results) with the argument "--out", "--eval"'
          ', "--format-only", "--show" or "--show-dir"')
@@ -128,6 +135,7 @@ def main():
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
+
     cfg.model.pretrained = None
     if cfg.model.get('neck'):
         if isinstance(cfg.model.neck, list):
@@ -140,11 +148,22 @@ def main():
                 cfg.model.neck.rfp_backbone.pretrained = None
 
     # in case the test dataset is concatenated
+    samples_per_gpu = 1
     if isinstance(cfg.data.test, dict):
         cfg.data.test.test_mode = True
+        samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 1)
+        if samples_per_gpu > 1:
+            # Replace 'ImageToTensor' to 'DefaultFormatBundle'
+            cfg.data.test.pipeline = replace_ImageToTensor(
+                cfg.data.test.pipeline)
     elif isinstance(cfg.data.test, list):
         for ds_cfg in cfg.data.test:
             ds_cfg.test_mode = True
+        samples_per_gpu = max(
+            [ds_cfg.pop('samples_per_gpu', 1) for ds_cfg in cfg.data.test])
+        if samples_per_gpu > 1:
+            for ds_cfg in cfg.data.test:
+                ds_cfg.pipeline = replace_ImageToTensor(ds_cfg.pipeline)
 
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
@@ -153,11 +172,14 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
+    rank, _ = get_dist_info()
+    # allows not to create
+    if args.work_dir is not None and rank == 0:
+        mmcv.mkdir_or_exist(osp.abspath(args.work_dir))
+        timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
+        json_file = osp.join(args.work_dir, f'eval_{timestamp}.json')
+
     # build the dataloader
-    samples_per_gpu = cfg.data.test.pop('samples_per_gpu', 1)
-    if samples_per_gpu > 1:
-        # Replace 'ImageToTensor' to 'DefaultFormatBundle'
-        cfg.data.test.pipeline = replace_ImageToTensor(cfg.data.test.pipeline)
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
@@ -167,7 +189,8 @@ def main():
         shuffle=False)
 
     # build the model and load checkpoint
-    model = build_detector(cfg.model, train_cfg=None, test_cfg=cfg.test_cfg)
+    cfg.model.train_cfg = None
+    model = build_detector(cfg.model, test_cfg=cfg.get('test_cfg'))
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
@@ -176,7 +199,7 @@ def main():
         model = fuse_conv_bn(model)
     # old versions did not save class info in checkpoints, this walkaround is
     # for backward compatibility
-    if 'CLASSES' in checkpoint['meta']:
+    if 'CLASSES' in checkpoint.get('meta', {}):
         model.CLASSES = checkpoint['meta']['CLASSES']
     else:
         model.CLASSES = dataset.CLASSES
@@ -205,12 +228,16 @@ def main():
             eval_kwargs = cfg.get('evaluation', {}).copy()
             # hard-code way to remove EvalHook args
             for key in [
-                'interval', 'tmpdir', 'start', 'gpu_collect', 'save_best',
-                'rule'
+                    'interval', 'tmpdir', 'start', 'gpu_collect', 'save_best',
+                    'rule'
             ]:
                 eval_kwargs.pop(key, None)
             eval_kwargs.update(dict(metric=args.eval, **kwargs))
-            print(dataset.evaluate(outputs, **eval_kwargs))
+            metric = dataset.evaluate(outputs, **eval_kwargs)
+            print(metric)
+            metric_dict = dict(config=args.config, metric=metric)
+            if args.work_dir is not None and rank == 0:
+                mmcv.dump(metric_dict, json_file)
 
 
 if __name__ == '__main__':

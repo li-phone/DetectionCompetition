@@ -214,8 +214,8 @@ def parse_args():
 
 def main():
     data = COCOAnalysis(
-        ann_files=[r"/home/lifeng/undone-work/dataset/detection/ultrasonic/annotations/simple-sample-checked.json"],
-        save_img_dir='./ultrasonic',
+        ann_files=[r"/home/lifeng/undone-work/dataset/detection/orange2/annotations/slice_800x800_1000x1000_train.json"],
+        save_img_dir='./orange2',
         legends=['all'])
     data.summary()
     # garbage_ana = COCOAnalysis(

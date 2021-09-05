@@ -1,3 +1,6 @@
+# tmp
+tmp/
+
 # code dir
 code/ignores
 code/*/build

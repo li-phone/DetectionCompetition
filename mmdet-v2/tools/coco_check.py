@@ -59,6 +59,7 @@ def check_coco(src, dst, img_dir=None, replace=True):
         if 'segmentation' not in v:
             seg = get_segmentation(v['bbox'])
             v['segmentation'] = [[float(_) for _ in seg]]
+            # v['segmentation'] = [float(_) for _ in seg]
     coco['annotations'] = anns
     # check image shape
     if img_dir is not None:
@@ -224,13 +225,13 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='Check ann_file')
     parser.add_argument('--ann_file',
-                        default="data/ultrasonic/annotations/simple-sample.json",
+                        default="/home/lifeng/undone-work/dataset/detection/orange2/annotations/instance-train.json",
                         help='annotation file or test image directory')
     parser.add_argument('--save_name',
-                        default="data/ultrasonic/annotations/simple-sample-checked.json",
+                        default="/home/lifeng/undone-work/dataset/detection/orange2/annotations/instance-train-checked.json",
                         help='save_name')
     parser.add_argument('--img_dir',
-                        default='data/ultrasonic/train/image',
+                        default='/home/lifeng/undone-work/dataset/detection/orange2/train/images',
                         help='img_dir')
     parser.add_argument('--check_type', default='coco,box', help='check_type')
     args = parser.parse_args()

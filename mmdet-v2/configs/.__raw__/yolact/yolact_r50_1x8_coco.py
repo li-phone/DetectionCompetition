@@ -4,7 +4,6 @@ _base_ = '../_base_/default_runtime.py'
 img_size = 550
 model = dict(
     type='YOLACT',
-    pretrained='torchvision://resnet50',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -14,7 +13,8 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=False,  # update the statistics of bn
         zero_init_residual=False,
-        style='pytorch'),
+        style='pytorch',
+        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
     neck=dict(
         type='FPN',
         in_channels=[256, 512, 1024, 2048],
@@ -62,28 +62,28 @@ model = dict(
         num_classes=80,
         in_channels=256,
         loss_segm=dict(
-            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)))
-# training and testing settings
-train_cfg = dict(
-    assigner=dict(
-        type='MaxIoUAssigner',
-        pos_iou_thr=0.5,
-        neg_iou_thr=0.4,
-        min_pos_iou=0.,
-        ignore_iof_thr=-1,
-        gt_max_assign_all=False),
-    # smoothl1_beta=1.,
-    allowed_border=-1,
-    pos_weight=-1,
-    neg_pos_ratio=3,
-    debug=False)
-test_cfg = dict(
-    nms_pre=1000,
-    min_bbox_size=0,
-    score_thr=0.05,
-    iou_thr=0.5,
-    top_k=200,
-    max_per_img=100)
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0)),
+    # training and testing settings
+    train_cfg=dict(
+        assigner=dict(
+            type='MaxIoUAssigner',
+            pos_iou_thr=0.5,
+            neg_iou_thr=0.4,
+            min_pos_iou=0.,
+            ignore_iof_thr=-1,
+            gt_max_assign_all=False),
+        # smoothl1_beta=1.,
+        allowed_border=-1,
+        pos_weight=-1,
+        neg_pos_ratio=3,
+        debug=False),
+    test_cfg=dict(
+        nms_pre=1000,
+        min_bbox_size=0,
+        score_thr=0.05,
+        iou_thr=0.5,
+        top_k=200,
+        max_per_img=100))
 # dataset settings
 dataset_type = 'CocoDataset'
 data_root = 'data/coco/'
@@ -155,6 +155,6 @@ lr_config = dict(
     warmup_iters=500,
     warmup_ratio=0.1,
     step=[20, 42, 49, 52])
-total_epochs = 55
+runner = dict(type='EpochBasedRunner', max_epochs=55)
 cudnn_benchmark = True
 evaluation = dict(metric=['bbox', 'segm'])

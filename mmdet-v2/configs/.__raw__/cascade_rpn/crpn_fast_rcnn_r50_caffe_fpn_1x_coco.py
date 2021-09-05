@@ -1,6 +1,5 @@
 _base_ = '../fast_rcnn/fast_rcnn_r50_fpn_1x_coco.py'
 model = dict(
-    pretrained='open-mmlab://detectron2/resnet50_caffe',
     backbone=dict(
         type='ResNet',
         depth=50,
@@ -9,19 +8,23 @@ model = dict(
         frozen_stages=1,
         norm_cfg=dict(type='BN', requires_grad=False),
         norm_eval=True,
-        style='caffe'),
+        style='caffe',
+        init_cfg=dict(
+            type='Pretrained',
+            checkpoint='open-mmlab://detectron2/resnet50_caffe')),
     roi_head=dict(
         bbox_head=dict(
             bbox_coder=dict(target_stds=[0.04, 0.04, 0.08, 0.08]),
             loss_cls=dict(
                 type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.5),
-            loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))))
-# model training and testing settings
-train_cfg = dict(
-    rcnn=dict(
-        assigner=dict(pos_iou_thr=0.65, neg_iou_thr=0.65, min_pos_iou=0.65),
-        sampler=dict(num=256)))
-test_cfg = dict(rcnn=dict(score_thr=1e-3))
+            loss_bbox=dict(type='SmoothL1Loss', beta=1.0, loss_weight=1.0))),
+    # model training and testing settings
+    train_cfg=dict(
+        rcnn=dict(
+            assigner=dict(
+                pos_iou_thr=0.65, neg_iou_thr=0.65, min_pos_iou=0.65),
+            sampler=dict(num=256))),
+    test_cfg=dict(rcnn=dict(score_thr=1e-3)))
 dataset_type = 'CocoDataset'
 data_root = 'data/coco/'
 img_norm_cfg = dict(

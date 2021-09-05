@@ -282,13 +282,13 @@ def parse_args():
     help()
     parser = argparse.ArgumentParser(description='Transform other dataset format into coco format')
     parser.add_argument('--x',
-                        default=r"data/ultrasonic/train/box/",
+                        default=r"data/orange2/annotations/annotations.csv",
                         help='x file/folder or original annotation file in test_img mode')
     parser.add_argument('--save_name',
-                        default=r"data/ultrasonic/annotations/simple-sample.json",
+                        default=r"data/orange2/annotations/instance-train.json",
                         help='save coco filename')
     parser.add_argument('--img_dir',
-                        default=r"data/ultrasonic/train/image/",
+                        default=r"data/orange2/train/images/",
                         help='img_dir')
     parser.add_argument(
         '--options',
@@ -298,7 +298,7 @@ def parse_args():
     parser.add_argument(
         '--fmt',
         choices=['json', 'xml', 'test_dir', 'csv', 'PANDA'],
-        default='xml', help='format type')
+        default='csv', help='format type')
     args = parser.parse_args()
     return args
 

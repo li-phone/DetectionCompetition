@@ -10,9 +10,11 @@ from .loading import (LoadAnnotations, LoadImageFromFile, LoadImageFromWebcam,
 from .test_time_aug import MultiScaleFlipAug
 from .transforms import (Albu, CutOut, Expand, MinIoURandomCrop, Normalize,
                          Pad, PhotoMetricDistortion, RandomCenterCropPad,
-                         RandomCrop, RandomFlip, Resize, SegRescale)
+                         RandomCrop, RandomFlip, RandomShift, Resize,
+                         SegRescale)
 
 from .slice_image import SliceROI, SliceImage
+from .slice_image import Concat
 
 __all__ = [
     'Compose', 'to_tensor', 'ToTensor', 'ImageToTensor', 'ToDataContainer',
@@ -23,6 +25,6 @@ __all__ = [
     'MinIoURandomCrop', 'Expand', 'PhotoMetricDistortion', 'Albu',
     'InstaBoost', 'RandomCenterCropPad', 'AutoAugment', 'CutOut', 'Shear',
     'Rotate', 'ColorTransform', 'EqualizeTransform', 'BrightnessTransform',
-    'ContrastTransform', 'Translate',
-    'SliceROI', 'SliceImage',
+    'ContrastTransform', 'Translate', 'RandomShift',
+    'SliceROI', 'SliceImage', 'Concat'
 ]

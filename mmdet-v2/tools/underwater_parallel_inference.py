@@ -15,9 +15,9 @@ from mmdet.apis import init_detector, inference_detector, show_result_pyplot
 
 class Config(object):
     # data module
-    img_dir = "data/underwater/test-A-image/"
+    img_dir = "data/underwater/test-B-image/"
     # test_file = "data/underwater/panda_round1_test_B_annos_20210222/person_bbox_test_B.json"
-    save_file = "work_dirs/underwater/best-x101-mst_slice.csv"
+    save_file = "work_dirs/underwater/testB-best-x101-mst_slice-1.csv"
     tasks = glob.glob(img_dir + "*.jpg")
     slice_num = 10000
     nms_whole = False
@@ -77,7 +77,7 @@ def process(image, **kwargs):
         mst_bboxes = torch.from_numpy(win_bboxes).float().cuda()
         bboxes = mst_bboxes[:, :4].contiguous()
         scores = mst_bboxes[:, 4].contiguous()
-        labels = (mst_bboxes[:, 5].long() + 1).contiguous()
+        labels = (mst_bboxes[:, 5].long()).contiguous()
         bboxes, keep = batched_nms(
             bboxes, scores, labels, nms_cfg=config.model.cfg.test_cfg.rcnn.nms)
         labels = labels[keep]
@@ -123,7 +123,7 @@ def parallel_infer():
         process=process,
         process_params=process_params,
         collect=['result'],
-        workers_num=8,
+        workers_num=3,
         print_process=5)
     parallel = Parallel(**settings)
     start = time.time()
