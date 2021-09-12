@@ -11,32 +11,15 @@ from x2coco import _get_box
 
 class Config(object):
     # process module
-    # 2000 x 2000
-    train_pipeline1 = [
-        dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.5, 0.5), resize=(1, 1),
-             keep_none=False),
-    ]
-    # 4000 x 4000
-    train_pipeline2 = [
-        dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1, 1),
-             keep_none=False),
-    ]
-    # # 8000 x 8000
-    # train_pipeline3 = [
-    #     dict(type='LoadImageFromFile'),
-    #     dict(type='SliceImage', overlap=1, base_win=(2000, 2000), step=(0.2, 0.2), resize=(1 / 4, 1 / 4),
-    #          keep_none=False),
-    # ]
-    # composes = [Compose(train_pipeline2)]
-    composes = [Compose(train_pipeline1), Compose(train_pipeline2)]
-
+    min_win = 600
+    max_win = 1400
+    min_area = 126.5
+    max_area = 426400.0
     # data module
     img_dir = "data/orange2/train/images"
     ann_file = "data/orange2/annotations/instance-train-checked.json"
-    save_img_dir = "data/orange2/slice_800x800_1000x1000-overlap_0.5/"
-    save_ann_file = "data/orange2/annotations/slice_800x800_1000x1000-overlap_0.5-train.json"
+    save_img_dir = "data/orange2/slice_1000x1000-overlap_0.5-auto/"
+    save_ann_file = "data/orange2/annotations/slice_1000x1000-overlap_0.5-auto-train.json"
     original_coco = COCO(ann_file)
 
 
@@ -61,7 +44,21 @@ def process(image, **kwargs):
     config = kwargs['config']
     image['filename'] = image['file_name']
     # 多尺度切割
-    for compose in config.composes:
+    annIds = config.original_coco.getAnnIds(imgIds=[image['id']])
+    anns = config.original_coco.loadAnns(annIds)
+    bboxes = np.array([x['bbox'] for x in anns])
+    areas = bboxes[:, 2] * bboxes[:, 3]
+    avg_area = np.mean(areas)
+    avg_ratio = (avg_area - config.min_area) / (config.max_area - config.min_area)
+    base_win = avg_ratio * (config.max_win - config.min_win) + config.min_win
+    base_win = int(base_win + 0.5)
+    train_pipeline = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(base_win, base_win), step=(0.5, 0.5), resize=(1, 1),
+             keep_none=False),
+    ]
+    composes = [Compose(train_pipeline)]
+    for compose in composes:
         annIds = config.original_coco.getAnnIds(imgIds=[image['id']])
         anns = config.original_coco.loadAnns(annIds)
         bboxes = np.array([x['bbox'] for x in anns])

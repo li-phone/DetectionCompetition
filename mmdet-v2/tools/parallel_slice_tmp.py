@@ -11,32 +11,59 @@ from x2coco import _get_box
 
 class Config(object):
     # process module
-    # 2000 x 2000
+    # 800 x 800
     train_pipeline1 = [
         dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.5, 0.5), resize=(1, 1),
+        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.2, 0.2), resize=(0.5, 0.5),
              keep_none=False),
     ]
-    # 4000 x 4000
     train_pipeline2 = [
         dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1, 1),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.2, 0.2), resize=(0.5, 0.5),
              keep_none=False),
     ]
-    # # 8000 x 8000
-    # train_pipeline3 = [
+    train_pipeline3 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.2, 0.2), resize=(1.0, 1.0),
+             keep_none=False),
+    ]
+    train_pipeline4 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.2, 0.2), resize=(1.0, 1.0),
+             keep_none=False),
+    ]
+    train_pipeline5 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.2, 0.2), resize=(1.5, 1.5),
+             keep_none=False),
+    ]
+    train_pipeline6 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.2, 0.2), resize=(1.5, 1.5),
+             keep_none=False),
+    ]
+    # train_pipeline5 = [
     #     dict(type='LoadImageFromFile'),
-    #     dict(type='SliceImage', overlap=1, base_win=(2000, 2000), step=(0.2, 0.2), resize=(1 / 4, 1 / 4),
+    #     dict(type='SliceImage', overlap=1, base_win=(800, 800), step=(0.2, 0.2), resize=(1.5, 1.5),
     #          keep_none=False),
     # ]
-    # composes = [Compose(train_pipeline2)]
-    composes = [Compose(train_pipeline1), Compose(train_pipeline2)]
+    # train_pipeline6 = [
+    #     dict(type='LoadImageFromFile'),
+    #     dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.2, 0.2), resize=(1.5, 1.5),
+    #          keep_none=False),
+    # ]
+
+    composes = [
+        Compose(train_pipeline1), Compose(train_pipeline2),
+        Compose(train_pipeline3), Compose(train_pipeline4),
+        Compose(train_pipeline5), Compose(train_pipeline6),
+    ]
 
     # data module
     img_dir = "data/orange2/train/images"
     ann_file = "data/orange2/annotations/instance-train-checked.json"
-    save_img_dir = "data/orange2/slice_800x800_1000x1000-overlap_0.5/"
-    save_ann_file = "data/orange2/annotations/slice_800x800_1000x1000-overlap_0.5-train.json"
+    save_img_dir = "data/orange2/slice_resize_0.5_1.0_1.5/"
+    save_ann_file = "data/orange2/annotations/slice_resize_0.5_1.0_1.5-train.json"
     original_coco = COCO(ann_file)
 
 
@@ -82,6 +109,19 @@ def process(image, **kwargs):
         if results is None: return save_results
         if not isinstance(results, (list, tuple)): results = [results]
         for i, result in enumerate(results):
+            # 过滤小尺寸
+            if compose.transforms[1].resize[0] == 0.5:
+                keep_bboxes = result['ann_info']['bboxes']
+                width = keep_bboxes[:, 2] - keep_bboxes[:, 0]
+                height = keep_bboxes[:, 3] - keep_bboxes[:, 1]
+                index1 = width >= 20
+                index2 = height >= 20
+                keep_idx = index1 + index2
+                result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
+                result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
+                result['gt_bboxes'] = result['ann_info']['bboxes']
+                result['gt_labels'] = result['ann_info']['labels']
+
             tmp_img = {k: v for k, v in image.items()}
             if 'slice_image' in result:
                 x1, y1, x2, y2 = result['slice_image']['window']
@@ -96,7 +136,7 @@ def process(image, **kwargs):
             save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
             if not os.path.exists(os.path.dirname(save_name)):
                 os.makedirs(os.path.dirname(save_name))
-            if not os.path.exists(save_name):
+            if not os.path.exists(save_name) or True:
                 # print(save_name)
                 cv2.imwrite(save_name, result['img'])
             kwargs['__results__']['images'].append(tmp_img)

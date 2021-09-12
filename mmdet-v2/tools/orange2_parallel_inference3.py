@@ -51,7 +51,7 @@ class Config(object):
     def __init__(self, cfg=None):
         self.tasks = glob.glob(self.img_dir + "/*")
         self.config_file = cfg
-        self.checkpoint_file = 'work_dirs/' + os.path.basename(cfg)[:-3] + '/latest.pth'
+        self.checkpoint_file = 'work_dirs/' + os.path.basename(cfg)[:-3][:-3] + '/epoch_12.pth'
         self.save_file = f"__work_dirs__/orange2/{os.path.basename(cfg)[:-3]}/detection-results"
         self.model = init_detector(cfg, self.checkpoint_file, device=self.device)
 
@@ -188,7 +188,7 @@ def parallel_infer(cfg=None):
         process=process,
         process_params=process_params,
         collect=['result'],
-        workers_num=12,
+        workers_num=3,
         print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

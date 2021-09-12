@@ -48,9 +48,24 @@ def coco_kmeans(coco, k=7):
         from pycocotools.coco import COCO
         coco = COCO(coco)
     data = coco.dataset['annotations']
+
+    areas = []
+    for image in coco.dataset['images']:
+        annIds = coco.getAnnIds(imgIds=[image['id']])
+        anns = coco.loadAnns(annIds)
+        bboxes = np.array([x['bbox'] for x in anns])
+        area = bboxes[:, 2] * bboxes[:, 3]
+        avg_area = np.mean(area)
+        areas.append(avg_area)
+    print('per image min area:', min(areas))
+    print('per image max area:', max(areas))
+
     data = [b['bbox'] for b in data]
     data = np.asarray(data)
     data = data[:, 2:]
+    areas = data[:, 0] * data[:, 1]
+    print('min area:', min(areas))
+    print('max area:', max(areas))
     out = kmeans(data, k=k)
     acc = avg_iou(data, out) * 100
     print("Accuracy: {:.2f}%".format(acc))
@@ -93,7 +108,7 @@ def main():
     for i in tqdm(range(1, 11)):
         print('-' * 64)
         ratios, acc, out = coco_kmeans(
-            '/home/lifeng/undone-work/dataset/detection/orange/annotations/instance-train-best-iou_0.7_score_0.8_iter_1.json', k=i)
+            '/home/lifeng/undone-work/dataset/detection/orange2/annotations/instance-train-checked.json', k=i)
         ks.append(i)
         accs.append(acc)
     acc_df = pd.DataFrame(data={'k': ks, 'avg_iou': accs})

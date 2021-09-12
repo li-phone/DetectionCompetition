@@ -15,15 +15,25 @@ class Config(object):
     # 2000 x 2000
     train_pipeline1 = [
         dict(type='LoadImageFromFile'),
-        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1, 1),
-             keep_none=True),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(0.5, 0.5),
+             keep_none=True, is_testing=False),
     ]
-    composes = [Compose(train_pipeline1)]
+    train_pipeline2 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1.0, 1.0),
+             keep_none=True, is_testing=False),
+    ]
+    train_pipeline3 = [
+        dict(type='LoadImageFromFile'),
+        dict(type='SliceImage', overlap=1, base_win=(1000, 1000), step=(0.5, 0.5), resize=(1.5, 1.5),
+             keep_none=True, is_testing=False),
+    ]
+    composes = [Compose(train_pipeline1), Compose(train_pipeline2), Compose(train_pipeline3)]
 
     # data module
     img_dir = "data/orange2/test_A/images/"
     tasks = glob.glob(img_dir + "*")
-    save_img_dir = "data/orange2/test_A-slice_1000x1000_overlap_0.5/"
+    save_img_dir = "data/orange2/test_A-slice_1000x1000-resize_3/"
 
 
 def plt_show():
@@ -66,7 +76,7 @@ def process(image, **kwargs):
             save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
             if not os.path.exists(os.path.dirname(save_name)):
                 os.makedirs(os.path.dirname(save_name))
-            if not os.path.exists(save_name):
+            if True or not os.path.exists(save_name):
                 # print(save_name)
                 cv2.imwrite(save_name, result['img'])
     end = time.time()
@@ -80,7 +90,7 @@ def parallel_slice():
     if not os.path.exists(config.save_img_dir):
         os.makedirs(config.save_img_dir)
     process_params = dict(config=config, time=dict(start=time.time()))
-    settings = dict(tasks=config.tasks, process=process, collect=[], workers_num=3,
+    settings = dict(tasks=config.tasks, process=process, collect=[], workers_num=8,
                     process_params=process_params, print_process=10)
     parallel = Parallel(**settings)
     start = time.time()

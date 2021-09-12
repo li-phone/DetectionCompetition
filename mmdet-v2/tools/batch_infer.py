@@ -45,7 +45,12 @@ def main():
         # "../configs/orange2/cas_r50-best-slice_1000x1000-finetune_iou_0.9_score_0.9.py",
         # "../configs/orange2/cas_r101-best-slice_1000x1000-softnms-aug-800x800.py",
         # "../configs/orange2/cas_x101-best-slice_1000x1000-softnms-aug-800x800.py",
-        "../configs/orange2/cas_r101-best_base-ovlap_0.5.py",
+        # "../configs/orange2/cas_r101-best_base-ovlap_0.5.py",
+        # "../configs/orange2/cas_r101-best_base-1000x1000_ovlap_0.5.py",
+        # "../configs/orange2/cas_r101-best_base-anchor_ratio.py",
+        # "../configs/orange2/cas_r101-best_base-ovlap_0.5-auto.py",
+        # "../configs/orange2/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0_1.5.py",
+        "../configs/orange2/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0-v2.py",
     ]
     configs.sort()
     for cfg in tqdm(configs):

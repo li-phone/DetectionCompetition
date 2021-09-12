@@ -191,7 +191,7 @@ class SliceImage(object):
     """
 
     def __init__(self, overlap=0.7, base_win=(2666, 1600), step=(0.2, 0.2), resize=None,
-                 fx=None, fy=None, center=None, keep_none=False):
+                 fx=None, fy=None, center=None, keep_none=False, is_testing=False):
         self.overlap = overlap
         self.base_win = base_win
         self.step = step
@@ -200,6 +200,7 @@ class SliceImage(object):
         self.fy = fy
         self.center = center if center is not None else [None, None]
         self.keep_none = keep_none
+        self.is_testing = is_testing
 
     def slice(self, base_win, img_shape, step=(0., 0.), fx=None, fy=None, center=None):
         img_h, img_w = img_shape[:2]
@@ -218,13 +219,17 @@ class SliceImage(object):
                     left, top = max(0, x - win[0] / 2), max(0, Y - win[1] / 2)
                     right, bottom = min(img_w, x + win[0] / 2), min(img_h, Y + win[1] / 2)
                     if x - win[0] / 2 < 0:
-                        right = left + win[0]
+                        if self.is_testing:
+                            right = left + win[0]
                     if Y - win[1] / 2 < 0:
-                        bottom = top + win[1]
+                        if self.is_testing:
+                            bottom = top + win[1]
                     if x + win[0] / 2 > img_w:
-                        left = right - win[0]
+                        if self.is_testing:
+                            left = right - win[0]
                     if Y + win[1] / 2 > img_h:
-                        top = bottom - win[1]
+                        if self.is_testing:
+                            top = bottom - win[1]
                     roi = list(map(int, (left, top, right, bottom)))
                     results.append(roi)
                     x += win[0] * (1. - step[0]) * sx

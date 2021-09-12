@@ -303,7 +303,7 @@ def main():
     parser = argparse.ArgumentParser(description='anchor cluster for a detector')
     parser.add_argument(
         '--dataset',
-        default="../../data/orange/annotations/instance-train-best-iou_0.7_score_0.8_iter_1.json",
+        default="/home/lifeng/undone-work/dataset/detection/orange2/annotations/slice_800x800_1000x1000_train.json",
         action='store_true', help='whether use cache')
     parser.add_argument(
         '--n', '-n', default=7, type=int, help='num of clusters')
