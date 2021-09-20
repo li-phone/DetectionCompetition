@@ -80,6 +80,19 @@ def process(image, **kwargs):
         if results is None: return save_results
         if not isinstance(results, (list, tuple)): results = [results]
         for i, result in enumerate(results):
+            # 过滤小尺寸
+            if compose.transforms[1].resize[0] == 0.5:
+                keep_bboxes = result['ann_info']['bboxes']
+                width = keep_bboxes[:, 2] - keep_bboxes[:, 0]
+                height = keep_bboxes[:, 3] - keep_bboxes[:, 1]
+                index1 = width >= 20
+                index2 = height >= 20
+                keep_idx = index1 + index2
+                result['ann_info']['bboxes'] = result['ann_info']['bboxes'][keep_idx]
+                result['ann_info']['labels'] = result['ann_info']['labels'][keep_idx]
+                result['gt_bboxes'] = result['ann_info']['bboxes']
+                result['gt_labels'] = result['ann_info']['labels']
+
             tmp_img = {k: v for k, v in image.items()}
             if 'slice_image' in result:
                 x1, y1, x2, y2 = result['slice_image']['window']

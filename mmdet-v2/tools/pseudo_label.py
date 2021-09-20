@@ -17,22 +17,22 @@ from mmdet.apis import init_detector, inference_detector, show_result_pyplot
 
 class Config(object):
     # data module
-    img_dir = "data/orange/test_A/images"
+    img_dir = "data/orange2/test_A-slice_1000x1000_overlap_0.5"
     slice_num = 10000
     nms_whole = False
-    label2name = {0: 'HLB', 1: 'health', 2: 'ill'}
+    label2name = {0: 0, 1: 1}
     # inference module
     device = 'cuda:0'
 
-    iou_thr = 0.6
-    score_thr = 0.5
+    iou_thr = 0.5
+    score_thr = 0.8
 
     def __init__(self, cfg_file=None, ckpt_file=None, ann_file=None):
         self.tasks = glob.glob(self.img_dir + "/*")
         self.config_file = cfg_file
         self.ckpt_file = ckpt_file
         self.ann_file = ann_file
-        self.save_file = "__work_dirs__/orange/detection-results"
+        self.save_file = "__work_dirs__/orange2/detection-results"
         self.model = init_detector(cfg_file, self.ckpt_file, device=self.device)
 
 
@@ -159,9 +159,13 @@ def main(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None):
     parallel_infer(cfg_file, ckpt_file, ann_file, save_name)
 
 
-if __name__ == '__main__':
-    cfg_path = "../configs/orange/cas_r50-best-iou_0.7_score_0.8-dh-rpn-3-DIouLoss.py"
-    load_from = 'work_dirs/doublehead-rpn-3-DIouLoss/epoch_21.pth'
-    ann_file = 'data/orange/annotations/instance-train-best-iou_0.7_score_0.8_iter_1.json'
-    save_name = f'data/orange/annotations/cas-rpn-train-pseudo_label-score-0.5.json'
+def main2():
+    cfg_path = "../configs/orange2/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0.py"
+    load_from = 'work_dirs/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0/epoch_12.pth'
+    ann_file = 'data/orange2/annotations/slice_resize_0.5_1.0-train.json'
+    save_name = f'data/orange2/annotations/pseudo_iou_0.5_score_0.8.json'
     main(cfg_path, load_from, ann_file, save_name)
+
+
+if __name__ == '__main__':
+    pass

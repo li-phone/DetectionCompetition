@@ -1,13 +1,9 @@
 import os
-import json
 import glob
 import cv2
 import time
-import numpy as np
-from pycocotools.coco import COCO
 from mmdet.datasets.pipelines import Compose
 from mmdet.third_party.parallel import Parallel
-from x2coco import _get_box
 
 
 class Config(object):
@@ -73,7 +69,7 @@ def process(image, **kwargs):
                 tmp_img['height'] = result['img'].shape[0]
                 tmp_img['width'] = result['img'].shape[1]
                 tmp_img['id'] = tmp_img['file_name']
-            save_name = os.path.join(config.save_img_dir, tmp_img['file_name'])
+            save_name = os.path.join(config.save_img_dir, os.path.basename(tmp_img['file_name']))
             if not os.path.exists(os.path.dirname(save_name)):
                 os.makedirs(os.path.dirname(save_name))
             if True or not os.path.exists(save_name):

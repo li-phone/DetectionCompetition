@@ -16,15 +16,15 @@ from mmdet.apis import init_detector, inference_detector, show_result_pyplot
 
 class Config(object):
     # data module
-    img_dir = "data/orange2/slice_1000x1000"
+    img_dir = "data/orange2/slice_resize_0.5_1.0"
     slice_num = 10000
     nms_whole = False
     label2name = {0: 'bug', 1: 'fruit_bug'}
     # inference module
     device = 'cuda:1'
 
-    iou_thr = 0.9
-    score_thr = 0.9
+    min_iou_thr = 0.8
+    min_score_thr = 0.3
 
     def __init__(self, cfg_file=None, ckpt_file=None, ann_file=None):
         self.tasks = glob.glob(self.img_dir + "/*")
@@ -44,7 +44,7 @@ def mkdirs(path, is_file=True):
             os.makedirs(path)
 
 
-def plt_bbox(image, boxes, labels, prefix=None, threshold=0.5):
+def plt_bbox(image, boxes, labels, prefix=None, threshold=0.5, bbox_color='green', is_save=True):
     # show test image
     import matplotlib.pyplot as plt
     from mmcv.visualization.image import imshow_det_bboxes
@@ -53,19 +53,27 @@ def plt_bbox(image, boxes, labels, prefix=None, threshold=0.5):
     else:
         img = image
     img = np.array(img)
-    index = np.where(boxes[:, 4] >= threshold)
-    boxes = boxes[index]
-    labels = labels[index]
-    img = imshow_det_bboxes(img, boxes[:, :4], labels, show=False)
+    if boxes.shape[1] > 4:
+        index = np.where(boxes[:, 4] >= threshold)
+        boxes = boxes[index]
+        labels = labels[index]
+        img = imshow_det_bboxes(img, boxes[:, :4], labels, show=False, bbox_color=bbox_color)
+    else:
+        img = imshow_det_bboxes(img, boxes[:, :4], labels, show=False, bbox_color=bbox_color)
+        # img = imshow_det_bboxes2(img, boxes, labels, show=False, bbox_color=bbox_color, thickness=2)
     # plt.imshow(img)
     if isinstance(image, str):
-        file_name = f"__show_img__/finetune-data/{image}.jpg"
+        if image == prefix:
+            file_name = prefix
+        else:
+            file_name = f"__show_img__/finetune-data/{image}.jpg"
     else:
         file_name = f"__show_img__/finetune-data/{prefix}.jpg"
     mkdirs(file_name)
     img = np.array(img)
-    cv2.imwrite(file_name, img)
-    pass
+    if is_save:
+        cv2.imwrite(file_name, img)
+    return img, file_name
 
 
 def process(image, **kwargs):
@@ -82,7 +90,7 @@ def process(image, **kwargs):
         win_bboxes = np.append(win_bboxes, bbox_result[j], axis=0)
     keep = np.argsort(-win_bboxes[:, 4])[:config.slice_num]
     win_bboxes = win_bboxes[keep]
-    plt_bbox(img_file, win_bboxes, win_bboxes[:, 5])
+    # plt_bbox(img_file, win_bboxes, win_bboxes[:, 5])
     if len(win_bboxes) < 1:
         return save_results
     if config.nms_whole:
@@ -114,8 +122,8 @@ def parallel_infer(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None)
         process=process,
         process_params=process_params,
         collect=['result'],
-        workers_num=10,
-        print_process=100)
+        workers_num=3,
+        print_process=50)
     parallel = Parallel(**settings)
     start = time.time()
     results = parallel()
@@ -124,11 +132,14 @@ def parallel_infer(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None)
     with open(ann_file) as fp:
         coco = json.load(fp)
     anns = json_normalize(coco['annotations'])
+    all_ious = []
+    all_scores = []
     for r1 in results['result']:
         for img_id, pred_rst in r1.items():
             df = anns[anns['image_id'] == img_id]
+            if len(df) == 0: continue
             bbox1 = [b for b in list(df['bbox'])]
-            bbox1 = np.array(bbox1).astype(dtype=np.float)
+            bbox1 = np.asarray(bbox1).astype(dtype=np.float)
             bbox1[:, 2] += bbox1[:, 0]
             bbox1[:, 3] += bbox1[:, 1]
             bbox2 = pred_rst['bbox'][:, :4]
@@ -139,17 +150,53 @@ def parallel_infer(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None)
             bbox1 = bbox1.numpy()
             bbox2 = bbox2.numpy()
             ious = ious.numpy()
+
+            labels1 = [b for b in list(df['category_id'])]
+            labels1 = np.asarray(labels1).astype(dtype=np.int)
+            show_img, show_name = plt_bbox(os.path.join(config.img_dir, img_id), bbox1, labels1)
+
+            # 修正ground truth的bbox
             for i in range(ious.shape[0]):
                 iou = ious[i, :]
                 idx = np.argmax(iou)
-                # 加权平均bbox
-                if iou[idx] >= config.iou_thr and score[idx] >= config.score_thr:
-                    b2 = bbox2[idx]
-                    b3 = (bbox1[i] + b2) / 2
-                    b3 = [b3[0], b3[1], b3[2] - b3[0], b3[3] - b3[1]]
-                    bbox = [float(_) for _ in b3]
-                    r1 = df.iloc[i]
-                    anns.at[r1['id'], 'bbox'] = bbox
+                all_ious.append(iou[idx])
+                all_scores.append(score[idx])
+                if iou[idx] >= config.min_iou_thr:
+                    # 自定义条件修正bbox
+                    # if score[idx] >= 0.9:
+                    #     pred_b2 = bbox2[idx]
+                    #     b3 = pred_b2
+                    #     b3 = [b3[0], b3[1], b3[2] - b3[0], b3[3] - b3[1]]
+                    #     bbox = [float(_) for _ in b3]
+                    #     r1 = df.iloc[i]
+                    #     anns.at[r1['id'], 'bbox'] = bbox
+                    if config.min_score_thr <= score[idx]:
+                        pred_b2 = bbox2[idx]
+                        b3 = [max(pred_b2[0], bbox1[i][0]), max(pred_b2[1], bbox1[i][1]),
+                              min(pred_b2[2], bbox1[i][2]), min(pred_b2[3], bbox1[i][3])]
+                        b3 = [b3[0], b3[1], b3[2] - b3[0], b3[3] - b3[1]]
+                        bbox = [float(_) for _ in b3]
+                        r1 = df.iloc[i]
+                        anns.at[r1['id'], 'bbox'] = bbox
+                    # elif 0.3 <= score[idx]:
+                    #     b2 = bbox2[idx]
+                    #     b3 = (bbox1[i] + b2) / 2
+                    #     b3 = [b3[0], b3[1], b3[2] - b3[0], b3[3] - b3[1]]
+                    #     bbox = [float(_) for _ in b3]
+                    #     r1 = df.iloc[i]
+                    #     anns.at[r1['id'], 'bbox'] = bbox
+            df1 = anns[anns['image_id'] == img_id]
+            bbox11 = [b for b in list(df1['bbox'])]
+            bbox11 = np.asarray(bbox11).astype(dtype=np.float)
+            bbox11[:, 2] += bbox11[:, 0]
+            bbox11[:, 3] += bbox11[:, 1]
+            labels11 = [b for b in list(df1['category_id'])]
+            labels11 = np.asarray(labels11).astype(dtype=np.int)
+            plt_bbox(show_name, bbox11, labels11, prefix=show_name, bbox_color='red')
+    print(f'[IOU] min: {min(all_ious)}, max: {max(all_ious)}, avg: {np.mean(all_ious)},')
+    print(f'[SCORE] min: {min(all_scores)}, max: {max(all_scores)}, avg: {np.mean(all_scores)},')
+    print(f'[IOU] all_ious: {all_ious}')
+    print(f'[IOU] all_scores: {all_scores}')
     anns = anns.to_dict(orient='records')
     coco['annotations'] = anns
     with open(save_name, 'w') as fp:
@@ -159,16 +206,12 @@ def parallel_infer(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None)
 
 
 def main(cfg_file=None, ckpt_file=None, ann_file=None, save_name=None):
+    cfg_file = "../configs/orange2/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0.py"
+    ckpt_file = 'work_dirs/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0/epoch_12.pth'
+    ann_file = 'data/orange2/annotations/slice_resize_0.5_1.0-train.json'
+    save_name = f'data/orange2/annotations/finetune-slice_resize_0.5_1.0-iou_0.8_score_0.3.json'
     parallel_infer(cfg_file, ckpt_file, ann_file, save_name)
 
 
 if __name__ == '__main__':
-    # cfg_path = "../configs/orange/cas_r50-best-finetune_data.py"
-    # load_from = 'work_dirs/cas_r50-best-finetune_data/latest.pth'
-    # ann_file = f'data/orange/annotations/instance-train-finetune-{1}.json'
-    # save_name = f'data/orange/annotations/instance-train-best-iou_0.8_score_0.8_{1}.json'
-    cfg_path = "../configs/orange2/cas_r50-best-slice_1000x1000.py"
-    load_from = 'work_dirs/cas_r50-best-slice_1000x1000/latest.pth'
-    ann_file = f'data/orange2/annotations/slice_1000x1000_train.json'
-    save_name = f'data/orange2/annotations/slice_1000x1000-iou_0.9_score_0.9_iter_{1}.json'
-    main(cfg_path, load_from, ann_file, save_name)
+    main()
