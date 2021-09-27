@@ -21,10 +21,10 @@ from finetune_data5 import main as finetune_data5_main
 #     finetune_data4_main()
 # except Exception as e:
 #     print('finetune_data4_main except:', e)
-try:
-    finetune_data5_main()
-except Exception as e:
-    print('finetune_data4_main except:', e)
+# try:
+#     finetune_data5_main()
+# except Exception as e:
+#     print('finetune_data4_main except:', e)
 bat_train_main()
 bat_infer_main()
 # infer_main3("../configs/orange2/cas_r101-best_base-800x800_1000x1000_ovlap_0.5-resize_0.5_1.0-v2.py")
